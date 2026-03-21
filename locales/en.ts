@@ -154,6 +154,8 @@ const en = {
   special: "Special",
   names: "Asma-ul-Husna",
   showAll: "Show all",
+  allTopics: "All Topics",
+  allAuthors: "All Authors",
   noSearchResult: "No result found",
   bottomInformationRenderPrayer: "is pronounced like the following: ",
   noName: "Please provide a name",

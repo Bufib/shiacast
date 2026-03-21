@@ -36,6 +36,7 @@ export type NewsArticlesType = {
   author: string;
   source: string;
   scholar_type: number;
+  article_topic?: string;
 };
 
 // News
@@ -544,6 +545,8 @@ export type PdfType = {
   pdf_filename: string; // The filename in your bucket (e.g., "quran-tafsir.pdf")
   language_code: string; // e.g., "en", "de", "ar"
   isBook: boolean;
+  pdf_topic?: string;
+  pdf_author?: string;
 };
 
 export type PdfViewerScreenPropsType = {
@@ -559,6 +562,8 @@ export type PodcastType = {
   filename: string;
   language_code?: string;
   created_at: string;
+  podcast_topic?: string;
+  podcast_author?: string;
 };
 
 export type SavedProgress = {

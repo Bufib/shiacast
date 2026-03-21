@@ -138,6 +138,8 @@ const ar = {
   special: "خاصة",
   names: "أسْماءُ الحُسْنَى",
   showAll: "إظهار الكل",
+  allTopics: "جميع المواضيع",
+  allAuthors: "جميع المؤلفين",
   noSearchResult: "لم يتم العثور على نتيجة",
   bottomInformationRenderPrayer: "ينطق كما يلي: ",
   noName: "يرجى تقديم اسم",

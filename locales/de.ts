@@ -140,6 +140,8 @@ const de = {
   special: "Speziell",
   names: "Asma-ul-Husna",
   showAll: "Alles anzeigen",
+  allTopics: "Alle Themen",
+  allAuthors: "Alle Autoren",
   noSearchResult: "Kein Ergebnis gefunden",
   bottomInformationRenderPrayer: "Wird wie folgt ausgesprochen: ",
   noName: "Bitte gebe einen Namen an",

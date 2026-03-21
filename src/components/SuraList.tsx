@@ -1546,6 +1546,31 @@ async function preseedPagesForSurah(info: SuraRowType, firstBatchSize = 3) {
   }
 }
 
+const SuraListSkeleton: React.FC<{ colorScheme: "light" | "dark" }> = ({ colorScheme }) => {
+  const anim = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(anim, { toValue: 1, duration: 850, useNativeDriver: true }),
+        Animated.timing(anim, { toValue: 0, duration: 850, useNativeDriver: true }),
+      ]),
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [anim]);
+  const opacity = anim.interpolate({ inputRange: [0, 1], outputRange: [0.35, 0.7] });
+  const bg = colorScheme === "dark" ? "rgba(255,255,255,0.09)" : "rgba(0,0,0,0.07)";
+  return (
+    <ThemedView style={{ flex: 1, paddingHorizontal: 16, paddingTop: 12 }}>
+      <Animated.View style={{ height: 140, borderRadius: 24, backgroundColor: bg, opacity, marginBottom: 16 }} />
+      <Animated.View style={{ height: 44, borderRadius: 22, backgroundColor: bg, opacity, marginBottom: 16 }} />
+      {Array.from({ length: 9 }).map((_, i) => (
+        <Animated.View key={i} style={{ height: 68, borderRadius: 14, backgroundColor: bg, opacity, marginBottom: 10 }} />
+      ))}
+    </ThemedView>
+  );
+};
+
 const SuraList: React.FC = () => {
   const { t } = useTranslation();
   const { lang, rtl } = useLanguage();
@@ -2235,11 +2260,7 @@ const SuraList: React.FC = () => {
   };
 
   if (isLoading) {
-    return (
-      <ThemedView style={styles.centerContainer}>
-        <LoadingIndicator size={"large"} />
-      </ThemedView>
-    );
+    return <SuraListSkeleton colorScheme={colorScheme as "light" | "dark"} />;
   }
 
   return (

@@ -26,11 +26,16 @@ const renderScene = SceneMap({
 
 export default function TopNavigationKnowledge() {
   const layout = useWindowDimensions();
-  const [index, setIndex] = React.useState(0);
+  const activeTab = useKnowledgeTabStore((s) => s.activeTab);
   const setActiveTab = useKnowledgeTabStore((s) => s.setActiveTab);
+  const [index, setIndex] = React.useState(activeTab);
   const colorScheme = useColorScheme() || "light";
   const { fadeAnim, onLayout } = useScreenFadeIn(800);
   const insets = useSafeAreaInsets();
+
+  React.useEffect(() => {
+    setIndex(activeTab);
+  }, [activeTab]);
 
   const handleIndexChange = (newIndex: number) => {
     setIndex(newIndex);

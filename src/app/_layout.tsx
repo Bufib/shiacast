@@ -457,6 +457,7 @@
 // }
 
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import "react-native-reanimated";
 import AppReviewPrompt from "@/components/AppReviewPrompt";
 import LanguageSelection from "@/components/LanguageSelectionScreen";
@@ -808,6 +809,7 @@ function AppContent() {
             <NoInternet showUI={!hasInternet} showToast={true} />
             <QueryClientProvider client={queryClient}>
               <SupabaseRealtimeProvider>
+                <BottomSheetModalProvider>
                 <Stack
                   screenOptions={{
                     headerShown: false,
@@ -831,6 +833,7 @@ function AppContent() {
                 </Stack>
                 <MiniPlayerBar />
                 <AppReviewPrompt />
+                </BottomSheetModalProvider>
               </SupabaseRealtimeProvider>
             </QueryClientProvider>
           </MenuProvider>
