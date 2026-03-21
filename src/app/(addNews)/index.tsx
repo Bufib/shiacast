@@ -11,7 +11,6 @@ import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 import { useRouter } from "expo-router";
 import AddPushMessages from "./addPushMessages";
 import AddNews from "./addNews";
-import { CoustomTheme } from "../../../utils/coustomTheme";
 import { Colors } from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -20,7 +19,6 @@ export default function Index() {
   const layout = useWindowDimensions();
   const [index, setIndex] = useState(0);
   const colorScheme = useColorScheme() || "light";
-  const themeStyles = CoustomTheme();
 
   const routes = [
     { key: "addNews", title: "Neue Nachricht" },
@@ -64,7 +62,7 @@ export default function Index() {
         renderTabBar={(props) => (
           <TabBar
             {...props}
-            style={[styles.tabBar, themeStyles.contrast]}
+            style={[styles.tabBar, Colors[colorScheme].contrast]}
             indicatorStyle={{
               backgroundColor: Colors[colorScheme].indicatorColor,
             }}

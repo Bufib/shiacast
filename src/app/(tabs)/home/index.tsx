@@ -1214,7 +1214,10 @@ export default function HomeScreen() {
                         color="rgba(255,255,255,0.55)"
                       />
                       <Text style={styles.calendarBannerLabel}>
-                        {t("calendarTitle").toUpperCase()}
+                        {(() => {
+                          const [y, m, d] = calendarEvent.gregorian_date.split("-");
+                          return `${calendarEvent.islamic_date} · ${d}. ${t(`months.${parseInt(m)}`)} ${y}`;
+                        })()}
                       </Text>
                       <View style={styles.calendarBadge}>
                         <Text style={styles.calendarBadgeText}>
@@ -1536,7 +1539,7 @@ const styles = StyleSheet.create({
   },
   scrollStyles: {},
   scrollContent: {
-    gap: 20,
+    gap: 15,
   },
   newsArticleContainer: {
     flex: 1,
@@ -1544,12 +1547,12 @@ const styles = StyleSheet.create({
   },
   podcastContainer: {
     flex: 1,
-    gap: 15,
+    gap: 20,
     marginBottom: 20
   },
   pdfContainer: {
     flex: 1,
-    gap: 15,
+    gap: 20,
     paddingBottom: 20
   },
   heroCard: {

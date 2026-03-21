@@ -8,7 +8,8 @@ import {
   Pressable,
   Platform,
   Keyboard,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
+  useColorScheme
 } from "react-native";
 import { supabase } from "../../utils/supabase";
 import { router } from "expo-router";
@@ -16,7 +17,6 @@ import { z } from "zod";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Colors } from "@/constants/Colors";
-import { CoustomTheme } from "../../utils/coustomTheme";
 import { ThemedText } from "./ThemedText";
 import { useAuthStore } from "../../stores/authStore";
 import { useConnectionStatus } from "../../hooks/useConnectionStatus";
@@ -24,9 +24,9 @@ import { useConnectionStatus } from "../../hooks/useConnectionStatus";
 // Define validation schema with Zod
 const schema = z.object({
   email: z
-    .string({
-      required_error: "E-Mail Adresse wird benötigt",
-    })
+    .string()
+    .trim()
+    .min(1, "E-Mail Adresse wird benötigt")
     .email("Ungültige E-Mail Adresse"),
 });
 
@@ -36,11 +36,10 @@ type ForgotPasswordFormValues = {
 
 export function ForgotPassword() {
   const [loading, setLoading] = useState(false);
-  const themeStyles = CoustomTheme();
   const clearSession = useAuthStore.getState().clearSession;
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
   const hasInternet = useConnectionStatus();
-
+  const colorScheme = useColorScheme() || "light";
   const {
     control,
     handleSubmit,
@@ -85,7 +84,7 @@ export function ForgotPassword() {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
        <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}
-            style={[styles.container, themeStyles.defaultBackgorundColor]}
+            style={[styles.container, Colors[colorScheme].background]}
             keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
             enabled
           >
@@ -94,7 +93,7 @@ export function ForgotPassword() {
           name="email"
           render={({ field: { onChange, value } }) => (
             <TextInput
-              style={[styles.input, themeStyles.contrast, themeStyles.text]}
+              style={[styles.input, Colors[colorScheme].contrast, Colors[colorScheme].text]}
               placeholder="Deine E-Mail-Adresse"
               onChangeText={onChange}
               value={value}

@@ -2,7 +2,6 @@ import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { Colors } from "@/constants/Colors";
 import { useConnectionStatus } from "../../../hooks/useConnectionStatus";
-import { CoustomTheme } from "../../../utils/coustomTheme";
 import { supabase } from "../../../utils/supabase";
 import React, { useState } from "react";
 import {
@@ -10,18 +9,17 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
+  TouchableOpacity,
   TouchableWithoutFeedback,
   useColorScheme,
   View,
 } from "react-native";
 
 const AddPushMessages: React.FC = () => {
-  const themeStyles = CoustomTheme();
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
@@ -63,7 +61,7 @@ const AddPushMessages: React.FC = () => {
     selected: boolean;
     onPress: () => void;
   }> = ({ code, label, selected, onPress }) => (
-    <Pressable
+    <TouchableOpacity
       style={[
         styles.langButton,
         selected ? styles.langButtonSelected : styles.langButtonUnselected,
@@ -75,13 +73,13 @@ const AddPushMessages: React.FC = () => {
       >
         {label}
       </Text>
-    </Pressable>
+    </TouchableOpacity>
   );
 
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={[styles.container, themeStyles.defaultBackgorundColor]}
+      style={[styles.container, Colors[colorScheme].background]}
       keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
       enabled
     >
@@ -97,8 +95,8 @@ const AddPushMessages: React.FC = () => {
               style={[
                 styles.input,
                 {
-                  backgroundColor: themeStyles.contrast.backgroundColor,
-                  color: themeStyles.text.color,
+                  backgroundColor: Colors[colorScheme].contrast,
+                  color: Colors[colorScheme].text,
                   borderWidth: 1,
                   borderColor: Colors[colorScheme].border,
                 },
@@ -115,8 +113,8 @@ const AddPushMessages: React.FC = () => {
                 styles.input,
                 styles.multilineInput,
                 {
-                  backgroundColor: themeStyles.contrast.backgroundColor,
-                  color: themeStyles.text.color,
+                  backgroundColor: Colors[colorScheme].contrast,
+                  color: Colors[colorScheme].text,
                   borderColor: Colors[colorScheme].border,
                 },
               ]}
@@ -146,7 +144,7 @@ const AddPushMessages: React.FC = () => {
                 onPress={() => setSelectedLanguage("en")}
               />
             </View>
-            <Pressable
+            <TouchableOpacity
               style={[
                 styles.button,
                 (isSending || !hasInternet) && styles.disabled,
@@ -157,7 +155,7 @@ const AddPushMessages: React.FC = () => {
               <Text style={styles.buttonText}>
                 {isSending ? "Wird gesendet..." : "Benachrichtigung senden"}
               </Text>
-            </Pressable>
+            </TouchableOpacity>
           </ThemedView>
         </TouchableWithoutFeedback>
       </ScrollView>

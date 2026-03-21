@@ -69,31 +69,57 @@ export function useAddNews() {
   };
 
   const uploadImages = async (
-    images: { uri: string; base64: string | null }[]
+    images: { uri: string; base64: string | null }[],
   ) => {
     const uploadedUrls: string[] = [];
+
     for (const { uri, base64 } of images) {
+      console.log("URI:", uri);
+      console.log("Has base64:", !!base64);
+
       if (!base64) continue;
+
       const ext = uri.split(".").pop()?.toLowerCase();
-      if (!ext || !["jpg", "jpeg", "png", "gif"].includes(ext)) continue;
-      const fileName = `${Date.now()}_${Math.random()
-        .toString(36)
-        .slice(2)}.${ext}`;
-      const contentType = `image/${ext}`;
-      const arrayBuffer = decode(base64);
+      console.log("Detected ext:", ext);
+
+      if (
+        !ext ||
+        !["jpg", "jpeg", "png", "gif", "heic", "webp"].includes(ext)
+      ) {
+        console.log("Skipped due to ext filter:", ext);
+        continue;
+      }
+
+      // Force jpeg for non-standard types
+      const safeExt = ["heic", "webp"].includes(ext) ? "jpeg" : ext;
+      const contentType = safeExt === "jpg" ? "image/jpeg" : `image/${safeExt}`;
+      const fileName = `${Date.now()}_${Math.random().toString(36).slice(2)}.${safeExt}`;
+
+      // Use blob instead of decode() — more reliable on Hermes
+      const blob = await fetch(`data:${contentType};base64,${base64}`).then(
+        (r) => r.blob(),
+      );
+
       const { error } = await supabase.storage
         .from("news")
-        .upload(`images/${fileName}`, arrayBuffer, {
+        .upload(`images/${fileName}`, blob, {
           contentType,
           cacheControl: "3600",
           upsert: true,
         });
-      if (error) continue;
+
+      if (error) {
+        console.log("Upload error:", error);
+        continue;
+      }
+
       const { data: pub } = supabase.storage
         .from("news")
         .getPublicUrl(`images/${fileName}`);
+
       if (pub?.publicUrl) uploadedUrls.push(pub.publicUrl);
     }
+
     return uploadedUrls.length > 0 ? uploadedUrls : null;
   };
 
@@ -110,7 +136,7 @@ export function useAddNews() {
     ) {
       Alert.alert(
         "Fehler",
-        "Die Nachricht kann nicht leer sein! Bitte gib einen Titel oder Inhalt ein oder lade ein Bild hoch."
+        "Die Nachricht kann nicht leer sein! Bitte gib einen Titel oder Inhalt ein oder lade ein Bild hoch.",
       );
       return;
     }
@@ -153,7 +179,10 @@ export function useAddNews() {
         },
       ]);
 
-      if (error) throw error;
+      if (error) {
+        console.log(error);
+        throw error;
+      }
 
       reset();
       setSelectedImages([]);

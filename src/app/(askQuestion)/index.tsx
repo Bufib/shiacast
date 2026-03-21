@@ -6,6 +6,7 @@ import {
   RefreshControl,
   Pressable,
   StyleSheet,
+  useColorScheme,
 } from "react-native";
 import { router, Stack } from "expo-router";
 import { useFetchUserQuestions } from "../../../hooks/useFetchUserQuestions";
@@ -13,7 +14,6 @@ import { useAuthStore } from "../../../stores/authStore";
 import { formatDate } from "../../../utils/formatDate";
 import { Colors } from "../../constants/Colors";
 import getStatusColor from "../../../utils/getStatusColor";
-import { CoustomTheme } from "../../../utils/coustomTheme";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { userQuestionErrorLoadingQuestions } from "@/constants/messages";
@@ -30,7 +30,6 @@ import { useQueryClient } from "@tanstack/react-query";
 export default function Index() {
   // 1. Check auth state from the store
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
-  const themeStyles = CoustomTheme();
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const session = useAuthStore.getState().session;
@@ -38,6 +37,7 @@ export default function Index() {
   // Track connection status
   const hasInternet = useConnectionStatus();
   const userQuestionVersion = useDataVersionStore((s) => s.userQuestionVersion);
+  const colorScheme = useColorScheme() || "light";
   console.log(userQuestionVersion);
   // 2. If not logged in, redirect to login
   useEffect(() => {
@@ -71,7 +71,7 @@ export default function Index() {
   const renderQuestion = useCallback(
     ({ item }: { item: QuestionsFromUserType }) => (
       <Pressable
-        style={[styles.questionCard, themeStyles.contrast]}
+        style={[styles.questionCard, Colors[colorScheme].contrast]}
         onPress={() =>
           router.push({
             pathname: "/(askQuestion)/questionDetailScreen",
@@ -97,7 +97,7 @@ export default function Index() {
       </Pressable>
     ),
 
-    [themeStyles]
+    [colorScheme],
   );
 
   if (isLoading) {
@@ -135,7 +135,9 @@ export default function Index() {
 
   // 9. Main UI
   return (
-    <ThemedView style={[styles.container, themeStyles.defaultBackgorundColor]}>
+    <ThemedView
+      style={[styles.container, Colors[colorScheme].backgroundColor]}
+    >
       {/* If offline, show your "No Internet" banner at top */}
       {!hasInternet && <NoInternet showUI={true} showToast={false} />}
 

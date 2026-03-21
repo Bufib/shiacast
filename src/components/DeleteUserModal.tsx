@@ -15,7 +15,6 @@ import { Feather } from "@expo/vector-icons";
 import { supabase } from "../../utils/supabase";
 import { useAuthStore } from "../../stores/authStore";
 import { Colors } from "@/constants/Colors";
-import { CoustomTheme } from "../../utils/coustomTheme";
 import { ThemedText } from "@/components/ThemedText";
 import { useConnectionStatus } from "../../hooks/useConnectionStatus";
 import { DeleteUserModalPropsType } from "@/constants/Types";
@@ -32,7 +31,6 @@ const DeleteUserModal: React.FC<DeleteUserModalPropsType> = ({
   serverUrl,
 }) => {
   const colorScheme = useColorScheme();
-  const themeStyles = CoustomTheme();
   const user = useAuthStore((state) => state.session?.user);
   const [password, setPassword] = useState<string>("");
   const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -177,7 +175,7 @@ const DeleteUserModal: React.FC<DeleteUserModalPropsType> = ({
       onRequestClose={handleCancel}
     >
       <View style={styles.overlay}>
-        <View style={[styles.modalContent, themeStyles.defaultBackgorundColor]}>
+        <View style={[styles.modalContent, Colors[colorScheme].background]}>
           {showConfirmation && (
             <>
               <ThemedText style={styles.title} type="title">
@@ -225,7 +223,7 @@ const DeleteUserModal: React.FC<DeleteUserModalPropsType> = ({
 
                 <View style={styles.passwordContainer}>
                   <TextInput
-                    style={[styles.passwordInput, themeStyles.text]}
+                    style={[styles.passwordInput, Colors[colorScheme].text]}
                     placeholder="Passwort"
                     placeholderTextColor={
                       colorScheme === "dark" ? "#888" : "#666"

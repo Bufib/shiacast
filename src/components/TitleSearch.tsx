@@ -339,10 +339,7 @@ interface TitleSearchInputProps {
   /** Called with updated CSV in same format */
   onChangeText: (text: string) => void;
   style?: any;
-  themeStyles: {
-    text: any;
-    contrast: any;
-  };
+
 }
 
 interface SelectedItem {
@@ -380,7 +377,7 @@ export const TitleSearchInput: React.FC<TitleSearchInputProps> = ({
   value,
   onChangeText,
   style,
-  themeStyles,
+
 }) => {
   const [searchText, setSearchText] = useState("");
   const [searchResults, setSearchResults] = useState<SelectedItem[]>([]);
@@ -518,7 +515,7 @@ export const TitleSearchInput: React.FC<TitleSearchInputProps> = ({
   /* ------------------------------- rendering ------------------------------- */
 
   const renderSelectedItem = ({ item }: { item: SelectedItem }) => (
-    <View style={[styles.selectedItemContainer, themeStyles.contrast]}>
+    <View style={[styles.selectedItemContainer, Colors[colorScheme].contrast]}>
       <View style={styles.selectedItemContent}>
         <ThemedText style={styles.titleText}>{item.title}</ThemedText>
         {item.category_name && (
@@ -553,7 +550,7 @@ export const TitleSearchInput: React.FC<TitleSearchInputProps> = ({
         onPress={() => setModalVisible(true)}
         style={[styles.input, style]}
       >
-        <ThemedText style={themeStyles.text}>{displayLabel}</ThemedText>
+        <ThemedText style={Colors[colorScheme].text}>{displayLabel}</ThemedText>
       </Pressable>
 
       {/* Modal with search + suggestions */}
@@ -564,9 +561,9 @@ export const TitleSearchInput: React.FC<TitleSearchInputProps> = ({
         onRequestClose={() => setModalVisible(false)}
       >
         <View style={styles.modalContainer}>
-          <View style={[styles.modalContent, themeStyles.contrast]}>
+          <View style={[styles.modalContent, Colors[colorScheme].contrast]}>
             <TextInput
-              style={[styles.input, themeStyles.text]}
+              style={[styles.input, Colors[colorScheme].text]}
               value={searchText}
               onChangeText={setSearchText}
               placeholder="Suche nach einer Frage"

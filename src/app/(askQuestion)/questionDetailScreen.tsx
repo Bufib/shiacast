@@ -7,7 +7,6 @@ import { QuestionsFromUserType } from "@/constants/Types";
 import { useLanguage } from "../../../contexts/LanguageContext";
 import { useConnectionStatus } from "../../../hooks/useConnectionStatus";
 import { useAuthStore } from "../../../stores/authStore";
-import { CoustomTheme } from "../../../utils/coustomTheme";
 import getStatusColor from "../../../utils/getStatusColor";
 import { supabase } from "../../../utils/supabase";
 import { useQueryClient } from "@tanstack/react-query";
@@ -30,7 +29,6 @@ export default function QuestionDetailScreen() {
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
   const session = useAuthStore.getState().session;
   const userId = session?.user?.id ?? null;
-  const themeStyles = CoustomTheme();
   const hasInternet = useConnectionStatus();
   const colorScheme = useColorScheme() || "light";
   const { t } = useTranslation();
@@ -177,7 +175,7 @@ export default function QuestionDetailScreen() {
   return (
     <ScrollView
       contentContainerStyle={styles.contentContainerScrollView}
-      style={[styles.container, themeStyles.defaultBackgorundColor]}
+      style={[styles.container, Colors[colorScheme].background]}
       showsVerticalScrollIndicator={false}
       refreshControl={
         <RefreshControl
@@ -199,7 +197,7 @@ export default function QuestionDetailScreen() {
       }
     >
       <NoInternet showUI={true} showToast={false} />
-      <ThemedView style={[styles.header, themeStyles.borderColor]}>
+      <ThemedView style={[styles.header, Colors[colorScheme].borderColor]}>
         <View
           style={[
             styles.statusBadge,

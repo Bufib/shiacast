@@ -83,7 +83,7 @@ export const NewsItem = ({
           style={{
             flexDirection: "row",
             justifyContent: "space-between",
-            alignItems: "flex-start",
+            alignItems: "center",
           }}
         >
           {title && title.trim() !== "" && (
@@ -94,16 +94,24 @@ export const NewsItem = ({
               {title}
             </ThemedText>
           )}
-          {is_pinned && (
-            <AntDesign
-              name="pushpin"
-              size={24}
-              color={colorScheme === "dark" ? "#2ea853" : "#057958"}
-              style={styles.pinIconStyle}
-            />
-          )}
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            {is_pinned && (
+              <AntDesign
+                name="pushpin"
+                size={24}
+                color={colorScheme === "dark" ? "#2ea853" : "#057958"}
+                style={styles.pinIconStyle}
+              />
+            )}
 
-          {isAdmin && <NewsMenu id={id} is_pinned={is_pinned || false} />}
+            {isAdmin && <NewsMenu id={id} is_pinned={is_pinned} />}
+          </View>
         </View>
 
         {content && content.trim() !== "" && (
@@ -139,7 +147,7 @@ export const NewsItem = ({
             ))}
           </ThemedView>
         )}
-        {images_url && images_url.length > 0 && (
+        {/* {images_url && images_url.length > 0 && (
           <View>
             <FlatList
               ref={flatListRef}
@@ -154,7 +162,9 @@ export const NewsItem = ({
               renderItem={({ item }) => {
                 const imageHeight = imageDimensions[item] || availableWidth;
                 return (
-                  <View style={[styles.imageContainer, { height: imageHeight }]}>
+                  <View
+                    style={[styles.imageContainer, { height: imageHeight }]}
+                  >
                     <Image
                       source={{ uri: item }}
                       style={[styles.image, { height: imageHeight }]}
@@ -183,7 +193,7 @@ export const NewsItem = ({
               </View>
             )}
           </View>
-        )}
+        )} */}
       </View>
 
       {/* Date always at the bottom */}
@@ -223,7 +233,6 @@ const styles = StyleSheet.create({
   newsTitle: {
     fontSize: 20,
     fontWeight: "bold",
-    marginBottom: 5,
     lineHeight: 30,
   },
   newsContent: {

@@ -9,7 +9,6 @@ import React, { useRef, useState, useEffect } from "react";
 import { Collapsible } from "@/components/Collapsible";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
-import { CoustomTheme } from "../../utils/coustomTheme";
 import { getQuestion, getRelatedQuestions } from "../../db/queries/questions";
 import { useFontSizeStore } from "../../stores/fontSizeStore";
 import * as Clipboard from "expo-clipboard";
@@ -32,7 +31,6 @@ const RenderQuestion = ({
   subcategory,
   questionId,
 }: RenderQuestionProps) => {
-  const themeStyles = CoustomTheme();
   // const [isLoadingQuestions, setIsLoadingQuestions] = useState(true);
   // const [isLoadingRelated, setIsLoadingRelated] = useState(true);
   const [question, setQuestion] = useState<QuestionType | null>(null);
@@ -191,11 +189,11 @@ const RenderQuestion = ({
       ]}
     >
       <ScrollView
-        style={[styles.scrollViewStyles, themeStyles.defaultBackgorundColor]}
+        style={[styles.scrollViewStyles, Colors[colorScheme].background]}
         contentContainerStyle={styles.scrollViewContent}
         showsVerticalScrollIndicator={false}
       >
-        <View style={[styles.questionContainer, themeStyles.contrast]}>
+        <View style={[styles.questionContainer, Colors[colorScheme].contrast]}>
           <ThemedText style={[styles.questionText, { fontSize, lineHeight }]}>
             {question?.question}
           </ThemedText>
@@ -203,7 +201,7 @@ const RenderQuestion = ({
 
         <View style={styles.answerContainer}>
           {question?.answer ? (
-            <ThemedView style={[styles.singleAnswer, themeStyles.contrast]}>
+            <ThemedView style={[styles.singleAnswer, Colors[colorScheme].contrast]}>
               <View style={styles.textIconContainer}>
                 {hasCopiedSingleAnswer ? (
                   <View style={styles.hasCopiedContainer}>

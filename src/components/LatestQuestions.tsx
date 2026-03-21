@@ -9,19 +9,18 @@ import {
 import { router } from "expo-router";
 import { getLatestQuestions } from "../../db/queries/questions";
 import { QuestionType } from "@/constants/Types";
-import { CoustomTheme } from "../../utils/coustomTheme";
 import { ThemedText } from "./ThemedText";
 import { ThemedView } from "./ThemedView";
 import { LoadingIndicator } from "./LoadingIndicator";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { useDataVersionStore } from "../../stores/dataVersionStore";
+import { Colors } from "@/constants/Colors";
 
 const LatestQuestions: React.FC = () => {
   //State & Hooks
   const [latestQuestions, setLatestQuestions] = useState<QuestionType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { lang } = useLanguage();
-  const themeStyles = CoustomTheme();
   const colorScheme = useColorScheme();
   const questionsVersion = useDataVersionStore((s) => s.questionsVersion);
 
@@ -91,7 +90,7 @@ const LatestQuestions: React.FC = () => {
       onPress={onPress}
       style={({ pressed }) => [
         styles.questionItem,
-        themeStyles.contrast,
+        Colors[colorScheme].contrast,
         pressed && {
           ...styles.pressed,
           backgroundColor: colorScheme === "dark" ? "#242c40" : "#E8E8E8",

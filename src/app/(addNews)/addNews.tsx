@@ -4,7 +4,6 @@ import { TitleSearchInput } from "@/components/TitleSearch";
 import { Colors } from "@/constants/Colors";
 import { useAddNews } from "../../../hooks/useAddNews";
 import { useConnectionStatus } from "../../../hooks/useConnectionStatus";
-import { CoustomTheme } from "../../../utils/coustomTheme";
 import React from "react";
 import { Controller } from "react-hook-form";
 import {
@@ -15,6 +14,7 @@ import {
   Switch,
   Text,
   TextInput,
+  TouchableOpacity,
   useColorScheme,
   View,
 } from "react-native";
@@ -30,7 +30,6 @@ export default function AddNews() {
     onSubmit,
   } = useAddNews();
 
-  const themeStyles = CoustomTheme();
   const hasInternet = useConnectionStatus();
   const colorScheme = useColorScheme() || "light";
 
@@ -52,7 +51,7 @@ export default function AddNews() {
 
   const renderForm = () => (
     <ThemedView>
-      <View style={[styles.card, themeStyles.contrast]}>
+      <View style={[styles.card, Colors[colorScheme].contrast]}>
         {/* Title Input */}
         <ThemedText style={styles.label}>Title</ThemedText>
         <Controller
@@ -60,7 +59,7 @@ export default function AddNews() {
           name="title"
           render={({ field: { onChange, value } }) => (
             <TextInput
-              style={[styles.input, themeStyles.text]}
+              style={[styles.input, Colors[colorScheme].text]}
               onChangeText={onChange}
               value={value}
               placeholder="Gib einen Titel ein"
@@ -76,7 +75,7 @@ export default function AddNews() {
           name="content"
           render={({ field: { onChange, value } }) => (
             <TextInput
-              style={[styles.input, styles.textArea, themeStyles.text]}
+              style={[styles.input, styles.textArea, Colors[colorScheme].text]}
               onChangeText={onChange}
               value={value}
               placeholder="Gib eine Nachricht ein"
@@ -93,7 +92,7 @@ export default function AddNews() {
           name="external_urls"
           render={({ field: { onChange, value } }) => (
             <TextInput
-              style={[styles.input, themeStyles.text]}
+              style={[styles.input, Colors[colorScheme].text]}
               onChangeText={onChange}
               value={value}
               placeholder="Kommagetrennte URLs mit http..."
@@ -111,7 +110,6 @@ export default function AddNews() {
             <TitleSearchInput
               value={value || ""}
               onChangeText={onChange}
-              themeStyles={themeStyles}
             />
           )}
         />
@@ -157,14 +155,14 @@ export default function AddNews() {
       </View>
 
       {/* Pick Image Button */}
-      <Pressable style={styles.pickImageButton} onPress={pickImages}>
+      {/* <TouchableOpacity style={styles.pickImageButton} onPress={pickImages}>
         <Text style={styles.imagePickerText}>
           {selectedImages.length ? "Mehr Bilder auswählen" : "Bilder hochladen"}
         </Text>
-      </Pressable>
+      </TouchableOpacity> */}
 
       {/* Submit Button */}
-      <Pressable
+      <TouchableOpacity
         style={[
           styles.submitButton,
           (uploading || !hasInternet) && styles.disabled,
@@ -175,7 +173,7 @@ export default function AddNews() {
         <Text style={styles.submitButtonText}>
           {uploading ? "Wird hochgeladen..." : "Hochladen"}
         </Text>
-      </Pressable>
+      </TouchableOpacity>
     </ThemedView>
   );
 
