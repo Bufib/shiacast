@@ -1170,7 +1170,7 @@ export default function HomeScreen() {
                 styles.heroHeader,
                 {
                   backgroundColor:
-                    colorScheme === "dark" ? Colors.dark.contrast : "#1A4731",
+                    colorScheme === "dark" ? Colors.dark.contrast : "#0b9955",
                   paddingTop: insets.top + 18,
                 },
               ]}

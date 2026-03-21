@@ -1,4 +1,3 @@
-//! Last worked
 
 // import React, { useEffect, useState, useRef } from "react";
 // import {
@@ -16,21 +15,21 @@
 // import { useRouter } from "expo-router";
 // import * as Sharing from "expo-sharing";
 // import * as FileSystem from "expo-file-system/legacy";
-// import { usePdfs } from "@/hooks/usePdfs";
-// import { useLanguage } from "@/contexts/LanguageContext";
+// import { usePdfs } from "../../hooks/usePdfs";
+// import { useLanguage } from "../../contexts/LanguageContext";
 // import Feather from "@expo/vector-icons/Feather";
 // import AsyncStorage from "@react-native-async-storage/async-storage";
 // import { PdfViewerScreenPropsType } from "@/constants/Types";
 // import { useSafeAreaInsets } from "react-native-safe-area-context";
 // import HeaderLeftBackButton from "./HeaderLeftBackButton";
-// import { isPdfFavorited, togglePdfFavorite } from "@/utils/favorites";
+// import { isPdfFavorited, togglePdfFavorite } from "../../utils/favorites";
 // import { StatusBar } from "expo-status-bar";
 // import { useTranslation } from "react-i18next";
 // import { Ionicons } from "@expo/vector-icons";
 // import { Colors } from "@/constants/Colors";
 // import { ThemedView } from "./ThemedView";
 // import { ThemedText } from "./ThemedText";
-// import { useDataVersionStore } from "@/stores/dataVersionStore";
+// import { useDataVersionStore } from "../../stores/dataVersionStore";
 
 // const getPdfNumericId = (filename: string): number => {
 //   const asNumber = Number(filename);
@@ -389,11 +388,7 @@
 
 //         {!error && !loading && sourceUri ? (
 //           <>
-//             <TouchableOpacity
-//               activeOpacity={1}
-//               style={styles.pdfContainer}
-//               onPress={toggleControls}
-//             >
+//             <View style={styles.pdfContainer}>
 //               <Pdf
 //                 ref={pdfRef}
 //                 source={{ uri: sourceUri, cache: true }}
@@ -409,6 +404,7 @@
 //                 enableDoubleTapZoom
 //                 fitPolicy={2}
 //                 spacing={10}
+//                 onPageSingleTap={toggleControls}
 //                 onLoadComplete={(numberOfPages) => {
 //                   setPageCount(numberOfPages);
 //                 }}
@@ -425,7 +421,7 @@
 //                   );
 //                 }}
 //               />
-//             </TouchableOpacity>
+//             </View>
 
 //             {/* Top Controls Bar */}
 //             {showControls ? (
@@ -902,6 +898,7 @@
 //   },
 // });
 
+
 import React, { useEffect, useState, useRef } from "react";
 import {
   ActivityIndicator,
@@ -915,6 +912,7 @@ import {
   useColorScheme,
 } from "react-native";
 import Pdf from "react-native-pdf";
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import * as Sharing from "expo-sharing";
 import * as FileSystem from "expo-file-system/legacy";
@@ -945,6 +943,9 @@ const getPdfNumericId = (filename: string): number => {
   return Math.abs(hash) || 1;
 };
 
+const isImageFile = (name: string): boolean =>
+  /\.(jpe?g|png|webp|gif)$/i.test(name.toLowerCase());
+
 const PdfViewerScreen: React.FC<PdfViewerScreenPropsType> = ({ filename }) => {
   const router = useRouter();
 
@@ -959,6 +960,7 @@ const PdfViewerScreen: React.FC<PdfViewerScreenPropsType> = ({ filename }) => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme() || "light";
+
   // eBook reader features
   const [showControls, setShowControls] = useState<boolean>(true);
   const [showPageJump, setShowPageJump] = useState<boolean>(false);
@@ -984,6 +986,8 @@ const PdfViewerScreen: React.FC<PdfViewerScreenPropsType> = ({ filename }) => {
     (s) => s.incrementPdfFavoritesVersion
   );
 
+  const isImage = filename ? isImageFile(filename) : false;
+
   // Load GLOBAL layout preference once on mount
   useEffect(() => {
     const loadGlobalPreference = async () => {
@@ -1002,9 +1006,9 @@ const PdfViewerScreen: React.FC<PdfViewerScreenPropsType> = ({ filename }) => {
     loadGlobalPreference();
   }, []);
 
-  // Load saved reading position (per-file)
+  // Load saved reading position (per-file) – PDFs only
   useEffect(() => {
-    if (!filename) return;
+    if (!filename || isImage) return;
 
     const loadSavedPage = async () => {
       try {
@@ -1016,7 +1020,7 @@ const PdfViewerScreen: React.FC<PdfViewerScreenPropsType> = ({ filename }) => {
     };
 
     loadSavedPage();
-  }, [filename]);
+  }, [filename, isImage]);
 
   // Save GLOBAL layout preference - ONLY after initial load
   useEffect(() => {
@@ -1027,9 +1031,9 @@ const PdfViewerScreen: React.FC<PdfViewerScreenPropsType> = ({ filename }) => {
     );
   }, [isHorizontal]);
 
-  // Save reading position (debounced)
+  // Save reading position (debounced) – PDFs only
   useEffect(() => {
-    if (!filename || currentPage === 1) return;
+    if (!filename || isImage || currentPage === 1) return;
     const saveTimeout = setTimeout(() => {
       AsyncStorage.setItem(
         `pdf_page_${filename}`,
@@ -1037,7 +1041,7 @@ const PdfViewerScreen: React.FC<PdfViewerScreenPropsType> = ({ filename }) => {
       ).catch(console.warn);
     }, 1000);
     return () => clearTimeout(saveTimeout);
-  }, [currentPage, filename]);
+  }, [currentPage, filename, isImage]);
 
   // Favorites: load initial favorite state
   useEffect(() => {
@@ -1072,7 +1076,7 @@ const PdfViewerScreen: React.FC<PdfViewerScreenPropsType> = ({ filename }) => {
     }
   };
 
-  // Download/Share PDF function
+  // Download/Share function (works for both PDF and images)
   const handleDownloadPdf = async () => {
     if (!sourceUri || isDownloading || !filename) return;
 
@@ -1081,7 +1085,6 @@ const PdfViewerScreen: React.FC<PdfViewerScreenPropsType> = ({ filename }) => {
     try {
       setIsDownloading(true);
 
-      // Check if sharing is available
       const isAvailable = await Sharing.isAvailableAsync();
 
       if (!isAvailable) {
@@ -1089,9 +1092,8 @@ const PdfViewerScreen: React.FC<PdfViewerScreenPropsType> = ({ filename }) => {
         return;
       }
 
-      // iOS requires files to be in DocumentDirectory to share
-      // Copy from cache to a temporary shareable location
-      const fileName = filename.endsWith(".pdf") ? filename : `${filename}.pdf`;
+      const extension = filename.includes(".") ? "" : isImage ? "" : ".pdf";
+      const fileName = `${filename}${extension}`;
       tempFilePath = `${
         FileSystem.documentDirectory
       }temp_${Date.now()}_${fileName}`;
@@ -1101,20 +1103,22 @@ const PdfViewerScreen: React.FC<PdfViewerScreenPropsType> = ({ filename }) => {
         to: tempFilePath,
       });
 
-      // Share the PDF file from the temporary location
+      const mimeType = isImage
+        ? `image/${filename.split(".").pop()?.toLowerCase() === "png" ? "png" : "jpeg"}`
+        : "application/pdf";
+
       await Sharing.shareAsync(tempFilePath, {
-        mimeType: "application/pdf",
+        mimeType,
         dialogTitle: `Save ${filename}`,
-        UTI: "com.adobe.pdf",
+        UTI: isImage ? "public.image" : "com.adobe.pdf",
       });
     } catch (err: any) {
-      console.warn("[PdfViewer] Download error:", err);
+      console.warn("[Viewer] Download error:", err);
       Alert.alert(
         "Download Failed",
-        err?.message || "Unable to save the PDF file"
+        err?.message || "Unable to save the file"
       );
     } finally {
-      // Clean up temporary file
       if (tempFilePath) {
         try {
           const fileInfo = await FileSystem.getInfoAsync(tempFilePath);
@@ -1122,7 +1126,7 @@ const PdfViewerScreen: React.FC<PdfViewerScreenPropsType> = ({ filename }) => {
             await FileSystem.deleteAsync(tempFilePath, { idempotent: true });
           }
         } catch (cleanupErr) {
-          console.warn("[PdfViewer] Cleanup error:", cleanupErr);
+          console.warn("[Viewer] Cleanup error:", cleanupErr);
         }
       }
       setIsDownloading(false);
@@ -1175,15 +1179,14 @@ const PdfViewerScreen: React.FC<PdfViewerScreenPropsType> = ({ filename }) => {
     }
   }, [filename]);
 
-  // PDF loading - OPTIMIZED VERSION
+  // File loading
   useEffect(() => {
     if (!filename) {
-      setError("No PDF filename provided.");
+      setError("No filename provided.");
       setLoading(false);
       return;
     }
 
-    // Prevent re-loading if already loaded for this file
     if (hasLoadedRef.current && sourceUri) return;
 
     let cancelled = false;
@@ -1215,7 +1218,7 @@ const PdfViewerScreen: React.FC<PdfViewerScreenPropsType> = ({ filename }) => {
           }
         }
       } catch (err: any) {
-        if (!cancelled) setError(err?.message ?? "Failed to load PDF.");
+        if (!cancelled) setError(err?.message ?? "Failed to load file.");
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -1228,7 +1231,7 @@ const PdfViewerScreen: React.FC<PdfViewerScreenPropsType> = ({ filename }) => {
     };
   }, [filename, lang, downloadPdf, getCachedUri, sourceUri]);
 
-  // Navigation functions
+  // Navigation functions – PDFs only
   const goToPage = (page: number) => {
     if (page >= 1 && page <= pageCount && pdfRef.current) {
       pdfRef.current.setPage(page);
@@ -1243,12 +1246,10 @@ const PdfViewerScreen: React.FC<PdfViewerScreenPropsType> = ({ filename }) => {
     if (currentPage > 1) goToPage(currentPage - 1);
   };
 
-  // Layout toggle
   const toggleLayout = () => {
     setIsHorizontal(!isHorizontal);
   };
 
-  // Determine effective layout (force horizontal for single-page PDFs)
   const effectiveIsHorizontal = pageCount === 1 ? true : isHorizontal;
 
   if (!filename) {
@@ -1260,42 +1261,61 @@ const PdfViewerScreen: React.FC<PdfViewerScreenPropsType> = ({ filename }) => {
   }
 
   return (
-    <>
-      <View style={styles.container}>
-        <StatusBar style={showControls ? "light" : "dark"} />
-        {error && (
-          <View style={styles.center}>
-            <Text style={styles.errorText}>{error}</Text>
+    <View style={[styles.container, isImage && styles.containerBlack]}>
+      <StatusBar style={showControls ? "light" : "dark"} />
+
+      {/* Error state */}
+      {error && (
+        <View style={styles.center}>
+          <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity
+            style={styles.retryButton}
+            onPress={() => router.back()}
+          >
+            <Text style={styles.retryText}>Go Back</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {/* Loading state */}
+      {!error && loading ? (
+        <ThemedView style={styles.center}>
+          <ActivityIndicator
+            size="large"
+            color={Colors[colorScheme].defaultIcon}
+          />
+          {progress > 0 && (
+            <ThemedText style={styles.progressText}>
+              {t("loading")} {Math.round(progress * 100)}%
+            </ThemedText>
+          )}
+        </ThemedView>
+      ) : null}
+
+      {/* Content loaded */}
+      {!error && !loading && sourceUri ? (
+        <>
+          {isImage ? (
+            /* ───── Image Viewer ───── */
             <TouchableOpacity
-              style={styles.retryButton}
-              onPress={() => router.back()}
+              activeOpacity={1}
+              style={styles.imageContainer}
+              onPress={toggleControls}
             >
-              <Text style={styles.retryText}>Go Back</Text>
+              <Image
+                source={{ uri: sourceUri }}
+                style={StyleSheet.absoluteFill}
+                contentFit="contain"
+                transition={200}
+              />
             </TouchableOpacity>
-          </View>
-        )}
-
-        {!error && loading ? (
-          <ThemedView style={styles.center}>
-            <ActivityIndicator
-              size="large"
-              color={Colors[colorScheme].defaultIcon}
-            />
-            {progress > 0 && (
-              <ThemedText style={styles.progressText}>
-                {t("loading")} {Math.round(progress * 100)}%
-              </ThemedText>
-            )}
-          </ThemedView>
-        ) : null}
-
-        {!error && !loading && sourceUri ? (
-          <>
+          ) : (
+            /* ───── PDF Viewer ───── */
             <View style={styles.pdfContainer}>
               <Pdf
                 ref={pdfRef}
                 source={{ uri: sourceUri, cache: true }}
-                style={[styles.pdf]}
+                style={styles.pdf}
                 enablePaging={effectiveIsHorizontal}
                 horizontal={effectiveIsHorizontal}
                 enableRTL={rtl}
@@ -1325,17 +1345,20 @@ const PdfViewerScreen: React.FC<PdfViewerScreenPropsType> = ({ filename }) => {
                 }}
               />
             </View>
+          )}
 
-            {/* Top Controls Bar */}
-            {showControls ? (
-              <Animated.View
-                style={[
-                  styles.topBar,
-                  { opacity: controlsOpacity, paddingTop: insets.top },
-                ]}
-              >
-                <HeaderLeftBackButton color={"#fff"} />
+          {/* ───── Top Controls Bar ───── */}
+          {showControls ? (
+            <Animated.View
+              style={[
+                styles.topBar,
+                { opacity: controlsOpacity, paddingTop: insets.top },
+              ]}
+            >
+              <HeaderLeftBackButton color={"#fff"} />
 
+              {/* Page info – PDFs only */}
+              {!isImage && (
                 <View style={styles.pageInfo}>
                   <TouchableOpacity
                     onPress={() => setShowPageJump(!showPageJump)}
@@ -1345,215 +1368,219 @@ const PdfViewerScreen: React.FC<PdfViewerScreenPropsType> = ({ filename }) => {
                     </Text>
                   </TouchableOpacity>
                 </View>
+              )}
 
-                <TouchableOpacity
-                  style={[styles.controlButton]}
-                  onPress={handleDownloadPdf}
-                  disabled={isDownloading}
-                >
-                  {isDownloading ? (
-                    <ActivityIndicator size="small" color="#FFFFFF" />
-                  ) : (
-                    <Feather name="download" size={24} color="#FFFFFF" />
-                  )}
-                </TouchableOpacity>
+              {/* Spacer when image (so buttons push right) */}
+              {isImage && <View style={{ flex: 1 }} />}
 
+              <TouchableOpacity
+                style={styles.controlButton}
+                onPress={handleDownloadPdf}
+                disabled={isDownloading}
+              >
+                {isDownloading ? (
+                  <ActivityIndicator size="small" color="#FFFFFF" />
+                ) : (
+                  <Feather name="download" size={24} color="#FFFFFF" />
+                )}
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.controlButton}
+                onPress={onPressToggleFavorite}
+              >
+                <Ionicons
+                  name={isFavorite ? "star" : "star-outline"}
+                  size={24}
+                  color={isFavorite ? Colors.universal.favorite : "#fff"}
+                />
+              </TouchableOpacity>
+
+              {/* Settings – PDFs with multiple pages only */}
+              {!isImage && pageCount > 1 && (
                 <TouchableOpacity
                   style={styles.controlButton}
-                  onPress={onPressToggleFavorite}
+                  onPress={() => setShowSettings(!showSettings)}
                 >
-                  <Ionicons
-                    name={isFavorite ? "star" : "star-outline"}
-                    size={24}
-                    color={isFavorite ? Colors.universal.favorite : "#fff"}
-                  />
+                  <Feather name="settings" size={24} color="#FFFFFF" />
                 </TouchableOpacity>
-                {pageCount > 1 && (
-                  <TouchableOpacity
-                    style={styles.controlButton}
-                    onPress={() => setShowSettings(!showSettings)}
-                  >
-                    <Feather name="settings" size={24} color="#FFFFFF" />
-                  </TouchableOpacity>
-                )}
-              </Animated.View>
-            ) : null}
+              )}
+            </Animated.View>
+          ) : null}
 
-            {/* Bottom Navigation Bar */}
-            {showControls ? (
-              <Animated.View
-                style={[styles.bottomBar, { opacity: controlsOpacity }]}
+          {/* ───── Bottom Navigation Bar – PDFs only ───── */}
+          {!isImage && showControls ? (
+            <Animated.View
+              style={[styles.bottomBar, { opacity: controlsOpacity }]}
+            >
+              <TouchableOpacity
+                style={[
+                  styles.navButton,
+                  currentPage === 1 && styles.navButtonDisabled,
+                ]}
+                onPress={goToPreviousPage}
+                disabled={currentPage === 1}
               >
-                <TouchableOpacity
-                  style={[
-                    styles.navButton,
-                    currentPage === 1 && styles.navButtonDisabled,
-                  ]}
-                  onPress={goToPreviousPage}
-                  disabled={currentPage === 1}
-                >
-                  <Feather
-                    name={
-                      effectiveIsHorizontal
-                        ? rtl
-                          ? "chevron-right"
-                          : "chevron-left"
-                        : "chevron-up"
-                    }
-                    size={28}
-                    color={currentPage === 1 ? "#6B7280" : "#FFFFFF"}
-                  />
-                </TouchableOpacity>
+                <Feather
+                  name={
+                    effectiveIsHorizontal
+                      ? rtl
+                        ? "chevron-right"
+                        : "chevron-left"
+                      : "chevron-up"
+                  }
+                  size={28}
+                  color={currentPage === 1 ? "#6B7280" : "#FFFFFF"}
+                />
+              </TouchableOpacity>
 
-                <View style={styles.progressBarContainer}>
-                  <View
-                    style={[
-                      styles.progressBar,
-                      { width: `${(currentPage / pageCount) * 100}%` },
-                    ]}
-                  />
+              <View style={styles.progressBarContainer}>
+                <View
+                  style={[
+                    styles.progressBar,
+                    { width: `${(currentPage / pageCount) * 100}%` },
+                  ]}
+                />
+              </View>
+
+              <TouchableOpacity
+                style={[
+                  styles.navButton,
+                  currentPage === pageCount && styles.navButtonDisabled,
+                ]}
+                onPress={goToNextPage}
+                disabled={currentPage === pageCount}
+              >
+                <Feather
+                  name={
+                    effectiveIsHorizontal
+                      ? rtl
+                        ? "chevron-left"
+                        : "chevron-right"
+                      : "chevron-down"
+                  }
+                  size={28}
+                  color={currentPage === pageCount ? "#6B7280" : "#FFFFFF"}
+                />
+              </TouchableOpacity>
+            </Animated.View>
+          ) : null}
+
+          {/* ───── Settings Menu – PDFs only ───── */}
+          {!isImage && showSettings && pageCount > 1 ? (
+            <View style={styles.settingsOverlay}>
+              <View style={styles.settingsContainer}>
+                <View style={styles.settingsHeader}>
+                  <Text style={styles.settingsTitle}>
+                    {t("readingSettings")}
+                  </Text>
+                  <TouchableOpacity onPress={() => setShowSettings(false)}>
+                    <Feather name="x" size={24} color="#FFFFFF" />
+                  </TouchableOpacity>
                 </View>
 
-                <TouchableOpacity
-                  style={[
-                    styles.navButton,
-                    currentPage === pageCount && styles.navButtonDisabled,
-                  ]}
-                  onPress={goToNextPage}
-                  disabled={currentPage === pageCount}
-                >
-                  <Feather
-                    name={
-                      effectiveIsHorizontal
-                        ? rtl
-                          ? "chevron-left"
-                          : "chevron-right"
-                        : "chevron-down"
-                    }
-                    size={28}
-                    color={currentPage === pageCount ? "#6B7280" : "#FFFFFF"}
-                  />
-                </TouchableOpacity>
-              </Animated.View>
-            ) : null}
-
-            {/* Settings Menu */}
-            {showSettings && pageCount > 1 ? (
-              <View style={styles.settingsOverlay}>
-                <View style={styles.settingsContainer}>
-                  <View style={styles.settingsHeader}>
-                    <Text style={styles.settingsTitle}>
-                      {t("readingSettings")}
-                    </Text>
-                    <TouchableOpacity onPress={() => setShowSettings(false)}>
-                      <Feather name="x" size={24} color="#FFFFFF" />
-                    </TouchableOpacity>
-                  </View>
-
-                  <View style={styles.settingsContent}>
-                    {/* Layout Mode */}
-                    <View style={styles.settingSection}>
-                      <Text style={styles.settingLabel}>{t("pageLayout")}</Text>
-                      <View style={styles.layoutButtons}>
-                        <TouchableOpacity
+                <View style={styles.settingsContent}>
+                  <View style={styles.settingSection}>
+                    <Text style={styles.settingLabel}>{t("pageLayout")}</Text>
+                    <View style={styles.layoutButtons}>
+                      <TouchableOpacity
+                        style={[
+                          styles.layoutButton,
+                          isHorizontal && styles.layoutButtonActive,
+                        ]}
+                        onPress={() => !isHorizontal && toggleLayout()}
+                        disabled={pageCount === 1}
+                      >
+                        <Feather
+                          name="columns"
+                          size={20}
+                          color={isHorizontal ? "#3B82F6" : "#9CA3AF"}
+                        />
+                        <Text
                           style={[
-                            styles.layoutButton,
-                            isHorizontal && styles.layoutButtonActive,
+                            styles.layoutButtonText,
+                            isHorizontal && styles.layoutButtonTextActive,
                           ]}
-                          onPress={() => !isHorizontal && toggleLayout()}
-                          disabled={pageCount === 1}
                         >
-                          <Feather
-                            name="columns"
-                            size={20}
-                            color={isHorizontal ? "#3B82F6" : "#9CA3AF"}
-                          />
-                          <Text
-                            style={[
-                              styles.layoutButtonText,
-                              isHorizontal && styles.layoutButtonTextActive,
-                            ]}
-                          >
-                            {t("horizontal")}
-                          </Text>
-                        </TouchableOpacity>
+                          {t("horizontal")}
+                        </Text>
+                      </TouchableOpacity>
 
-                        <TouchableOpacity
+                      <TouchableOpacity
+                        style={[
+                          styles.layoutButton,
+                          !isHorizontal && styles.layoutButtonActive,
+                        ]}
+                        onPress={() => isHorizontal && toggleLayout()}
+                        disabled={pageCount === 1}
+                      >
+                        <Feather
+                          name="align-justify"
+                          size={20}
+                          color={!isHorizontal ? "#3B82F6" : "#9CA3AF"}
+                        />
+                        <Text
                           style={[
-                            styles.layoutButton,
-                            !isHorizontal && styles.layoutButtonActive,
+                            styles.layoutButtonText,
+                            !isHorizontal && styles.layoutButtonTextActive,
                           ]}
-                          onPress={() => isHorizontal && toggleLayout()}
-                          disabled={pageCount === 1}
                         >
-                          <Feather
-                            name="align-justify"
-                            size={20}
-                            color={!isHorizontal ? "#3B82F6" : "#9CA3AF"}
-                          />
-                          <Text
-                            style={[
-                              styles.layoutButtonText,
-                              !isHorizontal && styles.layoutButtonTextActive,
-                            ]}
-                          >
-                            {t("vertical")}
-                          </Text>
-                        </TouchableOpacity>
-                      </View>
-                      <Text style={styles.settingHint}>
-                        {pageCount === 1
-                          ? "Single-page PDFs always use horizontal layout"
-                          : isHorizontal
-                          ? t("horizontalInfoText")
-                          : t("verticalInfoText")}
-                      </Text>
+                          {t("vertical")}
+                        </Text>
+                      </TouchableOpacity>
                     </View>
+                    <Text style={styles.settingHint}>
+                      {pageCount === 1
+                        ? "Single-page PDFs always use horizontal layout"
+                        : isHorizontal
+                        ? t("horizontalInfoText")
+                        : t("verticalInfoText")}
+                    </Text>
                   </View>
                 </View>
               </View>
-            ) : null}
+            </View>
+          ) : null}
 
-            {/* Page Jump Menu */}
-            {showPageJump ? (
-              <View style={styles.pageJumpOverlay}>
-                <View style={styles.pageJumpContainer}>
-                  <View style={styles.pageJumpHeader}>
-                    <Text style={styles.pageJumpTitle}>Jump to Page</Text>
-                    <TouchableOpacity onPress={() => setShowPageJump(false)}>
-                      <Feather name="x" size={24} color="#FFFFFF" />
-                    </TouchableOpacity>
-                  </View>
-
-                  <ScrollView style={styles.pageJumpScroll}>
-                    <Text style={styles.sectionTitle}>All Pages</Text>
-                    {Array.from({ length: pageCount }, (_, i) => i + 1).map(
-                      (page) => (
-                        <TouchableOpacity
-                          key={page}
-                          style={[
-                            styles.pageJumpItem,
-                            page === currentPage && styles.pageJumpItemActive,
-                          ]}
-                          onPress={() => {
-                            goToPage(page);
-                            setShowPageJump(false);
-                          }}
-                        >
-                          <Text style={styles.pageJumpItemText}>
-                            Page {page}
-                          </Text>
-                        </TouchableOpacity>
-                      )
-                    )}
-                  </ScrollView>
+          {/* ───── Page Jump Menu – PDFs only ───── */}
+          {!isImage && showPageJump ? (
+            <View style={styles.pageJumpOverlay}>
+              <View style={styles.pageJumpContainer}>
+                <View style={styles.pageJumpHeader}>
+                  <Text style={styles.pageJumpTitle}>Jump to Page</Text>
+                  <TouchableOpacity onPress={() => setShowPageJump(false)}>
+                    <Feather name="x" size={24} color="#FFFFFF" />
+                  </TouchableOpacity>
                 </View>
+
+                <ScrollView style={styles.pageJumpScroll}>
+                  <Text style={styles.sectionTitle}>All Pages</Text>
+                  {Array.from({ length: pageCount }, (_, i) => i + 1).map(
+                    (page) => (
+                      <TouchableOpacity
+                        key={page}
+                        style={[
+                          styles.pageJumpItem,
+                          page === currentPage && styles.pageJumpItemActive,
+                        ]}
+                        onPress={() => {
+                          goToPage(page);
+                          setShowPageJump(false);
+                        }}
+                      >
+                        <Text style={styles.pageJumpItemText}>
+                          Page {page}
+                        </Text>
+                      </TouchableOpacity>
+                    )
+                  )}
+                </ScrollView>
               </View>
-            ) : null}
-          </>
-        ) : null}
-      </View>
-    </>
+            </View>
+          ) : null}
+        </>
+      ) : null}
+    </View>
   );
 };
 
@@ -1564,8 +1591,15 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#111827",
   },
+  containerBlack: {
+    backgroundColor: "#000000",
+  },
   pdfContainer: {
     flex: 1,
+  },
+  imageContainer: {
+    flex: 1,
+    backgroundColor: "#000000",
   },
   pdf: {
     flex: 1,
@@ -1661,7 +1695,6 @@ const styles = StyleSheet.create({
     borderRadius: 2,
   },
 
-  // Settings Menu
   settingsOverlay: {
     position: "absolute",
     top: 0,
@@ -1711,7 +1744,6 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
 
-  // Layout Buttons
   layoutButtons: {
     flexDirection: "row",
     gap: 12,
@@ -1742,7 +1774,6 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
 
-  // Page Jump Menu
   pageJumpOverlay: {
     position: "absolute",
     top: 0,
