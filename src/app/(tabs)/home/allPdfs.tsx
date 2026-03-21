@@ -202,7 +202,6 @@ export default function AllPdfsScreen() {
   );
 
   const activeFilterCount = (selectedTopic ? 1 : 0) + (selectedAuthor ? 1 : 0);
-  const hasFilters = allTopics.length > 0 || allAuthors.length > 0;
 
   return (
     <SafeAreaView
@@ -223,25 +222,21 @@ export default function AllPdfsScreen() {
         <ThemedText type="subtitle" style={styles.headerTitle}>
           {t("pdfsTitle")}
         </ThemedText>
-        {hasFilters ? (
-          <TouchableOpacity
-            style={styles.filterBtn}
-            onPress={() => setFilterVisible(true)}
-          >
-            <Ionicons
-              name="options-outline"
-              size={22}
-              color={activeFilterCount > 0 ? Colors.universal.primary : Colors[colorScheme].text}
-            />
-            {activeFilterCount > 0 && (
-              <View style={styles.filterBadge}>
-                <Text style={styles.filterBadgeText}>{activeFilterCount}</Text>
-              </View>
-            )}
-          </TouchableOpacity>
-        ) : (
-          <View style={styles.headerSpacer} />
-        )}
+        <TouchableOpacity
+          style={styles.filterBtn}
+          onPress={() => setFilterVisible(true)}
+        >
+          <Ionicons
+            name="options-outline"
+            size={22}
+            color={activeFilterCount > 0 ? Colors.universal.primary : Colors[colorScheme].text}
+          />
+          {activeFilterCount > 0 && (
+            <View style={styles.filterBadge}>
+              <Text style={styles.filterBadgeText}>{activeFilterCount}</Text>
+            </View>
+          )}
+        </TouchableOpacity>
       </View>
 
       <FilterModal
@@ -338,7 +333,7 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
   },
   columnWrapper: {
-    marginBottom: 12,
+    marginBottom: 25,
     justifyContent: "space-between",
     paddingHorizontal: 16,
   },

@@ -37,11 +37,11 @@ export default function FilterModal({
   const insets = useSafeAreaInsets();
   const sheetRef = useRef<BottomSheetModal>(null);
 
-  const snapPoints = useMemo(() => ["85%"], []);
+  const snapPoints = useMemo(() => ["50%", "85%"], []);
 
   useEffect(() => {
     if (visible) {
-      sheetRef.current?.present();
+      sheetRef.current?.present({ snapIndex: 0 });
     } else {
       sheetRef.current?.dismiss();
     }
@@ -71,6 +71,7 @@ export default function FilterModal({
     <BottomSheetModal
       ref={sheetRef}
       snapPoints={snapPoints}
+      enableDynamicSizing={false}
       enablePanDownToClose
       onDismiss={onClose}
       backdropComponent={renderBackdrop}
