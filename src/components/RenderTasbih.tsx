@@ -952,6 +952,7 @@ import {
   useColorScheme,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Svg, { Circle } from "react-native-svg";
 import { ThemedText } from "@/components/ThemedText";
 import HeaderLeftBackButton from "@/components/HeaderLeftBackButton";
 import { useLanguage } from "../../contexts/LanguageContext";
@@ -1605,29 +1606,66 @@ export default function RenderTasbih() {
               },
             ]}
           >
-            <View style={styles.progressContainer}>
-              <View
-                style={[
-                  styles.progressBar,
-                  { width: `${percentage}%` },
-                  percentage >= 100 && !isPresetMode && styles.progressComplete,
-                  isPresetMode &&
-                    state.sequenceCompleted &&
-                    styles.progressSequenceComplete,
-                ]}
-              />
-            </View>
             <ThemedText style={styles.arabicText}>
               {t(activeCounter.arabicText)}
             </ThemedText>
-            <ThemedText style={styles.counterText}>
-              {activeCounter.count}
-            </ThemedText>
-            <ThemedText style={styles.limitText}>
-              {isPresetMode && state.sequenceCompleted
-                ? "Sequence Complete"
-                : `${activeCounter.count} / ${activeLimit}`}
-            </ThemedText>
+            {/* Circular progress ring around count */}
+            <View style={styles.circleContainer}>
+              {(() => {
+                const size = 180;
+                const strokeWidth = 10;
+                const radius = (size - strokeWidth) / 2;
+                const circumference = 2 * Math.PI * radius;
+                const clampedPct = Math.min(percentage, 100);
+                const strokeDashoffset =
+                  circumference - (clampedPct / 100) * circumference;
+                const ringColor =
+                  percentage >= 100 && !isPresetMode
+                    ? "#66CC8A"
+                    : isPresetMode && state.sequenceCompleted
+                    ? "#FFC107"
+                    : Colors.universal.primary;
+                return (
+                  <>
+                    <Svg width={size} height={size} style={styles.circleSvg}>
+                      {/* Track */}
+                      <Circle
+                        cx={size / 2}
+                        cy={size / 2}
+                        r={radius}
+                        stroke={Colors[colorScheme].border}
+                        strokeWidth={strokeWidth}
+                        fill="none"
+                      />
+                      {/* Progress */}
+                      <Circle
+                        cx={size / 2}
+                        cy={size / 2}
+                        r={radius}
+                        stroke={ringColor}
+                        strokeWidth={strokeWidth}
+                        fill="none"
+                        strokeDasharray={circumference}
+                        strokeDashoffset={strokeDashoffset}
+                        strokeLinecap="round"
+                        rotation="-90"
+                        origin={`${size / 2}, ${size / 2}`}
+                      />
+                    </Svg>
+                    <View style={styles.circleInner}>
+                      <ThemedText style={styles.counterText}>
+                        {activeCounter.count}
+                      </ThemedText>
+                      <ThemedText style={styles.limitText}>
+                        {isPresetMode && state.sequenceCompleted
+                          ? "✓"
+                          : `/ ${activeLimit}`}
+                      </ThemedText>
+                    </View>
+                  </>
+                );
+              })()}
+            </View>
             {isPresetMode && state.sequenceCompleted && (
               <Text
                 style={[styles.completionText, styles.sequenceCompletionText]}
@@ -1841,21 +1879,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderWidth: 1,
   },
-  progressContainer: {
-    position: "absolute",
-    top: -5,
-    left: 0,
-    right: 0,
-    height: 5,
-    marginHorizontal: 12,
-  },
-  progressBar: {
-    height: "100%",
-    backgroundColor: Colors.universal.primary,
-    borderRadius: 99,
-  },
-  progressComplete: { backgroundColor: "#66CC8A" },
-  progressSequenceComplete: { backgroundColor: "#FFC107" },
   arabicText: {
     fontSize: 32,
     lineHeight: 30,
@@ -1863,8 +1886,22 @@ const styles = StyleSheet.create({
     fontWeight: "300",
     textAlign: "center",
   },
-  counterText: { fontSize: 72, fontWeight: "bold", lineHeight: 80 },
-  limitText: { fontSize: 16, color: "#888", marginTop: 8 },
+  circleContainer: {
+    width: 180,
+    height: 180,
+    alignItems: "center",
+    justifyContent: "center",
+    marginVertical: 8,
+  },
+  circleSvg: {
+    position: "absolute",
+  },
+  circleInner: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  counterText: { fontSize: 64, fontWeight: "bold", lineHeight: 72 },
+  limitText: { fontSize: 14, color: "#888" },
   completionText: {
     fontSize: 16,
     fontWeight: "bold",

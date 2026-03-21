@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
   newsTitle: {
     fontSize: 20,
     fontWeight: "bold",
-    marginBottom: 15,
+    marginBottom: 5,
     lineHeight: 30,
   },
   newsContent: {

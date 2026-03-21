@@ -1173,7 +1173,7 @@ export default function HomeScreen() {
                 styles.heroHeader,
                 {
                   backgroundColor:
-                    colorScheme === "dark" ? "#152C3E" : "#1A4731",
+                    colorScheme === "dark" ? Colors.dark.contrast : "#1A4731",
                   paddingTop: insets.top + 18,
                 },
               ]}
@@ -1536,7 +1536,7 @@ const styles = StyleSheet.create({
   },
   scrollStyles: {},
   scrollContent: {
-    gap: 40,
+    gap: 20,
   },
   newsArticleContainer: {
     flex: 1,
@@ -1545,10 +1545,12 @@ const styles = StyleSheet.create({
   podcastContainer: {
     flex: 1,
     gap: 15,
+    marginBottom: 20
   },
   pdfContainer: {
     flex: 1,
     gap: 15,
+    paddingBottom: 20
   },
   heroCard: {
     overflow: "hidden",
