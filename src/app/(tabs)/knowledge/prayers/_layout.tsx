@@ -66,6 +66,30 @@ const Layout = () => {
         }}
       />
       <Stack.Screen name="tasbih" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="weeklyCalendar"
+        options={{
+          headerShown: true,
+          headerLeft: () => {
+            return (
+              <Pressable
+                onPress={() =>
+                  router.canGoBack()
+                    ? router.back()
+                    : router.replace("/(tabs)/knowledge")
+                }
+                hitSlop={10}
+              >
+                <Ionicons
+                  name="chevron-back-outline"
+                  size={30}
+                  color={colorScheme === "dark" ? "#fff" : "#000"}
+                />
+              </Pressable>
+            );
+          },
+        }}
+      />
     </Stack>
   );
 };

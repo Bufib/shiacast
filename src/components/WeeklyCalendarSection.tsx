@@ -31,6 +31,7 @@ export const WeeklyCalendarSection: React.FC<
     todosByDay: WeeklyTodosType;
     loading: boolean;
     onToggleTodo: (day: number, id: number) => void;
+    onNavigateToFullCalendar?: () => void;
   }
 > = ({
   selectedDay,
@@ -42,6 +43,7 @@ export const WeeklyCalendarSection: React.FC<
   todosByDay,
   loading,
   onToggleTodo,
+  onNavigateToFullCalendar,
 }) => {
   const { t } = useTranslation();
   const colorScheme = useColorScheme() || "light";
@@ -170,7 +172,12 @@ export const WeeklyCalendarSection: React.FC<
   return (
     <View style={styles.container}>
       <View style={styles.calendarHeader}>
-        <View style={styles.calendarHeaderContainer}>
+        <TouchableOpacity
+          style={styles.calendarHeaderContainer}
+          onPress={onNavigateToFullCalendar}
+          disabled={!onNavigateToFullCalendar}
+          activeOpacity={onNavigateToFullCalendar ? 0.7 : 1}
+        >
           <AntDesign
             name="calendar"
             size={isLarge ? 45 : isMedium ? 40 : 35}
@@ -200,7 +207,7 @@ export const WeeklyCalendarSection: React.FC<
               {t("weeklyToDoSubtitle")}
             </ThemedText>
           </View>
-        </View>
+        </TouchableOpacity>
         <TouchableOpacity
           style={[styles.addButton, selectedDay === null && { opacity: 0.5 }]}
           onPress={onShowAddModal}

@@ -296,6 +296,7 @@ export const TodoList = ({
   onShowDeleteModal,
   onShowAddModal,
   onSetReminder,
+  scrollEnabled = true,
 }: TodoListType) => {
   const { t } = useTranslation();
   const colorScheme = useColorScheme() || "light";
@@ -423,7 +424,8 @@ export const TodoList = ({
     <>
       <ScrollView
         contentContainerStyle={styles.scrollContent}
-        style={styles.scrollStyle}
+        style={scrollEnabled ? styles.scrollStyle : styles.staticStyle}
+        scrollEnabled={scrollEnabled}
       >
         {todos.map((todo) => {
           const reminder = reminders[String(todo.id)];
@@ -529,6 +531,9 @@ export const TodoList = ({
 const styles = StyleSheet.create({
   scrollStyle: {
     flex: 1,
+    marginHorizontal: 10,
+  },
+  staticStyle: {
     marginHorizontal: 10,
   },
   scrollContent: {

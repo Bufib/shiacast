@@ -645,6 +645,9 @@ const PrayerLinks = () => {
           selectedDay={selectedDay}
           currentDayIndex={getCurrentDayIndex()}
           onSelectDay={handleSelectDay}
+          onNavigateToFullCalendar={() =>
+            router.push("/knowledge/prayers/weeklyCalendar")
+          }
         />
 
       {selectedDay !== null && (

@@ -1208,11 +1208,7 @@ export default function HomeScreen() {
                 >
                   <View style={styles.calendarBannerContent}>
                     <View style={styles.calendarBannerTop}>
-                      <Ionicons
-                        name="moon-outline"
-                        size={11}
-                        color="rgba(255,255,255,0.55)"
-                      />
+                      
                       <Text style={styles.calendarBannerLabel}>
                         {(() => {
                           const [y, m, d] = calendarEvent.gregorian_date.split("-");

@@ -497,6 +497,7 @@ export type TodoListType = {
     time: Date | null,
     repeatWeekly: boolean,
   ) => void;
+  scrollEnabled?: boolean;
 };
 
 export type WeeklyTodosType = {
