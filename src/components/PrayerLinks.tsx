@@ -558,95 +558,94 @@ const PrayerLinks = () => {
               </View>
             </TouchableOpacity>
           ))}
-
-          <View style={styles.bottomRow}>
-            <TouchableOpacity
-              onPress={() => {
-                handleCategoryPress(tasbihCategory[0]);
-              }}
+        </View>
+        <View style={styles.bottomCategories}>
+          <TouchableOpacity
+            onPress={() => {
+              handleCategoryPress(tasbihCategory[0]);
+            }}
+            style={[
+              styles.element,
+              styles.bottomElement,
+              {
+                backgroundColor: Colors[colorScheme].contrast,
+                height: elementSize / 2,
+              },
+            ]}
+          >
+            <View
               style={[
-                styles.element,
-                styles.bottomElement,
-                {
-                  backgroundColor: Colors[colorScheme].contrast,
-                  height: elementSize / 2,
-                },
+                styles.categoryButtonContainer,
+                { gap: iconSize / 10 - 1 },
               ]}
             >
-              <View
-                style={[
-                  styles.categoryButtonContainer,
-                  { gap: iconSize / 10 - 1 },
-                ]}
-              >
-                <View style={styles.tasbihContainer}>
-                  {/* <Image
+              <View style={styles.tasbihContainer}>
+                {/* <Image
                     style={[styles.elementIcon, { width: iconSize / 1.2 }]}
                     source={require("@/assets/images/tasbih.png")}
                     contentFit="contain"
                   /> */}
-                  <ThemedText
-                    numberOfLines={1}
-                    adjustsFontSizeToFit
-                    style={[
-                      styles.bottomElementText,
-                      { fontSize: fontSize * 1.15 },
-                    ]}
-                  >
-                    {t("tasbih")}
-                  </ThemedText>
-                </View>
+                <ThemedText
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
+                  style={[
+                    styles.bottomElementText,
+                    { fontSize: fontSize * 1.15 },
+                  ]}
+                >
+                  {t("tasbih")}
+                </ThemedText>
               </View>
-            </TouchableOpacity>
+            </View>
+          </TouchableOpacity>
 
-            <TouchableOpacity
-              onPress={() => {
-                openPrayerTimes();
-              }}
+          <TouchableOpacity
+            onPress={() => {
+              openPrayerTimes();
+            }}
+            style={[
+              styles.element,
+              styles.bottomElement,
+              {
+                backgroundColor: Colors[colorScheme].contrast,
+                height: elementSize / 2,
+              },
+            ]}
+          >
+            <View
               style={[
-                styles.element,
-                styles.bottomElement,
-                {
-                  backgroundColor: Colors[colorScheme].contrast,
-                  height: elementSize / 2,
-                },
+                styles.categoryButtonContainer,
+                { gap: iconSize / 10 - 1 },
               ]}
             >
-              <View
-                style={[
-                  styles.categoryButtonContainer,
-                  { gap: iconSize / 10 - 1 },
-                ]}
-              >
-                <View style={styles.tasbihContainer}>
-                  <ThemedText
-                    numberOfLines={1}
-                    adjustsFontSizeToFit
-                    style={[
-                      styles.bottomElementText,
-                      { fontSize: fontSize * 1.05, color: "#E8BC14" },
-                    ]}
-                  >
-                    {t("prayerTime")}
-                  </ThemedText>
-                </View>
+              <View style={styles.tasbihContainer}>
+                <ThemedText
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
+                  style={[
+                    styles.bottomElementText,
+                    { fontSize: fontSize * 1.05, color: "#E8BC14" },
+                  ]}
+                >
+                  {t("prayerTime")}
+                </ThemedText>
               </View>
-            </TouchableOpacity>
-          </View>
+            </View>
+          </TouchableOpacity>
         </View>
       </View>
 
-      <WeeklyCalendarSection
-        todosByDay={todosByDay}
-        loading={loading}
-        onToggleTodo={toggleTodo}
-        onUndoAll={undoAllForDay}
-        onShowAddModal={() => setAddModalVisible(true)}
-        onShowDeleteModal={showDeleteConfirmation}
-        selectedDay={selectedDay}
-        currentDayIndex={getCurrentDayIndex()}
-        onSelectDay={handleSelectDay}
-      />
+        <WeeklyCalendarSection
+          todosByDay={todosByDay}
+          loading={loading}
+          onToggleTodo={toggleTodo}
+          onUndoAll={undoAllForDay}
+          onShowAddModal={() => setAddModalVisible(true)}
+          onShowDeleteModal={showDeleteConfirmation}
+          selectedDay={selectedDay}
+          currentDayIndex={getCurrentDayIndex()}
+          onSelectDay={handleSelectDay}
+        />
 
       {selectedDay !== null && (
         <>
@@ -671,13 +670,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: "column",
-    gap: 20,
     paddingTop: 10,
     paddingBottom: 4,
   },
 
   categoriesContainer: {
-    flexDirection: "row",
+    flex: 1,
+    flexDirection: "column",
+    gap: 15,
   },
 
   categories: {
@@ -688,6 +688,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
 
+  bottomCategories: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginHorizontal: 25,
+    gap: 10,
+  },
   element: {
     flexDirection: "column",
     justifyContent: "center",
@@ -720,14 +726,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "flex-start",
     width: "100%",
-  },
-
-  bottomRow: {
-    flex: 1,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginHorizontal: 20,
-    gap: 10,
   },
 
   bottomElement: {

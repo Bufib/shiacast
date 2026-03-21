@@ -232,7 +232,7 @@ const en = {
   searchPlaceholder: "Search for questions, prayers, news-articles or podcasts",
   question: "Question",
   prayer: "Prayer",
-  podcast: "Podcast",
+  podcast: "Podcasts",
   newsArticle: "Articles",
 
   searchContent: "Search Content",

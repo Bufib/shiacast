@@ -26,6 +26,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import HeaderLeftBackButton from "@/components/HeaderLeftBackButton";
 
 const PAGE_SIZE = 20;
 
@@ -40,7 +41,9 @@ export default function AllPdfsScreen() {
   const [selectedAuthor, setSelectedAuthor] = useState<string | null>(null);
   const [filterVisible, setFilterVisible] = useState(false);
 
-  const { data: filterPairs = [] } = useQuery<{ topic: string | null; author: string | null }[]>({
+  const { data: filterPairs = [] } = useQuery<
+    { topic: string | null; author: string | null }[]
+  >({
     queryKey: ["pdf_filter_pairs", lang],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -48,57 +51,76 @@ export default function AllPdfsScreen() {
         .select("pdf_topic, pdf_author")
         .eq("language_code", lang);
       if (error) throw error;
-      return (data ?? []).map((r: any) => ({ topic: r.pdf_topic ?? null, author: r.pdf_author ?? null }));
+      return (data ?? []).map((r: any) => ({
+        topic: r.pdf_topic ?? null,
+        author: r.pdf_author ?? null,
+      }));
     },
     staleTime: 60 * 60 * 1000,
   });
 
-  const allTopics = [...new Set(filterPairs.map((p) => p.topic).filter(Boolean))].sort() as string[];
-  const allAuthors = [...new Set(filterPairs.map((p) => p.author).filter(Boolean))].sort() as string[];
+  const allTopics = [
+    ...new Set(filterPairs.map((p) => p.topic).filter(Boolean)),
+  ].sort() as string[];
+  const allAuthors = [
+    ...new Set(filterPairs.map((p) => p.author).filter(Boolean)),
+  ].sort() as string[];
 
   const availableTopics = selectedAuthor
-    ? ([...new Set(filterPairs.filter((p) => p.author === selectedAuthor).map((p) => p.topic).filter(Boolean))].sort() as string[])
+    ? ([
+        ...new Set(
+          filterPairs
+            .filter((p) => p.author === selectedAuthor)
+            .map((p) => p.topic)
+            .filter(Boolean),
+        ),
+      ].sort() as string[])
     : allTopics;
   const availableAuthors = selectedTopic
-    ? ([...new Set(filterPairs.filter((p) => p.topic === selectedTopic).map((p) => p.author).filter(Boolean))].sort() as string[])
+    ? ([
+        ...new Set(
+          filterPairs
+            .filter((p) => p.topic === selectedTopic)
+            .map((p) => p.author)
+            .filter(Boolean),
+        ),
+      ].sort() as string[])
     : allAuthors;
 
-  const {
-    data,
-    isLoading,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useInfiniteQuery<
-    PdfType[],
-    Error,
-    InfiniteData<PdfType[]>,
-    QueryKey,
-    number
-  >({
-    queryKey: ["all_pdfs_filtered", lang, selectedTopic, selectedAuthor],
-    queryFn: async ({ pageParam = 0 }) => {
-      let query = supabase
-        .from("pdfs")
-        .select("*")
-        .eq("language_code", lang)
-        .order("created_at", { ascending: false })
-        .range(pageParam, pageParam + PAGE_SIZE - 1);
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useInfiniteQuery<
+      PdfType[],
+      Error,
+      InfiniteData<PdfType[]>,
+      QueryKey,
+      number
+    >({
+      queryKey: ["all_pdfs_filtered", lang, selectedTopic, selectedAuthor],
+      queryFn: async ({ pageParam = 0 }) => {
+        let query = supabase
+          .from("pdfs")
+          .select("*")
+          .eq("language_code", lang)
+          .order("created_at", { ascending: false })
+          .range(pageParam, pageParam + PAGE_SIZE - 1);
 
-      if (selectedTopic) query = query.eq("pdf_topic", selectedTopic);
-      if (selectedAuthor) query = query.eq("pdf_author", selectedAuthor);
+        if (selectedTopic) query = query.eq("pdf_topic", selectedTopic);
+        if (selectedAuthor) query = query.eq("pdf_author", selectedAuthor);
 
-      const { data: result, error } = await query;
-      if (error) throw error;
-      return result ?? [];
-    },
-    getNextPageParam: (lastPage, allPages) => {
-      const fetchedSoFar = allPages.reduce((acc, page) => acc + page.length, 0);
-      return lastPage.length === PAGE_SIZE ? fetchedSoFar : undefined;
-    },
-    initialPageParam: 0,
-    enabled: Boolean(lang),
-  });
+        const { data: result, error } = await query;
+        if (error) throw error;
+        return result ?? [];
+      },
+      getNextPageParam: (lastPage, allPages) => {
+        const fetchedSoFar = allPages.reduce(
+          (acc, page) => acc + page.length,
+          0,
+        );
+        return lastPage.length === PAGE_SIZE ? fetchedSoFar : undefined;
+      },
+      initialPageParam: 0,
+      enabled: Boolean(lang),
+    });
 
   const pdfs: PdfType[] = data?.pages.flat() ?? [];
 
@@ -174,7 +196,10 @@ export default function AllPdfsScreen() {
                   />
                   <Text
                     numberOfLines={1}
-                    style={[styles.metaText, { color: Colors[colorScheme].icon }]}
+                    style={[
+                      styles.metaText,
+                      { color: Colors[colorScheme].icon },
+                    ]}
                   >
                     {item.pdf_author ?? t("tab_pdfs")}
                   </Text>
@@ -198,7 +223,7 @@ export default function AllPdfsScreen() {
         </TouchableOpacity>
       );
     },
-    [colorScheme, previewSizes, t]
+    [colorScheme, previewSizes, t],
   );
 
   const activeFilterCount = (selectedTopic ? 1 : 0) + (selectedAuthor ? 1 : 0);
@@ -212,13 +237,8 @@ export default function AllPdfsScreen() {
     >
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <Ionicons
-            name="chevron-back"
-            size={26}
-            color={Colors[colorScheme].text}
-          />
-        </TouchableOpacity>
+        <HeaderLeftBackButton />
+
         <ThemedText type="subtitle" style={styles.headerTitle}>
           {t("pdfsTitle")}
         </ThemedText>
@@ -229,7 +249,11 @@ export default function AllPdfsScreen() {
           <Ionicons
             name="options-outline"
             size={22}
-            color={activeFilterCount > 0 ? Colors.universal.primary : Colors[colorScheme].text}
+            color={
+              activeFilterCount > 0
+                ? Colors.universal.primary
+                : Colors[colorScheme].text
+            }
           />
           {activeFilterCount > 0 && (
             <View style={styles.filterBadge}>

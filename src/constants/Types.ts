@@ -550,7 +550,6 @@ export type PdfType = {
 };
 
 export type PdfViewerScreenPropsType = {
-  id: number;
   filename: string;
 };
 

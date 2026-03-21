@@ -26,6 +26,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import HeaderLeftBackButton from "@/components/HeaderLeftBackButton";
 
 const PAGE_SIZE = 20;
 
@@ -212,13 +213,7 @@ export default function AllPodcastsScreen() {
     >
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <Ionicons
-            name="chevron-back"
-            size={26}
-            color={Colors[colorScheme].text}
-          />
-        </TouchableOpacity>
+       <HeaderLeftBackButton />
         <ThemedText type="subtitle" style={styles.headerTitle}>
           {t("podcastsTitle")}
         </ThemedText>

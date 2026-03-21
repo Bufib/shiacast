@@ -226,7 +226,7 @@ const de = {
   searchPlaceholder: "Suche nach Fragen, Gebeten, News-Artikel oder Podcasts",
   question: "Frage",
   prayer: "Gebet",
-  podcast: "Podcast",
+  podcast: "Podcasts",
   newsArticle: "Neuigkeiten",
   searchContent: "Inhalt suchen",
   searchQuranPrayers: "Quran & Gebete suchen...",
