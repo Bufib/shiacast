@@ -22,6 +22,7 @@ const de = {
   loading_stream: "Stream lädt",
   delete_from_cache: "Aus Cache löschen",
   // General
+  today: "Heute",
   yes: "Ja",
   reset: "Zurücksetzen",
   retry: "Wiederholen",

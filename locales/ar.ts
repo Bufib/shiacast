@@ -22,6 +22,7 @@ const ar = {
   loading_stream: "جارٍ تحميل الدفق",
   delete_from_cache: "حذف من ذاكرة التخزين المؤقت",
   // General
+  today: "اليوم",
   yes: "نعم",
   reset: "إعادة ضبط",
   retry: "إعادة المحاولة",

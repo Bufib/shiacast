@@ -180,7 +180,7 @@ export default function WeeklyCalendarScreen() {
                   {isToday && (
                     <View style={styles.todayBadge}>
                       <ThemedText style={styles.todayBadgeText}>
-                        {t("today") ?? "Today"}
+                        {t("today")}
                       </ThemedText>
                     </View>
                   )}

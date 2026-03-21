@@ -31,6 +31,7 @@ const en = {
   verticalInfoText: "Swipe up or down to change the page",
 
   // General
+  today: "Today",
   yes: "Yes",
   reset: "reset",
   retry: "Retry",
