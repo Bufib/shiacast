@@ -90,7 +90,7 @@ const LatestQuestions: React.FC = () => {
       onPress={onPress}
       style={({ pressed }) => [
         styles.questionItem,
-        Colors[colorScheme].contrast,
+        { backgroundColor: Colors[colorScheme].contrast },
         pressed && {
           ...styles.pressed,
           backgroundColor: colorScheme === "dark" ? "#242c40" : "#E8E8E8",
@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
   listContent: {
     marginTop: 15,
     gap: 12,
-    paddingBottom: 8
+    paddingBottom: 8,
   },
   questionItem: {
     borderRadius: 7,

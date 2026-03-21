@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import {
   ScrollView,
   TouchableOpacity,
@@ -25,9 +25,28 @@ export const DaySelector: React.FC<DaySelectorProps> = ({
   const { width, height } = useWindowDimensions();
   const { isLarge, isMedium } = returnSize(width, height);
   const colorScheme = useColorScheme() || "light";
+  const scrollViewRef = useRef<ScrollView>(null);
+
+  const GAP = 10;
+  const PADDING = 10;
+  const buttonWidth = isLarge ? 80 : isMedium ? 70 : 60;
+
+  useEffect(() => {
+    if (selectedDay === null) return;
+
+    const itemTotalWidth = buttonWidth + GAP;
+    // Center the selected day in the visible area
+    const offset = selectedDay * itemTotalWidth + PADDING - (width / 2 - buttonWidth / 2);
+
+    scrollViewRef.current?.scrollTo({
+      x: Math.max(0, offset),
+      animated: true,
+    });
+  }, [selectedDay, buttonWidth, width]);
 
   return (
     <ScrollView
+      ref={scrollViewRef}
       horizontal
       showsHorizontalScrollIndicator={false}
       contentContainerStyle={styles.scrollContent}
@@ -38,12 +57,9 @@ export const DaySelector: React.FC<DaySelectorProps> = ({
           key={index}
           style={[
             styles.dayButton,
-            {
-              width: isLarge ? 80 : isMedium ? 70 : 60,
-              height: 45
-            },
-            selectedDay === index && styles.selectedDayButton,
+            { width: buttonWidth, height: 45 },
             { backgroundColor: colorScheme === "dark" ? "#333" : "#ccc" },
+            selectedDay === index && styles.selectedDayButton,
             selectedDay === index && {
               backgroundColor: colorScheme === "dark" ? "#555" : "#e0e0e0",
             },
@@ -71,7 +87,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 10,
     paddingHorizontal: 10,
-
   },
   scrollStyle: {
     flexGrow: 0,
