@@ -9,23 +9,18 @@ type Props = {
   item: CalendarType;
   badgeColor: string;
   diff: number;
-  isNext: boolean;
   lang: string;
   t: (key: string) => string;
 };
 
 const CalendarEventCard = memo(
-  function CalendarEventCard({ item, badgeColor, diff, isNext, lang, t }: Props) {
+  function CalendarEventCard({ item, badgeColor, diff, lang, t }: Props) {
     const colorScheme = useColorScheme() || "light";
 
     const isToday = diff === 0;
     const isOld = diff < 0;
 
-    const statusLabel = isToday
-      ? t("legendToday")
-      : isNext
-      ? t("legendNext")
-      : "";
+    const statusLabel = isToday ? t("legendToday") : "";
 
     // Memoize parsed date values
     const { dayNumber, monthText, yearText } = useMemo(() => {
@@ -49,16 +44,6 @@ const CalendarEventCard = memo(
           borderLeftColor: badgeColor,
         };
       }
-      if (isNext) {
-        return {
-          backgroundColor:
-            colorScheme === "dark"
-              ? "rgba(6, 182, 212, 0.20)"
-              : "rgba(34, 211, 238, 0.15)",
-          borderLeftWidth: 4,
-          borderLeftColor: badgeColor,
-        };
-      }
       if (isOld) {
         return {
           backgroundColor: colorScheme === "dark" ? "#6f767aff" : "#F1F5F9",
@@ -72,7 +57,7 @@ const CalendarEventCard = memo(
         borderLeftWidth: 4,
         borderLeftColor: badgeColor,
       };
-    }, [isToday, isNext, isOld, badgeColor, colorScheme]);
+    }, [isToday, isOld, badgeColor, colorScheme]);
 
     return (
       <View
@@ -118,10 +103,7 @@ const CalendarEventCard = memo(
         {!!statusLabel && (
           <View style={styles.statusBadgeContainer}>
             <View
-              style={[
-                styles.statusBadge,
-                { backgroundColor: isToday ? "#FB923C" : "#06B6D4" },
-              ]}
+              style={[styles.statusBadge, { backgroundColor: "#FB923C" }]}
             >
               <ThemedText style={styles.statusBadgeText}>
                 {statusLabel}
@@ -141,7 +123,6 @@ const CalendarEventCard = memo(
       prevProps.item.description === nextProps.item.description &&
       prevProps.badgeColor === nextProps.badgeColor &&
       prevProps.diff === nextProps.diff &&
-      prevProps.isNext === nextProps.isNext &&
       prevProps.lang === nextProps.lang
     );
   }

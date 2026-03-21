@@ -884,7 +884,6 @@ import { useNewsArticles } from "../../../../hooks/useNewsArticles";
 import { usePodcasts } from "../../../../hooks/usePodcasts";
 import { useAuthStore } from "../../../../stores/authStore";
 import { useDataVersionStore } from "../../../../stores/dataVersionStore";
-import { useKnowledgeTabStore } from "../../../../stores/useKnowledgeTabStore";
 import { getAllCalendarDates } from "../../../../db/queries/calendar";
 import handleOpenExternalUrl from "../../../../utils/handleOpenExternalUrl";
 import { Ionicons } from "@expo/vector-icons";
@@ -973,8 +972,6 @@ export default function HomeScreen() {
   const pdfs: PdfType[] = pdfPages?.pages.flat() ?? [];
 
   // Calendar event (today or next upcoming)
-  const setKnowledgeTab = useKnowledgeTabStore((s) => s.setActiveTab);
-
   const calendarVersion = useDataVersionStore((s) => s.calendarVersion);
   const [calendarEvent, setCalendarEvent] = useState<CalendarType | null>(null);
   const [calendarEventDiff, setCalendarEventDiff] = useState<number>(0);
@@ -1201,8 +1198,13 @@ export default function HomeScreen() {
                 <TouchableOpacity
                   style={styles.calendarBanner}
                   onPress={() => {
-                    setKnowledgeTab(2);
-                    router.push("/(tabs)/knowledge" as any);
+                    router.push({
+                      pathname: "/(tabs)/knowledge/calendar/calendarDayDetail" as any,
+                      params: {
+                        date: calendarEvent.gregorian_date,
+                        islamicDate: calendarEvent.islamic_date,
+                      },
+                    });
                   }}
                   activeOpacity={0.75}
                 >

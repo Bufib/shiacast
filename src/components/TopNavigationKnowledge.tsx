@@ -6,7 +6,7 @@ import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 import indexPrayer from "@/app/(tabs)/knowledge/prayers/indexPrayer";
 import indexQuestion from "@/app/(tabs)/knowledge/questions/indexQuestion";
 import indexQuran from "@/app/(tabs)/knowledge/quran/indexQuran";
-import indexCalandar from "@/app/(tabs)/knowledge/calendar/indexCalendar";
+import indexCalendar from "@/app/(tabs)/knowledge/calendar/indexCalendar";
 import indexHistory from "@/app/(tabs)/knowledge/history/indexHistory";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { Colors } from "@/constants/Colors";
@@ -18,7 +18,7 @@ import { useKnowledgeTabStore } from "../../stores/useKnowledgeTabStore";
 const renderScene = SceneMap({
   questionsScreen: indexQuestion,
   prayerScreen: indexPrayer,
-  calendarScreen: indexCalandar,
+  calendarScreen: indexCalendar,
   videoScreen: indexVideos,
   quranScreen: indexQuran,
   historyScreen: indexHistory,

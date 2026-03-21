@@ -8,7 +8,8 @@ const _layout = () => {
         headerBackButtonMenuEnabled: false,
       }}
     >
-      <Stack.Screen name="indexCalandar" options={{ headerShown: true }} />
+      <Stack.Screen name="indexCalendar" options={{ headerShown: true }} />
+      <Stack.Screen name="calendarDayDetail" options={{ headerShown: true }} />
     </Stack>
   );
 };
