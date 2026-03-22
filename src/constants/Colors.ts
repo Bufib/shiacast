@@ -225,7 +225,7 @@ export const Colors: any = {
     itemTypeColor: "#ccc",
 
     // Home screen
-    homeCalendarCardBackground: "#1C1C1E",
+    homeCalendarCardBackground: "#305b6e",
     homeCalendarDatePillBackground: "rgba(93, 202, 165, 0.12)",
     homeCalendarDivider: "#333",
     homeCalendarMonthText: "rgba(255,255,255,0.55)",

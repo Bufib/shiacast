@@ -1013,7 +1013,7 @@ export default function HomeScreen() {
         }
       >
         <View style={styles.headerContainer}>
-          <ThemedText style={[styles.sectionLabel, { marginBottom: 15 }]}>
+          <ThemedText style={[styles.sectionLabel, { marginBottom: 10 }]}>
             {t("newsTitle").toUpperCase()}
           </ThemedText>
 
@@ -1477,7 +1477,7 @@ const styles = StyleSheet.create({
   },
 
   section: {
-    gap: 15,
+    gap: 10,
   },
   lastSection: {},
 
