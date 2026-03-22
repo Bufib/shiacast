@@ -24,7 +24,7 @@ export const gradientColorPalette = [
   ["#2c3e50", "#4a569d", "#8360c3"],
 
   // Tropical Vibes - Lime to turquoise
-  ["#11998e", "#388E3C", "#00d2ff"],
+  // ["#11998e", "#388E3C", "#00d2ff"],
 
   // Rose Gold Luxury - Soft pink to gold
   ["#ffecd2", "#fcb69f", "#ff9a9e"],
