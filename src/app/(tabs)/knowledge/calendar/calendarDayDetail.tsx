@@ -16,13 +16,12 @@ import {
 import { CalendarType } from "@/constants/Types";
 
 export default function CalendarDayDetail() {
-  const { date, islamicDate } = useLocalSearchParams<{
+  const { date } = useLocalSearchParams<{
     date: string;
     islamicDate: string;
   }>();
   const { lang } = useLanguage();
   const { t } = useTranslation();
-  const colorScheme = useColorScheme() || "light";
 
   const [events, setEvents] = useState<CalendarType[]>([]);
   const [legendColorMap, setLegendColorMap] = useState<Record<number, string>>(

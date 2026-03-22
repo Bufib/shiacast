@@ -985,7 +985,7 @@ export default function HomeScreen() {
         {
           backgroundColor: Colors[colorScheme].background,
           paddingTop: insets.top,
-          paddingBottom: insets.bottom,
+          paddingBottom: insets.bottom ,
         },
       ]}
     >
@@ -1390,6 +1390,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     gap: 30,
+    paddingBottom: 30
   },
 
   headerContainer: {

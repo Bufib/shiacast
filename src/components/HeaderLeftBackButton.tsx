@@ -7,14 +7,20 @@ const HeaderLeftBackButton = ({
   color,
   size,
   style,
+  route,
 }: {
   color?: string | null;
   size?: number | null;
   style?: any;
+  route?: any;
 }) => {
   const colorScheme = useColorScheme() || "light";
   return (
-    <TouchableOpacity onPress={() => router.back()} hitSlop={10} style={style}>
+    <TouchableOpacity
+      onPress={() => (route ? router.replace(route) : router.back())}
+      hitSlop={10}
+      style={style}
+    >
       <Ionicons
         name="chevron-back-outline"
         size={size ? size : 35}

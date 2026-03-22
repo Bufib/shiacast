@@ -1053,7 +1053,7 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
   },
   columnWrapper: {
-    marginBottom: 25,
+    marginBottom: 15,
     justifyContent: "space-between",
     paddingHorizontal: 16,
   },

@@ -14,6 +14,7 @@ import { Image } from "expo-image";
 import { useScreenFadeIn } from "../../hooks/useScreenFadeIn";
 import indexVideos from "@/app/(tabs)/knowledge/videos/indexVideos";
 import { useKnowledgeTabStore } from "../../stores/useKnowledgeTabStore";
+import indexArabic from "@/app/(tabs)/knowledge/arabic/indexArabic";
 
 const renderScene = SceneMap({
   questionsScreen: indexQuestion,
@@ -22,6 +23,7 @@ const renderScene = SceneMap({
   videoScreen: indexVideos,
   quranScreen: indexQuran,
   historyScreen: indexHistory,
+  arabicScreen: indexArabic
 });
 
 export default function TopNavigationKnowledge() {
@@ -72,6 +74,11 @@ export default function TopNavigationKnowledge() {
         key: "historyScreen",
         title: "",
         icon: require("@/assets/images/historyHeaderLogo.png"),
+      },
+      {
+        key: "arabicScreen",
+        title: "",
+        icon: require("@/assets/images/arabic3.png"),
       },
     ],
     [],
@@ -165,6 +172,19 @@ export default function TopNavigationKnowledge() {
             ),
           },
           historyScreen: {
+            icon: ({ route, focused }) => (
+              <Image
+                source={route.icon}
+                contentFit="contain"
+                style={{
+                  width: 35,
+                  height: 35,
+                  opacity: focused ? 1 : 0.6,
+                }}
+              />
+            ),
+          },
+          arabicScreen: {
             icon: ({ route, focused }) => (
               <Image
                 source={route.icon}

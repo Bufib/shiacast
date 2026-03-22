@@ -1,4 +1,7 @@
+// //!last that worked
+
 // import { GestureHandlerRootView } from "react-native-gesture-handler";
+// import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 // import "react-native-reanimated";
 // import AppReviewPrompt from "@/components/AppReviewPrompt";
 // import LanguageSelection from "@/components/LanguageSelectionScreen";
@@ -6,16 +9,16 @@
 // import ReMountManager from "@/components/ReMountManager";
 // import { SupabaseRealtimeProvider } from "@/components/SupabaseRealtimeProvider";
 // import { Colors } from "@/constants/Colors";
-// import { LanguageProvider, useLanguage } from "@/contexts/LanguageContext";
-// import { useColorScheme } from "@/hooks/useColorScheme";
-// import { useConnectionStatus } from "@/hooks/useConnectionStatus";
-// import { useDatabaseSync } from "@/hooks/useDatabaseSync";
-// import { cleanupCache } from "@/hooks/usePodcasts";
-// import { usePushNotifications } from "@/hooks/usePushNotifications";
-// import { useAuthStore } from "@/stores/authStore";
-// import { useFontSizeStore } from "@/stores/fontSizeStore";
-// import useNotificationStore from "@/stores/notificationStore";
-// import "@/utils/i18n";
+// import { LanguageProvider, useLanguage } from "../../contexts/LanguageContext";
+// import { useColorScheme } from "../../hooks/useColorScheme";
+// import { useConnectionStatus } from "../../hooks/useConnectionStatus";
+// import { useDatabaseSync } from "../../hooks/useDatabaseSync";
+// import { cleanupCache } from "../../hooks/usePodcasts";
+// import { usePushNotifications } from "../../hooks/usePushNotifications";
+// import { useAuthStore } from "../../stores/authStore";
+// import { useFontSizeStore } from "../../stores/fontSizeStore";
+// import useNotificationStore from "../../stores/notificationStore";
+// import "../../utils/i18n";
 // import {
 //   DarkTheme,
 //   DefaultTheme,
@@ -40,18 +43,19 @@
 // import { MenuProvider } from "react-native-popup-menu";
 // import Toast from "react-native-toast-message";
 // import MiniPlayerBar from "@/components/MiniPlayerBar";
-// import GlobalVideoHost from "@/player/GlobalVideoHost";
+// import GlobalVideoHost from "../../player/GlobalVideoHost";
 // import AsyncStorage from "@react-native-async-storage/async-storage";
-// import { setDatabase } from "../db";
-// import { migrateDbIfNeeded, DB_NAME } from "@/db/migrates";
+// import { setDatabase } from "../../db";
+// import { migrateDbIfNeeded, DB_NAME } from "../../db/migrates";
 // import { LoadingIndicator } from "@/components/LoadingIndicator";
 // import { ThemedText } from "@/components/ThemedText";
 // import { setAudioModeAsync } from "expo-audio";
+// import IntroVideo, { useIntroVideo } from "@/components/Intro";
 // // If removeEventListener doesn’t exist, patch it on-the-fly:
 // if (typeof (BackHandler as any).removeEventListener !== "function") {
 //   (BackHandler as any).removeEventListener = (
 //     eventName: any,
-//     handler: () => boolean
+//     handler: () => boolean,
 //   ) => {
 //     const subscription = BackHandler.addEventListener(eventName, handler);
 //     subscription.remove();
@@ -331,11 +335,8 @@
 //         </Text>
 //         <LoadingIndicator size={"large"} />
 //         <Text style={{ fontSize: 16, textAlign: "center", color: fg }}>
-//           {t("dataIsBeingLoadedTitle")}
-//         </Text>
-//         <ThemedText style={{ fontSize: 16, textAlign: "center", color: fg }}>
 //           {t("dataIsBeingLoadedMessage")}
-//         </ThemedText>
+//         </Text>
 //         <Toast />
 //       </View>
 //     );
@@ -352,6 +353,7 @@
 //             <NoInternet showUI={!hasInternet} showToast={true} />
 //             <QueryClientProvider client={queryClient}>
 //               <SupabaseRealtimeProvider>
+//                 <BottomSheetModalProvider>
 //                 <Stack
 //                   screenOptions={{
 //                     headerShown: false,
@@ -375,6 +377,7 @@
 //                 </Stack>
 //                 <MiniPlayerBar />
 //                 <AppReviewPrompt />
+//                 </BottomSheetModalProvider>
 //               </SupabaseRealtimeProvider>
 //             </QueryClientProvider>
 //           </MenuProvider>
@@ -390,6 +393,8 @@
 //   const [migrationError, setMigrationError] = useState<string | null>(null);
 //   const [retrying, setRetrying] = useState(false);
 //   const [audioReady, setAudioReady] = useState(Platform.OS !== "ios");
+//   const { hasPlayed: hasPlayedIntro, markAsPlayed: markIntroAsPlayed } =
+//     useIntroVideo();
 
 //   // Memoize the onInit callback to prevent SQLiteProvider from reinitializing
 //   const onInit = useCallback(async (db: SQLite.SQLiteDatabase) => {
@@ -430,7 +435,17 @@
 //       .finally(() => setAudioReady(true));
 //   }, []);
 
-//   if (!audioReady) return null;
+//   if (!audioReady || hasPlayedIntro === null) return null;
+
+//   if (hasPlayedIntro === false) {
+//     SplashScreen.hideAsync();
+//     return (
+//       <IntroVideo
+//         source={require("@/assets/videos/intro.mp4")}
+//         onComplete={markIntroAsPlayed}
+//       />
+//     );
+//   }
 
 //   return (
 //     <GlobalVideoHost>
@@ -483,10 +498,9 @@ import {
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { SQLiteProvider } from "expo-sqlite";
 import * as SQLite from "expo-sqlite";
 import { StatusBar } from "expo-status-bar";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Appearance,
@@ -507,7 +521,8 @@ import { LoadingIndicator } from "@/components/LoadingIndicator";
 import { ThemedText } from "@/components/ThemedText";
 import { setAudioModeAsync } from "expo-audio";
 import IntroVideo, { useIntroVideo } from "@/components/Intro";
-// If removeEventListener doesn’t exist, patch it on-the-fly:
+
+// If removeEventListener doesn't exist, patch it on-the-fly:
 if (typeof (BackHandler as any).removeEventListener !== "function") {
   (BackHandler as any).removeEventListener = (
     eventName: any,
@@ -610,44 +625,6 @@ function AppContent() {
     };
     setColorTheme();
   }, []);
-
-  //! Old hydration logic
-  // useEffect(() => {
-  //   const hydrateStores = async () => {
-  //     try {
-  //       await Promise.all([
-  //         useAuthStore.persist.rehydrate(),
-  //         useFontSizeStore.persist.rehydrate(),
-  //         useNotificationStore.persist.rehydrate(),
-  //       ]);
-  //       await useNotificationStore.getState().checkPermissions();
-  //       setStoresHydrated(true);
-  //     } catch (e) {
-  //       console.error("Failed to hydrate stores:", e);
-  //       setStoresHydrated(true);
-  //     }
-  //   };
-  //   hydrateStores();
-  // }, []);
-
-  //! Here
-  // useEffect(() => {
-  //   const checkHydration = () => {
-  //     const allHydrated =
-  //       useFontSizeStore.persist.hasHydrated() &&
-  //       useNotificationStore.persist.hasHydrated();
-
-  //     if (allHydrated) {
-  //       setStoresHydrated(true);
-  //       useNotificationStore.getState().checkPermissions();
-  //     }
-  //   };
-
-  //   checkHydration();
-  //   const interval = setInterval(checkHydration, 50);
-
-  //   return () => clearInterval(interval);
-  // }, []);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -760,9 +737,6 @@ function AppContent() {
   if (!languageContextReady || !storesHydrated || !isSessionRestored)
     return null;
 
-  //! Language Context
-  // if (languageContextReady && !hasStoredLanguage) return <LanguageSelection />;
-
   if (!isDbReady && showLoadingScreen && hasInternet) {
     const fg = colorScheme === "dark" ? Colors.dark.text : Colors.light.text;
     const bg =
@@ -810,29 +784,29 @@ function AppContent() {
             <QueryClientProvider client={queryClient}>
               <SupabaseRealtimeProvider>
                 <BottomSheetModalProvider>
-                <Stack
-                  screenOptions={{
-                    headerShown: false,
-                    headerBackButtonMenuEnabled: false,
-                  }}
-                >
-                  <Stack.Screen name="index" />
-                  <Stack.Screen name="(tabs)" />
-                  <Stack.Screen name="(addNews)" />
-                  <Stack.Screen name="(auth)" />
-                  <Stack.Screen name="(displayQuestion)" />
-                  <Stack.Screen name="(newsArticle)" />
-                  <Stack.Screen name="(displayPrayer)" />
-                  <Stack.Screen name="(askQuestion)" />
-                  <Stack.Screen name="(podcast)" />
-                  <Stack.Screen name="(pdfs)" />
-                  <Stack.Screen
-                    name="+not-found"
-                    options={{ headerShown: true }}
-                  />
-                </Stack>
-                <MiniPlayerBar />
-                <AppReviewPrompt />
+                  <Stack
+                    screenOptions={{
+                      headerShown: false,
+                      headerBackButtonMenuEnabled: false,
+                    }}
+                  >
+                    <Stack.Screen name="index" />
+                    <Stack.Screen name="(tabs)" />
+                    <Stack.Screen name="(addNews)" />
+                    <Stack.Screen name="(auth)" />
+                    <Stack.Screen name="(displayQuestion)" />
+                    <Stack.Screen name="(newsArticle)" />
+                    <Stack.Screen name="(displayPrayer)" />
+                    <Stack.Screen name="(askQuestion)" />
+                    <Stack.Screen name="(podcast)" />
+                    <Stack.Screen name="(pdfs)" />
+                    <Stack.Screen
+                      name="+not-found"
+                      options={{ headerShown: true }}
+                    />
+                  </Stack>
+                  <MiniPlayerBar />
+                  <AppReviewPrompt />
                 </BottomSheetModalProvider>
               </SupabaseRealtimeProvider>
             </QueryClientProvider>
@@ -847,30 +821,49 @@ function AppContent() {
 export default function RootLayout() {
   const colorScheme = (useColorScheme() || "light") as "light" | "dark";
   const [migrationError, setMigrationError] = useState<string | null>(null);
+  const [dbReady, setDbReady] = useState(false);
   const [retrying, setRetrying] = useState(false);
   const [audioReady, setAudioReady] = useState(Platform.OS !== "ios");
   const { hasPlayed: hasPlayedIntro, markAsPlayed: markIntroAsPlayed } =
     useIntroVideo();
 
-  // Memoize the onInit callback to prevent SQLiteProvider from reinitializing
-  const onInit = useCallback(async (db: SQLite.SQLiteDatabase) => {
-    try {
-      await migrateDbIfNeeded(db); // atomic; bumps user_version on success
-      setDatabase(db); // only after successful COMMIT
-    } catch (e: any) {
-      console.error("DB migration failed:", e);
-      setMigrationError(e?.message ?? String(e));
-      // Do NOT rethrow; we want to render a Retry UI instead of a red screen
-    }
-  }, []); // Empty deps - this only needs to run once
+  // Keep a stable reference to the DB handle so retries reuse it
+  const dbRef = useRef<SQLite.SQLiteDatabase | null>(null);
+
+  // Open DB once on mount — no SQLiteProvider, no auto-close on unmount
+  useEffect(() => {
+    let mounted = true;
+
+    (async () => {
+      try {
+        const db = await SQLite.openDatabaseAsync(DB_NAME);
+        dbRef.current = db;
+        await migrateDbIfNeeded(db);
+        setDatabase(db);
+        if (mounted) setDbReady(true);
+      } catch (e: any) {
+        console.error("DB migration failed:", e);
+        if (mounted) setMigrationError(e?.message ?? String(e));
+      }
+    })();
+
+    return () => {
+      mounted = false;
+      // Intentionally NO db.closeAsync() here —
+      // the singleton lives for the entire app lifetime.
+    };
+  }, []);
 
   const handleRetry = useCallback(async () => {
     try {
       setRetrying(true);
       setMigrationError(null);
-      const db = await SQLite.openDatabaseAsync(DB_NAME);
-      await migrateDbIfNeeded(db); // atomic
-      setDatabase(db); // mark db ready for the app
+      // Reuse the existing handle if available, otherwise open fresh
+      const db = dbRef.current ?? (await SQLite.openDatabaseAsync(DB_NAME));
+      dbRef.current = db;
+      await migrateDbIfNeeded(db);
+      setDatabase(db);
+      setDbReady(true);
     } catch (e: any) {
       console.error("DB migration retry failed:", e);
       setMigrationError(e?.message ?? String(e));
@@ -903,26 +896,24 @@ export default function RootLayout() {
     );
   }
 
+  if (migrationError) {
+    return (
+      <RetryMigrationScreen
+        message={migrationError}
+        onRetry={handleRetry}
+        isRetrying={retrying}
+        colorScheme={colorScheme}
+      />
+    );
+  }
+
+  if (!dbReady) return null;
+
   return (
     <GlobalVideoHost>
-      <SQLiteProvider
-        databaseName={DB_NAME}
-        useSuspense={false}
-        onInit={onInit}
-      >
-        {migrationError ? (
-          <RetryMigrationScreen
-            message={migrationError}
-            onRetry={handleRetry}
-            isRetrying={retrying}
-            colorScheme={colorScheme}
-          />
-        ) : (
-          <LanguageProvider>
-            <AppContent />
-          </LanguageProvider>
-        )}
-      </SQLiteProvider>
+      <LanguageProvider>
+        <AppContent />
+      </LanguageProvider>
     </GlobalVideoHost>
   );
 }
