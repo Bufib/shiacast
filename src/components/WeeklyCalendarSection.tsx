@@ -122,7 +122,7 @@ export const WeeklyCalendarSection: React.FC<
     dayIndex: number,
     todoId: string | number,
     time: Date | null,
-    repeatWeekly: boolean
+    repeatWeekly: boolean,
   ) => {
     try {
       const todoIdString = String(todoId);
@@ -135,7 +135,7 @@ export const WeeklyCalendarSection: React.FC<
       if (!getNotifications) {
         Alert.alert(
           t("pushNotificationsDisabledTitle"),
-          t("pushNotificationsDisabledMessage")
+          t("pushNotificationsDisabledMessage"),
         );
         return;
       }
@@ -157,7 +157,7 @@ export const WeeklyCalendarSection: React.FC<
         todoText,
         dayIndex,
         time,
-        repeatWeekly
+        repeatWeekly,
       );
 
       // Only show toast after successful scheduling
@@ -172,12 +172,7 @@ export const WeeklyCalendarSection: React.FC<
   return (
     <View style={styles.container}>
       <View style={styles.calendarHeader}>
-        <TouchableOpacity
-          style={styles.calendarHeaderContainer}
-          onPress={onNavigateToFullCalendar}
-          disabled={!onNavigateToFullCalendar}
-          activeOpacity={onNavigateToFullCalendar ? 0.7 : 1}
-        >
+        <View style={styles.calendarHeaderContainer}>
           <AntDesign
             name="calendar"
             size={isLarge ? 45 : isMedium ? 40 : 35}
@@ -190,24 +185,31 @@ export const WeeklyCalendarSection: React.FC<
             }}
           />
           <View style={styles.calendarTextContainer}>
-            <ThemedText
-              style={[
-                styles.calendarTextTitle,
-                { fontSize: isLarge ? 20 : isMedium ? 16 : 14 },
-              ]}
-            >
+            <ThemedText style={[styles.calendarTextTitle, { fontSize: 20 }]}>
               {t("weeklyToDoTitle")}
             </ThemedText>
-            <ThemedText
+            {/* <ThemedText
               style={[
                 styles.calendarTextSubtitle,
                 { fontSize: isLarge ? 16 : isMedium ? 14 : 12 },
               ]}
             >
               {t("weeklyToDoSubtitle")}
-            </ThemedText>
+            </ThemedText> */}
+            <TouchableOpacity
+              onPress={onNavigateToFullCalendar}
+              disabled={!onNavigateToFullCalendar}
+              activeOpacity={onNavigateToFullCalendar ? 0.7 : 1}
+            >
+              <ThemedText
+                style={{ fontSize: 14, color: Colors.universal.link }}
+              >
+                {t("showAll")}
+              </ThemedText>
+            </TouchableOpacity>
           </View>
-        </TouchableOpacity>
+        </View>
+
         <TouchableOpacity
           style={[styles.addButton, selectedDay === null && { opacity: 0.5 }]}
           onPress={onShowAddModal}

@@ -37,7 +37,7 @@ export default function FilterModal({
   const insets = useSafeAreaInsets();
   const sheetRef = useRef<BottomSheetModal>(null);
 
-  const snapPoints = useMemo(() => ["50%", "85%"], []);
+  const snapPoints = useMemo(() => ["75%", "90%"], []);
 
   useEffect(() => {
     if (visible) {

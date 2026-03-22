@@ -37,18 +37,21 @@ const getCurrentDayIndex = (): number => {
 export default function WeeklyCalendarScreen() {
   const { t } = useTranslation();
   const colorScheme = useColorScheme() || "light";
-  const { todosByDay, loading, toggleTodo, addTodo, deleteTodo, undoAllForDay } =
+  const { todosByDay, toggleTodo, addTodo, deleteTodo, undoAllForDay } =
     useWeeklyTodos();
 
+  const todayIndex = getCurrentDayIndex();
+
   const [expandedDays, setExpandedDays] = useState<Record<number, boolean>>(
-    () => Object.fromEntries(DAY_INDICES.map((d) => [d, true]))
+    () => Object.fromEntries(DAY_INDICES.map((d) => [d, d === todayIndex])),
   );
 
   const toggleDay = useCallback((dayIndex: number) => {
-    setExpandedDays((prev) => ({ ...prev, [dayIndex]: !prev[dayIndex] }));
+    setExpandedDays((prev) => ({
+      ...prev,
+      [dayIndex]: !prev[dayIndex],
+    }));
   }, []);
-
-  const todayIndex = getCurrentDayIndex();
 
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
   const [addModalVisible, setAddModalVisible] = useState(false);
@@ -75,13 +78,16 @@ export default function WeeklyCalendarScreen() {
       }
       setAddModalVisible(false);
     },
-    [addTodo, selectedDay]
+    [addTodo, selectedDay],
   );
 
-  const showDeleteConfirmation = useCallback((dayIndex: number, todoId: number) => {
-    setTodoToDelete({ dayIndex, todoId });
-    setDeleteModalVisible(true);
-  }, []);
+  const showDeleteConfirmation = useCallback(
+    (dayIndex: number, todoId: number) => {
+      setTodoToDelete({ dayIndex, todoId });
+      setDeleteModalVisible(true);
+    },
+    [],
+  );
 
   const handleConfirmDelete = useCallback(async () => {
     const { dayIndex, todoId } = todoToDelete;
@@ -109,7 +115,7 @@ export default function WeeklyCalendarScreen() {
         },
       ]);
     },
-    [t, undoAllForDay]
+    [t, undoAllForDay],
   );
 
   const handleSetReminder = useCallback(
@@ -117,7 +123,7 @@ export default function WeeklyCalendarScreen() {
       dayIndex: number,
       todoId: string | number,
       time: Date | null,
-      repeatWeekly: boolean
+      repeatWeekly: boolean,
     ) => {
       try {
         const todoIdString = String(todoId);
@@ -128,7 +134,7 @@ export default function WeeklyCalendarScreen() {
         if (!getNotifications) {
           Alert.alert(
             t("pushNotificationsDisabledTitle"),
-            t("pushNotificationsDisabledMessage")
+            t("pushNotificationsDisabledMessage"),
           );
           return;
         }
@@ -138,28 +144,33 @@ export default function WeeklyCalendarScreen() {
           if (latestStatus !== "granted") return;
         }
         const todosForDay = todosByDay[dayIndex] ?? [];
-        const todo = todosForDay.find((item) => String(item.id) === todoIdString);
+        const todo = todosForDay.find(
+          (item) => String(item.id) === todoIdString,
+        );
         const todoText = todo?.text.replace(/\{\{|\}\}/g, "") ?? "";
         await scheduleTodoReminderNotification(
           todoIdString,
           todoText,
           dayIndex,
           time,
-          repeatWeekly
+          repeatWeekly,
         );
         Toast.show({ type: "success", text1: t("timerSet") });
       } catch (error) {
         console.error("Failed to set/delete reminder:", error);
       }
     },
-    [getNotifications, permissionStatus, checkPermissions, todosByDay, t]
+    [getNotifications, permissionStatus, checkPermissions, todosByDay, t],
   );
 
   return (
     <ThemedView style={styles.container}>
       <Stack.Screen options={{ title: t("weeklyToDoTitle") }} />
       <ScrollView
-        contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 16 }]}
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingBottom: insets.bottom + 16 },
+        ]}
       >
         {DAY_INDICES.map((dayIndex) => {
           const todos = todosByDay[dayIndex] ?? [];
@@ -174,7 +185,9 @@ export default function WeeklyCalendarScreen() {
                   onPress={() => toggleDay(dayIndex)}
                   activeOpacity={0.7}
                 >
-                  <ThemedText style={[styles.dayTitle, isToday && styles.todayTitle]}>
+                  <ThemedText
+                    style={[styles.dayTitle, isToday && styles.todayTitle]}
+                  >
                     {getFullDayName(dayIndex)}
                   </ThemedText>
                   {isToday && (
@@ -198,11 +211,19 @@ export default function WeeklyCalendarScreen() {
 
                 <View style={styles.dayHeaderActions}>
                   {isExpanded && todos.length > 0 && (
-                    <TouchableOpacity onPress={() => handleUndo(dayIndex)} hitSlop={8}>
-                      <ThemedText style={styles.undoText}>{t("undo")}</ThemedText>
+                    <TouchableOpacity
+                      onPress={() => handleUndo(dayIndex)}
+                      hitSlop={8}
+                    >
+                      <ThemedText style={styles.undoText}>
+                        {t("undo")}
+                      </ThemedText>
                     </TouchableOpacity>
                   )}
-                  <TouchableOpacity onPress={() => openAddModal(dayIndex)} hitSlop={8}>
+                  <TouchableOpacity
+                    onPress={() => openAddModal(dayIndex)}
+                    hitSlop={8}
+                  >
                     <AntDesign
                       name="plus-circle"
                       size={22}
