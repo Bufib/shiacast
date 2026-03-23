@@ -330,3 +330,23 @@ export const arabicLetters = [
     final: "ـي",
   },
 ];
+
+
+
+export const shortVowels = [
+  { arabic: "بَ", latin: "ba", label: "Fatha = a" },
+  { arabic: "بِ", latin: "bi", label: "Kasra = i" },
+  { arabic: "بُ", latin: "bu", label: "Damma = u" },
+];
+
+export const longVowels = [
+  { arabic: "بَا", latin: "bā", label: "langes ā" },
+  { arabic: "بِي", latin: "bī", label: "langes ī" },
+  { arabic: "بُو", latin: "bū", label: "langes ū" },
+];
+
+export const comparePairs = [
+  { short: "بَ", shortLatin: "ba", long: "بَا", longLatin: "bā" },
+  { short: "بِ", shortLatin: "bi", long: "بِي", longLatin: "bī" },
+  { short: "بُ", shortLatin: "bu", long: "بُو", longLatin: "bū" },
+];

@@ -96,7 +96,7 @@ export default function Level1_1() {
               <ThemedText>Zurück</ThemedText>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => router.push("/(arabicLevels)/level1_1")}
+              onPress={() => router.push("/(arabicLevels)/level3")}
               style={styles.continueButton}
             >
               <ThemedText>Weiter</ThemedText>
@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
-    marginBottom: 15
+    marginBottom: 15,
   },
   headerTitle: {
     fontSize: 30,

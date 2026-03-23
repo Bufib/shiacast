@@ -831,3 +831,24 @@ export type ArabicCurriculumLevel = {
   description: string;
   modules: string[];
 };
+
+
+export type SectionItem =
+  | { type: "intro" }
+  | { type: "shortTitle" }
+  | { type: "longTitle" }
+  | { type: "compareTitle" }
+  | { type: "exercise" }
+  | {
+      type: "shortCard" | "longCard";
+      arabic: string;
+      latin: string;
+      label: string;
+    }
+  | {
+      type: "compareCard";
+      short: string;
+      shortLatin: string;
+      long: string;
+      longLatin: string;
+    };

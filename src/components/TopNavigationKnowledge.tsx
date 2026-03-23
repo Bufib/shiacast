@@ -78,10 +78,10 @@ export default function TopNavigationKnowledge() {
       {
         key: "arabicScreen",
         title: "",
-        icon: require("@/assets/images/arabic.png"),
+        icon: colorScheme === "dark" ? require("@/assets/images/arabic_white.png") : require("@/assets/images/arabic_black.png"),
       },
     ],
-    [],
+    [colorScheme],
   );
 
   return (
