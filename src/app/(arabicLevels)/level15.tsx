@@ -14,97 +14,114 @@ import HeaderLeftBackButton from "@/components/HeaderLeftBackButton";
 import { router } from "expo-router";
 import { ThemedText } from "@/components/ThemedText";
 
-type LevelAlifKhanjariyaSectionItem =
+type LevelHamzaSectionItem =
   | { type: "intro" }
-  | { type: "signTitle" }
-  | { type: "signCard"; arabic: string; latin: string; label: string }
+  | { type: "formsTitle" }
+  | { type: "formCard"; arabic: string; latin: string; label: string }
+  | { type: "waslQatTitle" }
+  | { type: "compareCard"; arabic: string; latin: string; hint: string }
   | { type: "wordTitle" }
-  | {
-      type: "wordCard";
-      arabic: string;
-      latin: string;
-      hint: string;
-    }
+  | { type: "wordCard"; arabic: string; latin: string; hint: string }
   | { type: "patternTitle" }
   | { type: "patternCard"; arabic: string; latin: string; hint: string }
   | { type: "exercise" };
 
-export default function LevelAlifKhanjariya() {
+export default function LevelHamza() {
   const colorScheme = useColorScheme() || "light";
 
-  const sections: LevelAlifKhanjariyaSectionItem[] = [
+  const sections: LevelHamzaSectionItem[] = [
     { type: "intro" },
 
-    { type: "signTitle" },
+    { type: "formsTitle" },
     {
-      type: "signCard",
-      arabic: "ٰ",
-      latin: "ā",
-      label: "dieses kleine Zeichen zeigt oft einen langen a-Laut",
+      type: "formCard",
+      arabic: "أ",
+      latin: "ʾa / ʾu",
+      label: "Hamza kann auf einem Alif stehen",
     },
     {
-      type: "signCard",
-      arabic: "هٰذَا",
-      latin: "hādhā",
-      label: "ein häufiges Wort mit Alif khanǧarīya",
+      type: "formCard",
+      arabic: "إ",
+      latin: "ʾi",
+      label: "Hamza kann auch unter dem Alif stehen",
     },
     {
-      type: "signCard",
-      arabic: "اللّٰه",
-      latin: "Allāh",
-      label: "auch in sehr wichtigen Wörtern kommt es vor",
+      type: "formCard",
+      arabic: "ء",
+      latin: "ʾ",
+      label: "manchmal steht Hamza auch allein",
+    },
+
+    { type: "waslQatTitle" },
+    {
+      type: "compareCard",
+      arabic: "ٱ",
+      latin: "Hamzat al-waṣl",
+      hint: "sie wird am Anfang gelesen, aber nicht immer weitergesprochen",
+    },
+    {
+      type: "compareCard",
+      arabic: "أ / إ",
+      latin: "Hamzat al-qaṭʿ",
+      hint: "sie wird klar gesprochen, auch wenn du das Wort neu beginnst",
+    },
+    {
+      type: "compareCard",
+      arabic: "ٱسْم / أَكَلَ",
+      latin: "ism / akala",
+      hint: "so erkennst du den Unterschied in echten Wörtern",
     },
 
     { type: "wordTitle" },
     {
       type: "wordCard",
-      arabic: "هٰذَا",
-      latin: "hādhā",
-      hint: "dieses",
+      arabic: "أَكَلَ",
+      latin: "akala",
+      hint: "ein Beispiel für Hamzat al-qaṭʿ",
     },
     {
       type: "wordCard",
-      arabic: "هٰذِهِ",
-      latin: "hādhihi",
-      hint: "diese",
+      arabic: "إِيمَان",
+      latin: "īmān",
+      hint: "hier steht die Hamza unter dem Alif",
     },
     {
       type: "wordCard",
-      arabic: "اللّٰه",
-      latin: "Allāh",
-      hint: "achte auf den langen ā-Laut",
+      arabic: "ٱسْم",
+      latin: "ism",
+      hint: "ein bekanntes Beispiel für Hamzat al-waṣl",
     },
     {
       type: "wordCard",
-      arabic: "رَحْمٰن",
-      latin: "raḥmān",
-      hint: "das kleine Zeichen ersetzt hier den langen Laut",
+      arabic: "ٱبْن",
+      latin: "ibn",
+      hint: "auch dieses Wort beginnt mit Hamzat al-waṣl",
     },
     {
       type: "wordCard",
-      arabic: "طٰه",
-      latin: "ṭāhā",
-      hint: "auch hier hörst du ein langes ā",
+      arabic: "أُمّ",
+      latin: "umm",
+      hint: "auch das ist Hamzat al-qaṭʿ",
     },
 
     { type: "patternTitle" },
     {
       type: "patternCard",
-      arabic: "هٰذَا",
-      latin: "hādhā",
-      hint: "das kleine Zeichen hilft dir beim langen Laut",
+      arabic: "أَ",
+      latin: "ʾa",
+      hint: "Hamzat al-qaṭʿ wird klar mitgesprochen",
     },
     {
       type: "patternCard",
-      arabic: "اللّٰه",
-      latin: "Allāh",
-      hint: "achte auf Shadda und langen Vokal zusammen",
+      arabic: "إِ",
+      latin: "ʾi",
+      hint: "auch diese Form gehört zur Hamzat al-qaṭʿ",
     },
     {
       type: "patternCard",
-      arabic: "رَحْمٰن",
-      latin: "raḥmān",
-      hint: "lies den Laut lang, auch wenn kein normales ا da ist",
+      arabic: "ٱ",
+      latin: "waṣl",
+      hint: "Hamzat al-waṣl hilft nur beim Beginn des Wortes",
     },
 
     { type: "exercise" },
@@ -118,7 +135,7 @@ export default function LevelAlifKhanjariya() {
       ]}
       edges={["top"]}
     >
-      <FlatList<LevelAlifKhanjariyaSectionItem>
+      <FlatList<LevelHamzaSectionItem>
         data={sections}
         keyExtractor={(_, index) => index.toString()}
         showsVerticalScrollIndicator={false}
@@ -133,7 +150,7 @@ export default function LevelAlifKhanjariya() {
                   { color: Colors[colorScheme].text },
                 ]}
               >
-                Die Alif khanǧarīya
+                Die Hamza
               </Text>
             </View>
           </View>
@@ -157,9 +174,10 @@ export default function LevelAlifKhanjariya() {
                       { color: Colors[colorScheme].text },
                     ]}
                   >
-                    Jetzt lernst du ein sehr kleines Zeichen kennen. Es zeigt
-                    dir oft einen langen a-Laut, obwohl kein normales Alif
-                    geschrieben ist.
+                    Jetzt lernst du die Hamza kennen. Sie ist kein normaler
+                    langer Vokal, sondern ein eigener Laut am Anfang oder mitten
+                    im Wort. Du lernst hier ihre Grundformen, Hamzat al-waṣl
+                    und Hamzat al-qaṭʿ.
                   </Text>
                 </ThemedView>
 
@@ -178,7 +196,7 @@ export default function LevelAlifKhanjariya() {
                       { color: Colors[colorScheme].text },
                     ]}
                   >
-                    So liest du das kleine Alif
+                    So erkennst du die Hamza
                   </Text>
                   <Text
                     style={[
@@ -186,8 +204,9 @@ export default function LevelAlifKhanjariya() {
                       { color: Colors[colorScheme].text },
                     ]}
                   >
-                    Achte auf das kleine Zeichen über dem Buchstaben. Es hilft
-                    dir, den Laut lang zu lesen.
+                    Achte auf das kleine Zeichen über oder unter dem Alif. Es
+                    zeigt dir, dass hier die Hamza gesprochen wird oder dass das
+                    Wort mit einer besonderen Anfangsform beginnt.
                   </Text>
                   <Text
                     style={[
@@ -195,14 +214,14 @@ export default function LevelAlifKhanjariya() {
                       { color: Colors[colorScheme].text },
                     ]}
                   >
-                    هٰذَا{"\n"}hādhā
+                    أَ{"   "}إِ{"   "}ٱ{"\n"}ʾa{"   "}ʾi{"   "}waṣl
                   </Text>
                 </ThemedView>
               </View>
             );
           }
 
-          if (item.type === "signTitle") {
+          if (item.type === "formsTitle") {
             return (
               <Text
                 style={[
@@ -210,12 +229,12 @@ export default function LevelAlifKhanjariya() {
                   { color: Colors[colorScheme].text },
                 ]}
               >
-                Das neue Zeichen
+                Hamza in ihren Grundformen
               </Text>
             );
           }
 
-          if (item.type === "signCard") {
+          if (item.type === "formCard") {
             return (
               <ThemedView
                 style={[
@@ -254,6 +273,58 @@ export default function LevelAlifKhanjariya() {
             );
           }
 
+          if (item.type === "waslQatTitle") {
+            return (
+              <Text
+                style={[
+                  styles.sectionTitle,
+                  { color: Colors[colorScheme].text },
+                ]}
+              >
+                Hamzat al-waṣl und Hamzat al-qaṭʿ
+              </Text>
+            );
+          }
+
+          if (item.type === "compareCard") {
+            return (
+              <ThemedView
+                style={[
+                  styles.patternCard,
+                  {
+                    backgroundColor: Colors[colorScheme].contrast,
+                    borderColor: Colors[colorScheme].border,
+                  },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.patternArabic,
+                    { color: Colors[colorScheme].text },
+                  ]}
+                >
+                  {item.arabic}
+                </Text>
+                <Text
+                  style={[
+                    styles.patternLatin,
+                    { color: Colors[colorScheme].text },
+                  ]}
+                >
+                  {item.latin}
+                </Text>
+                <Text
+                  style={[
+                    styles.labelText,
+                    { color: Colors[colorScheme].text },
+                  ]}
+                >
+                  {item.hint}
+                </Text>
+              </ThemedView>
+            );
+          }
+
           if (item.type === "wordTitle") {
             return (
               <Text
@@ -262,7 +333,7 @@ export default function LevelAlifKhanjariya() {
                   { color: Colors[colorScheme].text },
                 ]}
               >
-                Wörter mit Alif khanǧarīya
+                Beispiele
               </Text>
             );
           }
@@ -314,7 +385,7 @@ export default function LevelAlifKhanjariya() {
                   { color: Colors[colorScheme].text },
                 ]}
               >
-                So liest du es
+                Darauf musst du achten
               </Text>
             );
           }
@@ -393,7 +464,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  هٰذَا
+                  أَكَلَ
                 </Text>
                 <Text
                   style={[
@@ -401,7 +472,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  هٰذِهِ
+                  إِيمَان
                 </Text>
                 <Text
                   style={[
@@ -409,7 +480,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  اللّٰه
+                  ٱسْم
                 </Text>
                 <Text
                   style={[
@@ -417,7 +488,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  رَحْمٰن
+                  ٱبْن
                 </Text>
                 <Text
                   style={[
@@ -425,7 +496,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  طٰه
+                  أُمّ
                 </Text>
 
                 <Text
@@ -434,8 +505,8 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  Frage dich: Wo siehst du das kleine Zeichen, das den langen
-                  Laut zeigt?
+                  Frage dich: Wo siehst du Hamzat al-waṣl, und wo siehst du
+                  Hamzat al-qaṭʿ?
                 </Text>
               </ThemedView>
             );
@@ -453,7 +524,7 @@ export default function LevelAlifKhanjariya() {
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={() => router.push("/(arabicLevels)/level12")}
+              onPress={() => router.push("/(arabicLevels)/level16")}
               style={[styles.button, styles.primaryButton]}
             >
               <ThemedText>Weiter</ThemedText>

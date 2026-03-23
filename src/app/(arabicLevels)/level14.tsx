@@ -14,10 +14,10 @@ import HeaderLeftBackButton from "@/components/HeaderLeftBackButton";
 import { router } from "expo-router";
 import { ThemedText } from "@/components/ThemedText";
 
-type LevelAlifKhanjariyaSectionItem =
+type LevelTaDifferenceSectionItem =
   | { type: "intro" }
-  | { type: "signTitle" }
-  | { type: "signCard"; arabic: string; latin: string; label: string }
+  | { type: "compareTitle" }
+  | { type: "compareCard"; arabic: string; latin: string; label: string }
   | { type: "wordTitle" }
   | {
       type: "wordCard";
@@ -29,82 +29,82 @@ type LevelAlifKhanjariyaSectionItem =
   | { type: "patternCard"; arabic: string; latin: string; hint: string }
   | { type: "exercise" };
 
-export default function LevelAlifKhanjariya() {
+export default function LevelTaDifference() {
   const colorScheme = useColorScheme() || "light";
 
-  const sections: LevelAlifKhanjariyaSectionItem[] = [
+  const sections: LevelTaDifferenceSectionItem[] = [
     { type: "intro" },
 
-    { type: "signTitle" },
+    { type: "compareTitle" },
     {
-      type: "signCard",
-      arabic: "ٰ",
-      latin: "ā",
-      label: "dieses kleine Zeichen zeigt oft einen langen a-Laut",
+      type: "compareCard",
+      arabic: "ت",
+      latin: "t",
+      label: "das ist die offene Tāʾ, also Tāʾ maftūḥa",
     },
     {
-      type: "signCard",
-      arabic: "هٰذَا",
-      latin: "hādhā",
-      label: "ein häufiges Wort mit Alif khanǧarīya",
+      type: "compareCard",
+      arabic: "ة",
+      latin: "a / ah / at",
+      label: "das ist die gebundene Tāʾ, also Tāʾ marbūṭa",
     },
     {
-      type: "signCard",
-      arabic: "اللّٰه",
-      latin: "Allāh",
-      label: "auch in sehr wichtigen Wörtern kommt es vor",
+      type: "compareCard",
+      arabic: "ت / ة",
+      latin: "offen / gebunden",
+      label: "beide sehen ähnlich aus, aber sie sind nicht dasselbe",
     },
 
     { type: "wordTitle" },
     {
       type: "wordCard",
-      arabic: "هٰذَا",
-      latin: "hādhā",
-      hint: "dieses",
+      arabic: "بَيْت",
+      latin: "bayt",
+      hint: "endet mit offener Tāʾ: ت",
     },
     {
       type: "wordCard",
-      arabic: "هٰذِهِ",
-      latin: "hādhihi",
-      hint: "diese",
+      arabic: "رَحْمَة",
+      latin: "raḥmah",
+      hint: "endet mit Tāʾ marbūṭa: ة",
     },
     {
       type: "wordCard",
-      arabic: "اللّٰه",
-      latin: "Allāh",
-      hint: "achte auf den langen ā-Laut",
+      arabic: "جَنَّة",
+      latin: "jannah",
+      hint: "auch hier steht am Ende eine Tāʾ marbūṭa",
     },
     {
       type: "wordCard",
-      arabic: "رَحْمٰن",
-      latin: "raḥmān",
-      hint: "das kleine Zeichen ersetzt hier den langen Laut",
+      arabic: "بِنْت",
+      latin: "bint",
+      hint: "hier hörst und siehst du die offene Tāʾ am Ende",
     },
     {
       type: "wordCard",
-      arabic: "طٰه",
-      latin: "ṭāhā",
-      hint: "auch hier hörst du ein langes ā",
+      arabic: "نِعْمَة",
+      latin: "niʿmah",
+      hint: "am Ende steht eine gebundene Tāʾ",
     },
 
     { type: "patternTitle" },
     {
       type: "patternCard",
-      arabic: "هٰذَا",
-      latin: "hādhā",
-      hint: "das kleine Zeichen hilft dir beim langen Laut",
+      arabic: "ت",
+      latin: "t",
+      hint: "die offene Tāʾ hat die normale Tāʾ-Form mit zwei Punkten",
     },
     {
       type: "patternCard",
-      arabic: "اللّٰه",
-      latin: "Allāh",
-      hint: "achte auf Shadda und langen Vokal zusammen",
+      arabic: "ة",
+      latin: "a / ah",
+      hint: "die Tāʾ marbūṭa sieht rund aus und steht oft am Wortende",
     },
     {
       type: "patternCard",
-      arabic: "رَحْمٰن",
-      latin: "raḥmān",
-      hint: "lies den Laut lang, auch wenn kein normales ا da ist",
+      arabic: "بَيْت / رَحْمَة",
+      latin: "bayt / raḥmah",
+      hint: "achte genau darauf, ob am Ende ت oder ة steht",
     },
 
     { type: "exercise" },
@@ -118,7 +118,7 @@ export default function LevelAlifKhanjariya() {
       ]}
       edges={["top"]}
     >
-      <FlatList<LevelAlifKhanjariyaSectionItem>
+      <FlatList<LevelTaDifferenceSectionItem>
         data={sections}
         keyExtractor={(_, index) => index.toString()}
         showsVerticalScrollIndicator={false}
@@ -133,7 +133,7 @@ export default function LevelAlifKhanjariya() {
                   { color: Colors[colorScheme].text },
                 ]}
               >
-                Die Alif khanǧarīya
+                Unterschied zwischen Tāʾ maftūḥa und Tāʾ marbūṭa
               </Text>
             </View>
           </View>
@@ -157,9 +157,10 @@ export default function LevelAlifKhanjariya() {
                       { color: Colors[colorScheme].text },
                     ]}
                   >
-                    Jetzt lernst du ein sehr kleines Zeichen kennen. Es zeigt
-                    dir oft einen langen a-Laut, obwohl kein normales Alif
-                    geschrieben ist.
+                    Jetzt lernst du den Unterschied zwischen zwei ähnlichen
+                    Formen kennen: der offenen Tāʾ und der gebundenen Tāʾ. Beide
+                    haben zwei Punkte, aber sie sehen nicht gleich aus und werden
+                    nicht gleich verwendet.
                   </Text>
                 </ThemedView>
 
@@ -178,7 +179,7 @@ export default function LevelAlifKhanjariya() {
                       { color: Colors[colorScheme].text },
                     ]}
                   >
-                    So liest du das kleine Alif
+                    So erkennst du den Unterschied
                   </Text>
                   <Text
                     style={[
@@ -186,8 +187,8 @@ export default function LevelAlifKhanjariya() {
                       { color: Colors[colorScheme].text },
                     ]}
                   >
-                    Achte auf das kleine Zeichen über dem Buchstaben. Es hilft
-                    dir, den Laut lang zu lesen.
+                    Die offene Tāʾ sieht so aus: ت. Die Tāʾ marbūṭa sieht so aus:
+                    ة. Achte besonders auf die Form am Wortende.
                   </Text>
                   <Text
                     style={[
@@ -195,14 +196,14 @@ export default function LevelAlifKhanjariya() {
                       { color: Colors[colorScheme].text },
                     ]}
                   >
-                    هٰذَا{"\n"}hādhā
+                    ت{"   "}ة{"\n"}t{"   "}a / ah
                   </Text>
                 </ThemedView>
               </View>
             );
           }
 
-          if (item.type === "signTitle") {
+          if (item.type === "compareTitle") {
             return (
               <Text
                 style={[
@@ -210,12 +211,12 @@ export default function LevelAlifKhanjariya() {
                   { color: Colors[colorScheme].text },
                 ]}
               >
-                Das neue Zeichen
+                Die beiden Formen
               </Text>
             );
           }
 
-          if (item.type === "signCard") {
+          if (item.type === "compareCard") {
             return (
               <ThemedView
                 style={[
@@ -262,7 +263,7 @@ export default function LevelAlifKhanjariya() {
                   { color: Colors[colorScheme].text },
                 ]}
               >
-                Wörter mit Alif khanǧarīya
+                Beispiele zum Vergleichen
               </Text>
             );
           }
@@ -314,7 +315,7 @@ export default function LevelAlifKhanjariya() {
                   { color: Colors[colorScheme].text },
                 ]}
               >
-                So liest du es
+                Darauf musst du achten
               </Text>
             );
           }
@@ -384,7 +385,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  Lies laut:
+                  Schau genau hin:
                 </Text>
 
                 <Text
@@ -393,7 +394,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  هٰذَا
+                  بَيْت
                 </Text>
                 <Text
                   style={[
@@ -401,7 +402,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  هٰذِهِ
+                  رَحْمَة
                 </Text>
                 <Text
                   style={[
@@ -409,7 +410,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  اللّٰه
+                  بِنْت
                 </Text>
                 <Text
                   style={[
@@ -417,7 +418,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  رَحْمٰن
+                  جَنَّة
                 </Text>
                 <Text
                   style={[
@@ -425,7 +426,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  طٰه
+                  نِعْمَة
                 </Text>
 
                 <Text
@@ -434,8 +435,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  Frage dich: Wo siehst du das kleine Zeichen, das den langen
-                  Laut zeigt?
+                  Frage dich: Welches Wort endet mit ت und welches mit ة?
                 </Text>
               </ThemedView>
             );
@@ -453,7 +453,7 @@ export default function LevelAlifKhanjariya() {
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={() => router.push("/(arabicLevels)/level12")}
+              onPress={() => router.push("/(arabicLevels)/level15")}
               style={[styles.button, styles.primaryButton]}
             >
               <ThemedText>Weiter</ThemedText>

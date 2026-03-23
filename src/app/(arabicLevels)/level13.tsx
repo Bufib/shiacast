@@ -14,7 +14,7 @@ import HeaderLeftBackButton from "@/components/HeaderLeftBackButton";
 import { router } from "expo-router";
 import { ThemedText } from "@/components/ThemedText";
 
-type LevelLamAlifLigatureSectionItem =
+type LevelTaMaftuhaSectionItem =
   | { type: "intro" }
   | { type: "signTitle" }
   | { type: "signCard"; arabic: string; latin: string; label: string }
@@ -29,82 +29,82 @@ type LevelLamAlifLigatureSectionItem =
   | { type: "patternCard"; arabic: string; latin: string; hint: string }
   | { type: "exercise" };
 
-export default function LevelLamAlifLigature() {
+export default function LevelTaMaftuha() {
   const colorScheme = useColorScheme() || "light";
 
-  const sections: LevelLamAlifLigatureSectionItem[] = [
+  const sections: LevelTaMaftuhaSectionItem[] = [
     { type: "intro" },
 
     { type: "signTitle" },
     {
       type: "signCard",
-      arabic: "لا",
-      latin: "lā",
-      label: "Lam und Alif werden oft zu einer gemeinsamen Form verbunden",
+      arabic: "ت",
+      latin: "t",
+      label: "das ist die offene Tāʾ",
     },
     {
       type: "signCard",
-      arabic: "لَا",
-      latin: "lā",
-      label: "mit Fatḥa liest du hier einen langen ā-Laut",
+      arabic: "تَ",
+      latin: "ta",
+      label: "mit Fatḥa hörst du ta",
     },
     {
       type: "signCard",
-      arabic: "إِلَّا",
-      latin: "illā",
-      label: "diese verbundene Form kommt in vielen häufigen Wörtern vor",
+      arabic: "تُ",
+      latin: "tu",
+      label: "mit Ḍamma hörst du tu",
     },
 
     { type: "wordTitle" },
     {
       type: "wordCard",
-      arabic: "لا",
-      latin: "lā",
-      hint: "ein sehr häufiges Wort mit der Ligatur",
+      arabic: "تَبَ",
+      latin: "taba",
+      hint: "achte auf den t-Laut am Anfang",
     },
     {
       type: "wordCard",
-      arabic: "إِلَّا",
-      latin: "illā",
-      hint: "achte auf die Lam-Alif-Form am Ende",
+      arabic: "بَيْت",
+      latin: "bayt",
+      hint: "hier hörst du die Tāʾ am Ende",
     },
     {
       type: "wordCard",
-      arabic: "لَا رَيْبَ",
-      latin: "lā rayba",
-      hint: "hier steht die Ligatur direkt am Anfang",
+      arabic: "كِتَاب",
+      latin: "kitāb",
+      hint: "die Tāʾ steht hier in der Mitte",
     },
     {
       type: "wordCard",
-      arabic: "لَا تَخَفْ",
-      latin: "lā takhaf",
-      hint: "erkenne zuerst die Form لا",
+      arabic: "تِين",
+      latin: "tīn",
+      hint: "ein klares Wort mit Tāʾ am Anfang",
     },
     {
       type: "wordCard",
-      arabic: "لَا تُبْطِلُوا",
-      latin: "lā tubṭilū",
-      hint: "auch in längeren Ausdrücken erscheint die Ligatur",
+      arabic: "مَتَى",
+      latin: "matā",
+      hint: "auch hier hörst du deutlich den t-Laut",
     },
 
     { type: "patternTitle" },
     {
       type: "patternCard",
-      arabic: "ل + ا = لا",
-      latin: "lam + alif = lā",
-      hint: "zwei Buchstaben werden zu einer verbundenen Form",
+      arabic: "تَ",
+      latin: "ta",
+      hint: "mit Fatḥa liest du ta",
     },
     {
       type: "patternCard",
-      arabic: "لَا",
-      latin: "lā",
-      hint: "erkenne zuerst die Form, dann lies den Laut",
+      arabic: "تِ",
+      latin: "ti",
+      hint: "mit Kasra liest du ti",
     },
     {
       type: "patternCard",
-      arabic: "إِلَّا",
-      latin: "illā",
-      hint: "die Ligatur kann mitten oder am Ende eines Wortes erscheinen",
+      arabic: "تُ",
+      latin: "tu",
+      hint: "mit Ḍamma liest du tu",
     },
 
     { type: "exercise" },
@@ -118,7 +118,7 @@ export default function LevelLamAlifLigature() {
       ]}
       edges={["top"]}
     >
-      <FlatList<LevelLamAlifLigatureSectionItem>
+      <FlatList<LevelTaMaftuhaSectionItem>
         data={sections}
         keyExtractor={(_, index) => index.toString()}
         showsVerticalScrollIndicator={false}
@@ -133,7 +133,7 @@ export default function LevelLamAlifLigature() {
                   { color: Colors[colorScheme].text },
                 ]}
               >
-                Die Lam-Alif-Ligatur
+                Die Tāʾ maftūḥa
               </Text>
             </View>
           </View>
@@ -157,9 +157,8 @@ export default function LevelLamAlifLigature() {
                       { color: Colors[colorScheme].text },
                     ]}
                   >
-                    Jetzt lernst du eine wichtige verbundene Form kennen. Wenn
-                    Lam und Alif zusammenkommen, werden sie oft als eine
-                    gemeinsame Ligatur geschrieben.
+                    Jetzt lernst du die offene Tāʾ kennen. Sie sieht so aus: ت.
+                    Du hörst bei ihr einen klaren t-Laut.
                   </Text>
                 </ThemedView>
 
@@ -178,7 +177,7 @@ export default function LevelLamAlifLigature() {
                       { color: Colors[colorScheme].text },
                     ]}
                   >
-                    So erkennst du die Ligatur
+                    So liest du die Tāʾ
                   </Text>
                   <Text
                     style={[
@@ -186,8 +185,8 @@ export default function LevelLamAlifLigature() {
                       { color: Colors[colorScheme].text },
                     ]}
                   >
-                    Achte auf die verbundene Form لا. Sie besteht aus Lam und
-                    Alif, die zusammen geschrieben werden.
+                    Achte auf die zwei Punkte über dem Buchstaben. So erkennst
+                    du die offene Tāʾ schnell.
                   </Text>
                   <Text
                     style={[
@@ -195,7 +194,7 @@ export default function LevelLamAlifLigature() {
                       { color: Colors[colorScheme].text },
                     ]}
                   >
-                    لا{"\n"}lā
+                    تَ{"\n"}ta
                   </Text>
                 </ThemedView>
               </View>
@@ -210,7 +209,7 @@ export default function LevelLamAlifLigature() {
                   { color: Colors[colorScheme].text },
                 ]}
               >
-                Das neue Zeichenbild
+                Der neue Buchstabe
               </Text>
             );
           }
@@ -262,7 +261,7 @@ export default function LevelLamAlifLigature() {
                   { color: Colors[colorScheme].text },
                 ]}
               >
-                Wörter mit Lam-Alif-Ligatur
+                Wörter mit Tāʾ maftūḥa
               </Text>
             );
           }
@@ -393,7 +392,7 @@ export default function LevelLamAlifLigature() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  لا
+                  تَ
                 </Text>
                 <Text
                   style={[
@@ -401,7 +400,7 @@ export default function LevelLamAlifLigature() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  إِلَّا
+                  تِ
                 </Text>
                 <Text
                   style={[
@@ -409,7 +408,7 @@ export default function LevelLamAlifLigature() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  لَا رَيْبَ
+                  تُ
                 </Text>
                 <Text
                   style={[
@@ -417,7 +416,7 @@ export default function LevelLamAlifLigature() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  لَا تَخَفْ
+                  تِين
                 </Text>
                 <Text
                   style={[
@@ -425,7 +424,7 @@ export default function LevelLamAlifLigature() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  لَا تُبْطِلُوا
+                  بَيْت
                 </Text>
 
                 <Text
@@ -434,7 +433,7 @@ export default function LevelLamAlifLigature() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  Frage dich: Wo siehst du die verbundene Form aus Lam und Alif?
+                  Frage dich: Wo siehst du die zwei Punkte über der Tāʾ?
                 </Text>
               </ThemedView>
             );
@@ -452,7 +451,7 @@ export default function LevelLamAlifLigature() {
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={() => router.push("/(arabicLevels)/level11")}
+              onPress={() => router.push("/(arabicLevels)/level14")}
               style={[styles.button, styles.primaryButton]}
             >
               <ThemedText>Weiter</ThemedText>

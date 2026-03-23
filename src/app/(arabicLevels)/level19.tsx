@@ -14,7 +14,7 @@ import HeaderLeftBackButton from "@/components/HeaderLeftBackButton";
 import { router } from "expo-router";
 import { ThemedText } from "@/components/ThemedText";
 
-type LevelAlifKhanjariyaSectionItem =
+type LevelFlowReadingSectionItem =
   | { type: "intro" }
   | { type: "signTitle" }
   | { type: "signCard"; arabic: string; latin: string; label: string }
@@ -29,82 +29,82 @@ type LevelAlifKhanjariyaSectionItem =
   | { type: "patternCard"; arabic: string; latin: string; hint: string }
   | { type: "exercise" };
 
-export default function LevelAlifKhanjariya() {
+export default function LevelFlowReading() {
   const colorScheme = useColorScheme() || "light";
 
-  const sections: LevelAlifKhanjariyaSectionItem[] = [
+  const sections: LevelFlowReadingSectionItem[] = [
     { type: "intro" },
 
     { type: "signTitle" },
     {
       type: "signCard",
-      arabic: "ٰ",
-      latin: "ā",
-      label: "dieses kleine Zeichen zeigt oft einen langen a-Laut",
+      arabic: "رَبِّ الْعَالَمِينَ",
+      latin: "rabbi l-ʿālamīn",
+      label: "beim Weiterlesen verbindest du die Wörter im Lesefluss",
     },
     {
       type: "signCard",
-      arabic: "هٰذَا",
-      latin: "hādhā",
-      label: "ein häufiges Wort mit Alif khanǧarīya",
+      arabic: "فِي بُيُوتٍ",
+      latin: "fī buyūtin",
+      label: "der Schluss eines Wortes geht direkt in das nächste Wort über",
     },
     {
       type: "signCard",
-      arabic: "اللّٰه",
-      latin: "Allāh",
-      label: "auch in sehr wichtigen Wörtern kommt es vor",
+      arabic: "بِسْمِ اللَّهِ",
+      latin: "bismi llāh",
+      label: "im Satzfluss wird flüssig weitergelesen, nicht Wort für Wort getrennt",
     },
 
     { type: "wordTitle" },
     {
       type: "wordCard",
-      arabic: "هٰذَا",
-      latin: "hādhā",
-      hint: "dieses",
+      arabic: "رَبِّ + الْعَالَمِينَ",
+      latin: "rabbi + al-ʿālamīna → rabbi l-ʿālamīn",
+      hint: "beim Weiterlesen hörst du den Übergang zwischen den Wörtern",
     },
     {
       type: "wordCard",
-      arabic: "هٰذِهِ",
-      latin: "hādhihi",
-      hint: "diese",
+      arabic: "بِسْمِ + اللَّهِ",
+      latin: "bismi + llāhi → bismi llāh",
+      hint: "die Wörter werden im Satzfluss verbunden gelesen",
     },
     {
       type: "wordCard",
-      arabic: "اللّٰه",
-      latin: "Allāh",
-      hint: "achte auf den langen ā-Laut",
+      arabic: "فِي + بُيُوتٍ",
+      latin: "fī + buyūtin → fī buyūtin",
+      hint: "der Lesefluss geht direkt weiter",
     },
     {
       type: "wordCard",
-      arabic: "رَحْمٰن",
-      latin: "raḥmān",
-      hint: "das kleine Zeichen ersetzt hier den langen Laut",
+      arabic: "مَالِكِ + يَوْمِ",
+      latin: "māliki + yawmi",
+      hint: "lies nicht hart getrennt, sondern flüssig weiter",
     },
     {
       type: "wordCard",
-      arabic: "طٰه",
-      latin: "ṭāhā",
-      hint: "auch hier hörst du ein langes ā",
+      arabic: "نَسْتَعِينُ + اهْدِنَا",
+      latin: "nastaʿīnu + ihdinā",
+      hint: "achte darauf, wie ein Wort in das nächste übergeht",
     },
 
     { type: "patternTitle" },
     {
       type: "patternCard",
-      arabic: "هٰذَا",
-      latin: "hādhā",
-      hint: "das kleine Zeichen hilft dir beim langen Laut",
+      arabic: "Wort + Wort",
+      latin: "flow reading",
+      hint: "beim Weiterlesen bleibt der Lesefluss erhalten",
     },
     {
       type: "patternCard",
-      arabic: "اللّٰه",
-      latin: "Allāh",
-      hint: "achte auf Shadda und langen Vokal zusammen",
+      arabic: "Endung + nächstes Wort",
+      latin: "carry forward",
+      hint: "die Endung eines Wortes wird weitergelesen, wenn du nicht stoppst",
     },
     {
       type: "patternCard",
-      arabic: "رَحْمٰن",
-      latin: "raḥmān",
-      hint: "lies den Laut lang, auch wenn kein normales ا da ist",
+      arabic: "kein Stopp = voller Klang",
+      latin: "continue reading",
+      hint: "beim Satzfluss bleiben Endungen und Übergänge hörbar",
     },
 
     { type: "exercise" },
@@ -118,7 +118,7 @@ export default function LevelAlifKhanjariya() {
       ]}
       edges={["top"]}
     >
-      <FlatList<LevelAlifKhanjariyaSectionItem>
+      <FlatList<LevelFlowReadingSectionItem>
         data={sections}
         keyExtractor={(_, index) => index.toString()}
         showsVerticalScrollIndicator={false}
@@ -133,7 +133,7 @@ export default function LevelAlifKhanjariya() {
                   { color: Colors[colorScheme].text },
                 ]}
               >
-                Die Alif khanǧarīya
+                Weiterlesen im Wort- und Satzfluss
               </Text>
             </View>
           </View>
@@ -157,9 +157,10 @@ export default function LevelAlifKhanjariya() {
                       { color: Colors[colorScheme].text },
                     ]}
                   >
-                    Jetzt lernst du ein sehr kleines Zeichen kennen. Es zeigt
-                    dir oft einen langen a-Laut, obwohl kein normales Alif
-                    geschrieben ist.
+                    Jetzt lernst du das Weiterlesen im Wort- und Satzfluss. Wenn
+                    du nicht auf einem Wort anhältst, liest du die Wörter
+                    flüssig weiter. Dann bleiben Endungen hörbar und Wörter
+                    gehen direkt ineinander über.
                   </Text>
                 </ThemedView>
 
@@ -178,7 +179,7 @@ export default function LevelAlifKhanjariya() {
                       { color: Colors[colorScheme].text },
                     ]}
                   >
-                    So liest du das kleine Alif
+                    So liest du im Satzfluss
                   </Text>
                   <Text
                     style={[
@@ -186,8 +187,9 @@ export default function LevelAlifKhanjariya() {
                       { color: Colors[colorScheme].text },
                     ]}
                   >
-                    Achte auf das kleine Zeichen über dem Buchstaben. Es hilft
-                    dir, den Laut lang zu lesen.
+                    Wenn du weiterliest, hörst du die Endung eines Wortes und
+                    gehst direkt zum nächsten Wort über. Du stoppst also nicht
+                    nach jedem einzelnen Wort.
                   </Text>
                   <Text
                     style={[
@@ -195,7 +197,7 @@ export default function LevelAlifKhanjariya() {
                       { color: Colors[colorScheme].text },
                     ]}
                   >
-                    هٰذَا{"\n"}hādhā
+                    بِسْمِ اللَّهِ{"\n"}bismi llāh
                   </Text>
                 </ThemedView>
               </View>
@@ -210,7 +212,7 @@ export default function LevelAlifKhanjariya() {
                   { color: Colors[colorScheme].text },
                 ]}
               >
-                Das neue Zeichen
+                Die Grundidee
               </Text>
             );
           }
@@ -262,7 +264,7 @@ export default function LevelAlifKhanjariya() {
                   { color: Colors[colorScheme].text },
                 ]}
               >
-                Wörter mit Alif khanǧarīya
+                Beispiele im Lesefluss
               </Text>
             );
           }
@@ -314,7 +316,7 @@ export default function LevelAlifKhanjariya() {
                   { color: Colors[colorScheme].text },
                 ]}
               >
-                So liest du es
+                Darauf musst du achten
               </Text>
             );
           }
@@ -384,7 +386,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  Lies laut:
+                  Lies flüssig weiter:
                 </Text>
 
                 <Text
@@ -393,7 +395,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  هٰذَا
+                  بِسْمِ اللَّهِ
                 </Text>
                 <Text
                   style={[
@@ -401,7 +403,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  هٰذِهِ
+                  رَبِّ الْعَالَمِينَ
                 </Text>
                 <Text
                   style={[
@@ -409,7 +411,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  اللّٰه
+                  فِي بُيُوتٍ
                 </Text>
                 <Text
                   style={[
@@ -417,7 +419,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  رَحْمٰن
+                  مَالِكِ يَوْمِ
                 </Text>
                 <Text
                   style={[
@@ -425,7 +427,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  طٰه
+                  نَسْتَعِينُ اهْدِنَا
                 </Text>
 
                 <Text
@@ -434,8 +436,8 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  Frage dich: Wo siehst du das kleine Zeichen, das den langen
-                  Laut zeigt?
+                  Frage dich: Welche Endung hörst du noch, weil du nicht
+                  stoppst, sondern direkt weiterliest?
                 </Text>
               </ThemedView>
             );
@@ -453,7 +455,7 @@ export default function LevelAlifKhanjariya() {
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={() => router.push("/(arabicLevels)/level12")}
+              onPress={() => router.push("/(arabicLevels)/level20")}
               style={[styles.button, styles.primaryButton]}
             >
               <ThemedText>Weiter</ThemedText>
@@ -543,11 +545,11 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   arabicBig: {
-    fontSize: 40,
+    fontSize: 32,
     textAlign: "center",
   },
   latinText: {
-    fontSize: 22,
+    fontSize: 18,
     fontWeight: "700",
     textAlign: "center",
   },
@@ -565,7 +567,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   patternArabic: {
-    fontSize: 28,
+    fontSize: 26,
     textAlign: "center",
     fontWeight: "700",
   },

@@ -3,78 +3,201 @@ import { ArabicCurriculumLevel } from "@/constants/Types";
 export const arabicCurriculum: ArabicCurriculumLevel[] = [
   {
     id: "1",
-    title: "Buchstaben kennenlernen",
+    title: "Arabische Buchstaben Isoliert",
     shortTitle: "Level 1",
     description:
       "In diesem Level lernst du die wichtigsten arabischen Buchstaben kennen. Du erkennst, dass viele Buchstaben ähnlich aussehen und sich oft nur durch ihre Punkte unterscheiden.",
-    modules: [
-      "Einfache einzelne Buchstaben",
-      "Buchstaben mit ähnlicher Form",
-      "Weitere wichtige Buchstabengruppen",
-    ],
   },
   {
     id: "2",
-    title: "Buchstaben in Wörtern erkennen",
+    title: "Buchstaben an unterschiedlichen Satzstellen",
     shortTitle: "Level 2",
     description:
       "Hier lernst du, wie Buchstaben im Wort aussehen. Du erkennst, dass ein Buchstabe je nach Position am Anfang, in der Mitte oder am Ende anders aussehen kann.",
-    modules: [
-      "Einzel- und Endform",
-      "Anfangs- und Mittelform",
-      "Buchstabenformen vergleichen",
-    ],
   },
   {
     id: "3",
-    title: "Buchstaben verbinden",
+    title: "Lange und Kurze Vokale",
     shortTitle: "Level 3",
     description:
       "In diesem Level verstehst du, wie Buchstaben miteinander verbunden werden. Du lernst auch, dass manche Buchstaben eine Verbindung unterbrechen.",
-    modules: [
-      "Verbundene und nicht verbundene Buchstaben",
-      "Zwei- und Dreierverbindungen",
-      "Erste kleine Wörter",
-    ],
   },
   {
     id: "4",
-    title: "Kurze Vokale lesen",
+    title: "Sukūn",
     shortTitle: "Level 4",
     description:
       "Jetzt beginnst du richtig zu lesen. Du lernst die kurzen Vokale kennen und kannst erste einfache Silben und Wörter mit Vokalzeichen lesen.",
-    modules: ["Fatḥa", "Kasra und Ḍamma", "Erste Wörter mit Vokalzeichen"],
   },
   {
     id: "5",
-    title: "Lange Vokale lesen",
+    title: "Tanwīn",
     shortTitle: "Level 5",
     description:
       "Hier lernst du den Unterschied zwischen kurzen und langen Vokalen. Dadurch kannst du Wörter sicherer und genauer lesen.",
-    modules: ["ā", "ī und ū", "Training mit kurzen und langen Vokalen"],
   },
   {
     id: "6",
-    title: "Wichtige Lesezeichen verstehen",
+    title: "Ganze Wörter lesen",
     shortTitle: "Level 6",
     description:
       "In diesem Level lernst du weitere wichtige Zeichen kennen, die beim Lesen helfen. So kannst du häufige Wortmuster und schwierigere Wörter besser verstehen.",
-    modules: ["Sukūn", "Shadda", "Tanwīn und häufige Wortmuster"],
   },
   {
     id: "7",
-    title: "Kurze religiöse Texte lesen",
+    title: "Der bestimmte Artikel",
     shortTitle: "Level 7",
     description:
       "Zum Schluss wendest du alles Gelernte auf religiöse Wörter und kurze Texte an. Du liest erste Duʿāʾ-Formeln und sehr kurze qurʾānnahe Passagen.",
-    modules: [
-      "Wichtige religiöse Wörter",
-      "Bekannte Formeln und kurze Duʿāʾ",
-      "Sehr kurze qurʾānnahe Texte",
-    ],
+  },
+  {
+    id: "8",
+    title: "Der bestimmte Artikel bei Sonnenbuchstaben",
+    shortTitle: "Level 8",
+    description:
+      "",
+  },
+  {
+    id: "9",
+    title: "Die Shadda",
+    shortTitle: "Level 9",
+    description:
+      "",
+  },
+  {
+    id: "10",
+    title: "Die Tā`marbūṭa",
+    shortTitle: "Level 10",
+    description:
+      "",
+  },
+  {
+    id: "11",
+    title: "Die Alif khanǧarīya",
+    shortTitle: "Level 11",
+    description:
+      "",
+  },
+  {
+    id: "12",
+    title: "Die Lam-Alif-Ligatur",
+    shortTitle: "Level 12",
+    description:
+      "",
+  },
+  {
+    id: "13",
+    title: "Die Tāʾ maftūḥa",
+    shortTitle: "Level 13",
+    description:
+      "",
+  },
+  {
+    id: "14",
+    title: "Unterschied zwischen Tāʾ maftūḥa und Tāʾ marbūṭa",
+    shortTitle: "Level 14",
+    description:
+      "",
+  },
+  {
+    id: "15",
+    title: "Die Hamza",
+    shortTitle: "Level 15",
+    description:
+      "",
+  },
+  {
+    id: "16",
+    title: "Die Alif maqṣūra",
+    shortTitle: "Level 16",
+    description:
+      "",
+  },
+  {
+    id: "17",
+    title: "Die Madda ",
+    shortTitle: "Level 17",
+    description:
+      "",
+  },
+  {
+    id: "18",
+    title: "Das Pauselesen",
+    shortTitle: "Level 18",
+    description:
+      "",
+  },
+  {
+    id: "19",
+    title: "Weiterlesen im Wort- und Satzfluss",
+    shortTitle: "Level 19",
+    description:
+      "",
+  },
+  {
+    id: "20",
+    title: "Shadda in verschiedenen Positionen",
+    shortTitle: "Level 20",
+    description:
+      "",
+  },
+  {
+    id: "21",
+    title: "Tanwīn im Lesefluss",
+    shortTitle: "Level 21",
+    description:
+      "",
+  },
+  {
+    id: "22",
+    title: "Artikel plus Hamza-Formen und Spezialschreibungen",
+    shortTitle: "Level 22",
+    description:
+      "",
+  },
+  {
+    id: "23",
+    title: "Wortanfang mit Vokalträgern",
+    shortTitle: "Level 23",
+    description:
+      "",
+  },
+  {
+    id: "24",
+    title: "Wortende mit stillen oder anders gesprochenen Zeichen",
+    shortTitle: "Level 24",
+    description:
+      "",
+  },
+  {
+    id: "25",
+    title: "Unregelmäßige lange Vokale",
+    shortTitle: "Level 25",
+    description:
+      "",
+  },
+  {
+    id: "26",
+    title: "Häufige Funktionswörter",
+    shortTitle: "Level 26",
+    description:
+      "",
+  },
+  {
+    id: "27",
+    title: "Kurze Wortgruppen",
+    shortTitle: "Level 27",
+    description:
+      "",
+  },
+  {
+    id: "28",
+    title: "Mini-Sätze",
+    shortTitle: "Level 28",
+    description:
+      "",
   },
 ];
-
 
 export const arabicLetters = [
   {
@@ -330,8 +453,6 @@ export const arabicLetters = [
     final: "ـي",
   },
 ];
-
-
 
 export const shortVowels = [
   { arabic: "بَ", latin: "ba", label: "Fatha = a" },

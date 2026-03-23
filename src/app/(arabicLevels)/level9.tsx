@@ -482,7 +482,7 @@ export default function LevelShadda() {
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={() => router.push("/(arabicLevels)/level9")}
+              onPress={() => router.push("/(arabicLevels)/level10")}
               style={[styles.button, styles.primaryButton]}
             >
               <ThemedText>Weiter</ThemedText>

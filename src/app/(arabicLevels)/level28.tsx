@@ -14,7 +14,7 @@ import HeaderLeftBackButton from "@/components/HeaderLeftBackButton";
 import { router } from "expo-router";
 import { ThemedText } from "@/components/ThemedText";
 
-type LevelAlifKhanjariyaSectionItem =
+type LevelMiniSentencesSectionItem =
   | { type: "intro" }
   | { type: "signTitle" }
   | { type: "signCard"; arabic: string; latin: string; label: string }
@@ -29,82 +29,82 @@ type LevelAlifKhanjariyaSectionItem =
   | { type: "patternCard"; arabic: string; latin: string; hint: string }
   | { type: "exercise" };
 
-export default function LevelAlifKhanjariya() {
+export default function LevelMiniSentences() {
   const colorScheme = useColorScheme() || "light";
 
-  const sections: LevelAlifKhanjariyaSectionItem[] = [
+  const sections: LevelMiniSentencesSectionItem[] = [
     { type: "intro" },
 
     { type: "signTitle" },
     {
       type: "signCard",
-      arabic: "ٰ",
-      latin: "ā",
-      label: "dieses kleine Zeichen zeigt oft einen langen a-Laut",
+      arabic: "هَٰذَا بَيْتٌ",
+      latin: "hādhā baytun",
+      label: "jetzt liest du nicht nur Wörter oder Wortgruppen, sondern kleine ganze Sätze",
     },
     {
       type: "signCard",
-      arabic: "هٰذَا",
-      latin: "hādhā",
-      label: "ein häufiges Wort mit Alif khanǧarīya",
+      arabic: "اللَّهُ غَفُورٌ",
+      latin: "allāhu ghafūrun",
+      label: "ein Mini-Satz hat schon einen vollständigen kleinen Sinn",
     },
     {
       type: "signCard",
-      arabic: "اللّٰه",
-      latin: "Allāh",
-      label: "auch in sehr wichtigen Wörtern kommt es vor",
+      arabic: "فِي الْبَيْتِ نُورٌ",
+      latin: "fī l-bayti nūrun",
+      label: "du liest mehrere Wörter jetzt zusammen als kleine Aussage",
     },
 
     { type: "wordTitle" },
     {
       type: "wordCard",
-      arabic: "هٰذَا",
-      latin: "hādhā",
-      hint: "dieses",
+      arabic: "هَٰذَا بَيْتٌ",
+      latin: "hādhā baytun",
+      hint: "lies den ganzen Satz flüssig als eine kleine Einheit",
     },
     {
       type: "wordCard",
-      arabic: "هٰذِهِ",
-      latin: "hādhihi",
-      hint: "diese",
+      arabic: "اللَّهُ غَفُورٌ",
+      latin: "allāhu ghafūrun",
+      hint: "achte darauf, wie die Wörter zusammen einen Sinn ergeben",
     },
     {
       type: "wordCard",
-      arabic: "اللّٰه",
-      latin: "Allāh",
-      hint: "achte auf den langen ā-Laut",
+      arabic: "فِي الْبَيْتِ نُورٌ",
+      latin: "fī l-bayti nūrun",
+      hint: "lies nicht Wort für Wort isoliert, sondern als kleine Aussage",
     },
     {
       type: "wordCard",
-      arabic: "رَحْمٰن",
-      latin: "raḥmān",
-      hint: "das kleine Zeichen ersetzt hier den langen Laut",
+      arabic: "هُوَ إِمَامٌ",
+      latin: "huwa imāmun",
+      hint: "auch sehr kurze Sätze sind schon vollständige Mini-Sätze",
     },
     {
       type: "wordCard",
-      arabic: "طٰه",
-      latin: "ṭāhā",
-      hint: "auch hier hörst du ein langes ā",
+      arabic: "مَعِي كِتَابٌ",
+      latin: "maʿī kitābun",
+      hint: "verbinde die Wörter zu einem natürlichen Lesefluss",
     },
 
     { type: "patternTitle" },
     {
       type: "patternCard",
-      arabic: "هٰذَا",
-      latin: "hādhā",
-      hint: "das kleine Zeichen hilft dir beim langen Laut",
+      arabic: "mehrere Wörter, ein Sinn",
+      latin: "one small meaning",
+      hint: "ein Mini-Satz besteht aus mehreren Wörtern, die zusammen etwas sagen",
     },
     {
       type: "patternCard",
-      arabic: "اللّٰه",
-      latin: "Allāh",
-      hint: "achte auf Shadda und langen Vokal zusammen",
+      arabic: "flüssig zusammen lesen",
+      latin: "read with flow",
+      hint: "halte nicht nach jedem Wort hart an",
     },
     {
       type: "patternCard",
-      arabic: "رَحْمٰن",
-      latin: "raḥmān",
-      hint: "lies den Laut lang, auch wenn kein normales ا da ist",
+      arabic: "als Aussage erkennen",
+      latin: "recognize the statement",
+      hint: "frage dich beim Lesen immer: Was sagt dieser kleine Satz aus?",
     },
 
     { type: "exercise" },
@@ -118,7 +118,7 @@ export default function LevelAlifKhanjariya() {
       ]}
       edges={["top"]}
     >
-      <FlatList<LevelAlifKhanjariyaSectionItem>
+      <FlatList<LevelMiniSentencesSectionItem>
         data={sections}
         keyExtractor={(_, index) => index.toString()}
         showsVerticalScrollIndicator={false}
@@ -133,7 +133,7 @@ export default function LevelAlifKhanjariya() {
                   { color: Colors[colorScheme].text },
                 ]}
               >
-                Die Alif khanǧarīya
+                Mini-Sätze
               </Text>
             </View>
           </View>
@@ -157,9 +157,10 @@ export default function LevelAlifKhanjariya() {
                       { color: Colors[colorScheme].text },
                     ]}
                   >
-                    Jetzt lernst du ein sehr kleines Zeichen kennen. Es zeigt
-                    dir oft einen langen a-Laut, obwohl kein normales Alif
-                    geschrieben ist.
+                    Jetzt lernst du Mini-Sätze. Dabei liest du mehrere Wörter
+                    zusammen als kleine vollständige Aussage. Du achtest nicht
+                    nur auf einzelne Wörter, sondern auf den Sinn der ganzen
+                    kleinen Satzform.
                   </Text>
                 </ThemedView>
 
@@ -178,7 +179,7 @@ export default function LevelAlifKhanjariya() {
                       { color: Colors[colorScheme].text },
                     ]}
                   >
-                    So liest du das kleine Alif
+                    So liest du Mini-Sätze
                   </Text>
                   <Text
                     style={[
@@ -186,8 +187,9 @@ export default function LevelAlifKhanjariya() {
                       { color: Colors[colorScheme].text },
                     ]}
                   >
-                    Achte auf das kleine Zeichen über dem Buchstaben. Es hilft
-                    dir, den Laut lang zu lesen.
+                    Schau den ganzen Satz an und lies ihn in einem ruhigen
+                    Lesefluss. Versuche direkt zu merken, was die kleine Aussage
+                    bedeutet, statt nur Wort für Wort zu entziffern.
                   </Text>
                   <Text
                     style={[
@@ -195,7 +197,7 @@ export default function LevelAlifKhanjariya() {
                       { color: Colors[colorScheme].text },
                     ]}
                   >
-                    هٰذَا{"\n"}hādhā
+                    هَٰذَا بَيْتٌ{"\n"}hādhā baytun
                   </Text>
                 </ThemedView>
               </View>
@@ -210,7 +212,7 @@ export default function LevelAlifKhanjariya() {
                   { color: Colors[colorScheme].text },
                 ]}
               >
-                Das neue Zeichen
+                Die Grundidee
               </Text>
             );
           }
@@ -262,7 +264,7 @@ export default function LevelAlifKhanjariya() {
                   { color: Colors[colorScheme].text },
                 ]}
               >
-                Wörter mit Alif khanǧarīya
+                Beispiele
               </Text>
             );
           }
@@ -314,7 +316,7 @@ export default function LevelAlifKhanjariya() {
                   { color: Colors[colorScheme].text },
                 ]}
               >
-                So liest du es
+                Darauf musst du achten
               </Text>
             );
           }
@@ -384,7 +386,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  Lies laut:
+                  Lies die Mini-Sätze flüssig und als ganze Aussage:
                 </Text>
 
                 <Text
@@ -393,7 +395,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  هٰذَا
+                  هَٰذَا بَيْتٌ
                 </Text>
                 <Text
                   style={[
@@ -401,7 +403,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  هٰذِهِ
+                  اللَّهُ غَفُورٌ
                 </Text>
                 <Text
                   style={[
@@ -409,7 +411,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  اللّٰه
+                  فِي الْبَيْتِ نُورٌ
                 </Text>
                 <Text
                   style={[
@@ -417,7 +419,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  رَحْمٰن
+                  هُوَ إِمَامٌ
                 </Text>
                 <Text
                   style={[
@@ -425,7 +427,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  طٰه
+                  مَعِي كِتَابٌ
                 </Text>
 
                 <Text
@@ -434,8 +436,9 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  Frage dich: Wo siehst du das kleine Zeichen, das den langen
-                  Laut zeigt?
+                  Frage dich: Kannst du den ganzen Mini-Satz auf einmal lesen
+                  und direkt verstehen, dass er eine kleine vollständige Aussage
+                  ist?
                 </Text>
               </ThemedView>
             );
@@ -453,7 +456,7 @@ export default function LevelAlifKhanjariya() {
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={() => router.push("/(arabicLevels)/level12")}
+              onPress={() => console.log("Fertig")}
               style={[styles.button, styles.primaryButton]}
             >
               <ThemedText>Weiter</ThemedText>
@@ -543,11 +546,11 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   arabicBig: {
-    fontSize: 40,
+    fontSize: 32,
     textAlign: "center",
   },
   latinText: {
-    fontSize: 22,
+    fontSize: 18,
     fontWeight: "700",
     textAlign: "center",
   },
@@ -565,7 +568,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   patternArabic: {
-    fontSize: 28,
+    fontSize: 26,
     textAlign: "center",
     fontWeight: "700",
   },

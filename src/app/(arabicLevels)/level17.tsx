@@ -14,7 +14,7 @@ import HeaderLeftBackButton from "@/components/HeaderLeftBackButton";
 import { router } from "expo-router";
 import { ThemedText } from "@/components/ThemedText";
 
-type LevelAlifKhanjariyaSectionItem =
+type LevelMaddaSectionItem =
   | { type: "intro" }
   | { type: "signTitle" }
   | { type: "signCard"; arabic: string; latin: string; label: string }
@@ -29,82 +29,82 @@ type LevelAlifKhanjariyaSectionItem =
   | { type: "patternCard"; arabic: string; latin: string; hint: string }
   | { type: "exercise" };
 
-export default function LevelAlifKhanjariya() {
+export default function LevelMadda() {
   const colorScheme = useColorScheme() || "light";
 
-  const sections: LevelAlifKhanjariyaSectionItem[] = [
+  const sections: LevelMaddaSectionItem[] = [
     { type: "intro" },
 
     { type: "signTitle" },
     {
       type: "signCard",
-      arabic: "ٰ",
+      arabic: "آ",
       latin: "ā",
-      label: "dieses kleine Zeichen zeigt oft einen langen a-Laut",
+      label: "das ist ein Alif mit Madda",
     },
     {
       type: "signCard",
-      arabic: "هٰذَا",
-      latin: "hādhā",
-      label: "ein häufiges Wort mit Alif khanǧarīya",
+      arabic: "آدَم",
+      latin: "Ādam",
+      label: "am Wortanfang hörst du einen langen ā-Laut",
     },
     {
       type: "signCard",
-      arabic: "اللّٰه",
-      latin: "Allāh",
-      label: "auch in sehr wichtigen Wörtern kommt es vor",
+      arabic: "قُرْآن",
+      latin: "qurʾān",
+      label: "die Madda zeigt eine besondere lange Anfangsform",
     },
 
     { type: "wordTitle" },
     {
       type: "wordCard",
-      arabic: "هٰذَا",
-      latin: "hādhā",
-      hint: "dieses",
+      arabic: "آدَم",
+      latin: "Ādam",
+      hint: "beginnt mit Alif madda",
     },
     {
       type: "wordCard",
-      arabic: "هٰذِهِ",
-      latin: "hādhihi",
-      hint: "diese",
+      arabic: "آخِر",
+      latin: "ākhir",
+      hint: "am Anfang steht die Madda",
     },
     {
       type: "wordCard",
-      arabic: "اللّٰه",
-      latin: "Allāh",
-      hint: "achte auf den langen ā-Laut",
+      arabic: "آمَنَ",
+      latin: "āmana",
+      hint: "achte auf den langen ā-Laut am Anfang",
     },
     {
       type: "wordCard",
-      arabic: "رَحْمٰن",
-      latin: "raḥmān",
-      hint: "das kleine Zeichen ersetzt hier den langen Laut",
+      arabic: "الْقُرْآن",
+      latin: "al-qurʾān",
+      hint: "auch hier siehst du die Madda",
     },
     {
       type: "wordCard",
-      arabic: "طٰه",
-      latin: "ṭāhā",
-      hint: "auch hier hörst du ein langes ā",
+      arabic: "آيَة",
+      latin: "āyah",
+      hint: "das Wort beginnt mit Alif madda",
     },
 
     { type: "patternTitle" },
     {
       type: "patternCard",
-      arabic: "هٰذَا",
-      latin: "hādhā",
-      hint: "das kleine Zeichen hilft dir beim langen Laut",
+      arabic: "آ",
+      latin: "ā",
+      hint: "diese Form liest du als langen ā-Laut",
     },
     {
       type: "patternCard",
-      arabic: "اللّٰه",
-      latin: "Allāh",
-      hint: "achte auf Shadda und langen Vokal zusammen",
+      arabic: "أ / آ",
+      latin: "ʾa / ā",
+      hint: "achte auf den Unterschied zwischen Hamza und Madda",
     },
     {
       type: "patternCard",
-      arabic: "رَحْمٰن",
-      latin: "raḥmān",
-      hint: "lies den Laut lang, auch wenn kein normales ا da ist",
+      arabic: "آدَم / آمَنَ",
+      latin: "Ādam / āmana",
+      hint: "beide Wörter beginnen mit Madda",
     },
 
     { type: "exercise" },
@@ -118,7 +118,7 @@ export default function LevelAlifKhanjariya() {
       ]}
       edges={["top"]}
     >
-      <FlatList<LevelAlifKhanjariyaSectionItem>
+      <FlatList<LevelMaddaSectionItem>
         data={sections}
         keyExtractor={(_, index) => index.toString()}
         showsVerticalScrollIndicator={false}
@@ -133,7 +133,7 @@ export default function LevelAlifKhanjariya() {
                   { color: Colors[colorScheme].text },
                 ]}
               >
-                Die Alif khanǧarīya
+                Die Madda
               </Text>
             </View>
           </View>
@@ -157,9 +157,8 @@ export default function LevelAlifKhanjariya() {
                       { color: Colors[colorScheme].text },
                     ]}
                   >
-                    Jetzt lernst du ein sehr kleines Zeichen kennen. Es zeigt
-                    dir oft einen langen a-Laut, obwohl kein normales Alif
-                    geschrieben ist.
+                    Jetzt lernst du die Madda kennen. Sie steht auf einem Alif
+                    und zeigt dir am Anfang eines Wortes einen langen ā-Laut.
                   </Text>
                 </ThemedView>
 
@@ -178,7 +177,7 @@ export default function LevelAlifKhanjariya() {
                       { color: Colors[colorScheme].text },
                     ]}
                   >
-                    So liest du das kleine Alif
+                    So liest du die Madda
                   </Text>
                   <Text
                     style={[
@@ -186,8 +185,8 @@ export default function LevelAlifKhanjariya() {
                       { color: Colors[colorScheme].text },
                     ]}
                   >
-                    Achte auf das kleine Zeichen über dem Buchstaben. Es hilft
-                    dir, den Laut lang zu lesen.
+                    Achte auf die kleine Wellenform über dem Alif: آ. Diese Form
+                    liest du als langen ā-Laut.
                   </Text>
                   <Text
                     style={[
@@ -195,7 +194,7 @@ export default function LevelAlifKhanjariya() {
                       { color: Colors[colorScheme].text },
                     ]}
                   >
-                    هٰذَا{"\n"}hādhā
+                    آ{"\n"}ā
                   </Text>
                 </ThemedView>
               </View>
@@ -210,7 +209,7 @@ export default function LevelAlifKhanjariya() {
                   { color: Colors[colorScheme].text },
                 ]}
               >
-                Das neue Zeichen
+                Das neue Zeichenbild
               </Text>
             );
           }
@@ -262,7 +261,7 @@ export default function LevelAlifKhanjariya() {
                   { color: Colors[colorScheme].text },
                 ]}
               >
-                Wörter mit Alif khanǧarīya
+                Wörter mit Madda
               </Text>
             );
           }
@@ -393,7 +392,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  هٰذَا
+                  آدَم
                 </Text>
                 <Text
                   style={[
@@ -401,7 +400,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  هٰذِهِ
+                  آخِر
                 </Text>
                 <Text
                   style={[
@@ -409,7 +408,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  اللّٰه
+                  آمَنَ
                 </Text>
                 <Text
                   style={[
@@ -417,7 +416,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  رَحْمٰن
+                  الْقُرْآن
                 </Text>
                 <Text
                   style={[
@@ -425,7 +424,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  طٰه
+                  آيَة
                 </Text>
 
                 <Text
@@ -434,8 +433,8 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  Frage dich: Wo siehst du das kleine Zeichen, das den langen
-                  Laut zeigt?
+                  Frage dich: Wo siehst du am Wortanfang das Alif mit der
+                  Wellenform darüber?
                 </Text>
               </ThemedView>
             );
@@ -453,7 +452,7 @@ export default function LevelAlifKhanjariya() {
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={() => router.push("/(arabicLevels)/level12")}
+              onPress={() => router.push("/(arabicLevels)/level18")}
               style={[styles.button, styles.primaryButton]}
             >
               <ThemedText>Weiter</ThemedText>

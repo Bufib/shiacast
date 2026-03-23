@@ -14,7 +14,7 @@ import HeaderLeftBackButton from "@/components/HeaderLeftBackButton";
 import { router } from "expo-router";
 import { ThemedText } from "@/components/ThemedText";
 
-type LevelAlifKhanjariyaSectionItem =
+type LevelWordStartVowelCarriersSectionItem =
   | { type: "intro" }
   | { type: "signTitle" }
   | { type: "signCard"; arabic: string; latin: string; label: string }
@@ -29,82 +29,82 @@ type LevelAlifKhanjariyaSectionItem =
   | { type: "patternCard"; arabic: string; latin: string; hint: string }
   | { type: "exercise" };
 
-export default function LevelAlifKhanjariya() {
+export default function LevelWordStartVowelCarriers() {
   const colorScheme = useColorScheme() || "light";
 
-  const sections: LevelAlifKhanjariyaSectionItem[] = [
+  const sections: LevelWordStartVowelCarriersSectionItem[] = [
     { type: "intro" },
 
     { type: "signTitle" },
     {
       type: "signCard",
-      arabic: "ٰ",
-      latin: "ā",
-      label: "dieses kleine Zeichen zeigt oft einen langen a-Laut",
+      arabic: "أَكَلَ",
+      latin: "akala",
+      label: "am Wortanfang kann ein Vokal auf einem Alif-Träger stehen",
     },
     {
       type: "signCard",
-      arabic: "هٰذَا",
-      latin: "hādhā",
-      label: "ein häufiges Wort mit Alif khanǧarīya",
+      arabic: "إِمَام",
+      latin: "imām",
+      label: "manchmal steht die Hamza mit Vokal unter dem Alif",
     },
     {
       type: "signCard",
-      arabic: "اللّٰه",
-      latin: "Allāh",
-      label: "auch in sehr wichtigen Wörtern kommt es vor",
+      arabic: "أُمَّة",
+      latin: "umma",
+      label: "auch ein u-Laut kann am Anfang auf einem Vokalträger stehen",
     },
 
     { type: "wordTitle" },
     {
       type: "wordCard",
-      arabic: "هٰذَا",
-      latin: "hādhā",
-      hint: "dieses",
+      arabic: "أَ",
+      latin: "a",
+      hint: "Hamza auf Alif mit Fatḥa zeigt einen a-Anfang",
     },
     {
       type: "wordCard",
-      arabic: "هٰذِهِ",
-      latin: "hādhihi",
-      hint: "diese",
+      arabic: "إِ",
+      latin: "i",
+      hint: "Hamza unter dem Alif mit Kasra zeigt einen i-Anfang",
     },
     {
       type: "wordCard",
-      arabic: "اللّٰه",
-      latin: "Allāh",
-      hint: "achte auf den langen ā-Laut",
+      arabic: "أُ",
+      latin: "u",
+      hint: "Hamza auf Alif mit Ḍamma zeigt einen u-Anfang",
     },
     {
       type: "wordCard",
-      arabic: "رَحْمٰن",
-      latin: "raḥmān",
-      hint: "das kleine Zeichen ersetzt hier den langen Laut",
+      arabic: "أَخ",
+      latin: "akh",
+      hint: "du beginnst das Wort direkt mit dem hörbaren Vokal",
     },
     {
       type: "wordCard",
-      arabic: "طٰه",
-      latin: "ṭāhā",
-      hint: "auch hier hörst du ein langes ā",
+      arabic: "إِلَى",
+      latin: "ilā",
+      hint: "achte darauf, ob der Anfang oben oder unten markiert ist",
     },
 
     { type: "patternTitle" },
     {
       type: "patternCard",
-      arabic: "هٰذَا",
-      latin: "hādhā",
-      hint: "das kleine Zeichen hilft dir beim langen Laut",
+      arabic: "أَ = a",
+      latin: "alif carrier with fatḥa",
+      hint: "oben auf dem Alif liest du hier ein a",
     },
     {
       type: "patternCard",
-      arabic: "اللّٰه",
-      latin: "Allāh",
-      hint: "achte auf Shadda und langen Vokal zusammen",
+      arabic: "إِ = i",
+      latin: "alif carrier with kasra",
+      hint: "unter dem Alif liest du hier ein i",
     },
     {
       type: "patternCard",
-      arabic: "رَحْمٰن",
-      latin: "raḥmān",
-      hint: "lies den Laut lang, auch wenn kein normales ا da ist",
+      arabic: "أُ = u",
+      latin: "alif carrier with ḍamma",
+      hint: "oben auf dem Alif mit ḍamma liest du ein u",
     },
 
     { type: "exercise" },
@@ -118,7 +118,7 @@ export default function LevelAlifKhanjariya() {
       ]}
       edges={["top"]}
     >
-      <FlatList<LevelAlifKhanjariyaSectionItem>
+      <FlatList<LevelWordStartVowelCarriersSectionItem>
         data={sections}
         keyExtractor={(_, index) => index.toString()}
         showsVerticalScrollIndicator={false}
@@ -133,7 +133,7 @@ export default function LevelAlifKhanjariya() {
                   { color: Colors[colorScheme].text },
                 ]}
               >
-                Die Alif khanǧarīya
+                Wortanfang mit Vokalträgern
               </Text>
             </View>
           </View>
@@ -157,9 +157,9 @@ export default function LevelAlifKhanjariya() {
                       { color: Colors[colorScheme].text },
                     ]}
                   >
-                    Jetzt lernst du ein sehr kleines Zeichen kennen. Es zeigt
-                    dir oft einen langen a-Laut, obwohl kein normales Alif
-                    geschrieben ist.
+                    Jetzt lernst du Wörter, die mit einem Vokalträger beginnen.
+                    Am Wortanfang steht oft ein Alif mit Hamza. Daran erkennst
+                    du sofort, ob das Wort mit a, i oder u beginnt.
                   </Text>
                 </ThemedView>
 
@@ -178,7 +178,7 @@ export default function LevelAlifKhanjariya() {
                       { color: Colors[colorScheme].text },
                     ]}
                   >
-                    So liest du das kleine Alif
+                    So liest du den Anfang
                   </Text>
                   <Text
                     style={[
@@ -186,8 +186,9 @@ export default function LevelAlifKhanjariya() {
                       { color: Colors[colorScheme].text },
                     ]}
                   >
-                    Achte auf das kleine Zeichen über dem Buchstaben. Es hilft
-                    dir, den Laut lang zu lesen.
+                    Schau zuerst auf das erste Zeichen. Wenn du eine Hamza auf
+                    oder unter dem Alif siehst, liest du direkt den passenden
+                    Anfangsvokal. Danach liest du das Wort normal weiter.
                   </Text>
                   <Text
                     style={[
@@ -195,7 +196,7 @@ export default function LevelAlifKhanjariya() {
                       { color: Colors[colorScheme].text },
                     ]}
                   >
-                    هٰذَا{"\n"}hādhā
+                    أَكَلَ{"\n"}akala
                   </Text>
                 </ThemedView>
               </View>
@@ -210,7 +211,7 @@ export default function LevelAlifKhanjariya() {
                   { color: Colors[colorScheme].text },
                 ]}
               >
-                Das neue Zeichen
+                Die Grundidee
               </Text>
             );
           }
@@ -262,7 +263,7 @@ export default function LevelAlifKhanjariya() {
                   { color: Colors[colorScheme].text },
                 ]}
               >
-                Wörter mit Alif khanǧarīya
+                Beispiele
               </Text>
             );
           }
@@ -314,7 +315,7 @@ export default function LevelAlifKhanjariya() {
                   { color: Colors[colorScheme].text },
                 ]}
               >
-                So liest du es
+                Darauf musst du achten
               </Text>
             );
           }
@@ -384,7 +385,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  Lies laut:
+                  Lies die Wörter und achte auf den ersten Vokal:
                 </Text>
 
                 <Text
@@ -393,7 +394,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  هٰذَا
+                  أَكَلَ
                 </Text>
                 <Text
                   style={[
@@ -401,7 +402,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  هٰذِهِ
+                  إِمَام
                 </Text>
                 <Text
                   style={[
@@ -409,7 +410,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  اللّٰه
+                  أُمَّة
                 </Text>
                 <Text
                   style={[
@@ -417,7 +418,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  رَحْمٰن
+                  أَخ
                 </Text>
                 <Text
                   style={[
@@ -425,7 +426,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  طٰه
+                  إِلَى
                 </Text>
 
                 <Text
@@ -434,8 +435,8 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  Frage dich: Wo siehst du das kleine Zeichen, das den langen
-                  Laut zeigt?
+                  Frage dich: Beginnt das Wort mit a, i oder u, und woran
+                  erkennst du das am Vokalträger?
                 </Text>
               </ThemedView>
             );
@@ -453,7 +454,7 @@ export default function LevelAlifKhanjariya() {
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={() => router.push("/(arabicLevels)/level12")}
+              onPress={() => router.push("/(arabicLevels)/level24")}
               style={[styles.button, styles.primaryButton]}
             >
               <ThemedText>Weiter</ThemedText>
@@ -543,11 +544,11 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   arabicBig: {
-    fontSize: 40,
+    fontSize: 32,
     textAlign: "center",
   },
   latinText: {
-    fontSize: 22,
+    fontSize: 18,
     fontWeight: "700",
     textAlign: "center",
   },
@@ -565,7 +566,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   patternArabic: {
-    fontSize: 28,
+    fontSize: 26,
     textAlign: "center",
     fontWeight: "700",
   },

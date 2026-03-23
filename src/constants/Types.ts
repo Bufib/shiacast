@@ -829,7 +829,6 @@ export type ArabicCurriculumLevel = {
   title: string;
   shortTitle: string;
   description: string;
-  modules: string[];
 };
 
 

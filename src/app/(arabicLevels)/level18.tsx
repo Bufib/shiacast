@@ -14,7 +14,7 @@ import HeaderLeftBackButton from "@/components/HeaderLeftBackButton";
 import { router } from "expo-router";
 import { ThemedText } from "@/components/ThemedText";
 
-type LevelAlifKhanjariyaSectionItem =
+type LevelPauseReadingSectionItem =
   | { type: "intro" }
   | { type: "signTitle" }
   | { type: "signCard"; arabic: string; latin: string; label: string }
@@ -29,82 +29,82 @@ type LevelAlifKhanjariyaSectionItem =
   | { type: "patternCard"; arabic: string; latin: string; hint: string }
   | { type: "exercise" };
 
-export default function LevelAlifKhanjariya() {
+export default function LevelPauseReading() {
   const colorScheme = useColorScheme() || "light";
 
-  const sections: LevelAlifKhanjariyaSectionItem[] = [
+  const sections: LevelPauseReadingSectionItem[] = [
     { type: "intro" },
 
     { type: "signTitle" },
     {
       type: "signCard",
-      arabic: "ٰ",
-      latin: "ā",
-      label: "dieses kleine Zeichen zeigt oft einen langen a-Laut",
+      arabic: "كِتَابٌ → كِتَابْ",
+      latin: "kitābun → kitāb",
+      label: "beim Anhalten fällt die Endung oft weg",
     },
     {
       type: "signCard",
-      arabic: "هٰذَا",
-      latin: "hādhā",
-      label: "ein häufiges Wort mit Alif khanǧarīya",
+      arabic: "رَحْمَةٌ → رَحْمَهْ",
+      latin: "raḥmatun → raḥmah",
+      label: "Tāʾ marbūṭa wird beim Pauselesen meist wie h gehört",
     },
     {
       type: "signCard",
-      arabic: "اللّٰه",
-      latin: "Allāh",
-      label: "auch in sehr wichtigen Wörtern kommt es vor",
+      arabic: "نَسْتَعِينُ → نَسْتَعِينْ",
+      latin: "nastaʿīnu → nastaʿīn",
+      label: "auch ḍamma, kasra und fatḥa am Ende werden beim Stopp oft nicht gelesen",
     },
 
     { type: "wordTitle" },
     {
       type: "wordCard",
-      arabic: "هٰذَا",
-      latin: "hādhā",
-      hint: "dieses",
+      arabic: "كِتَابٌ",
+      latin: "kitābun → kitāb",
+      hint: "sprichst du weiter, liest du die Endung; beim Stopp fällt sie weg",
     },
     {
       type: "wordCard",
-      arabic: "هٰذِهِ",
-      latin: "hādhihi",
-      hint: "diese",
+      arabic: "رَحْمَةٌ",
+      latin: "raḥmatun → raḥmah",
+      hint: "beim Pauselesen endet das Wort auf h",
     },
     {
       type: "wordCard",
-      arabic: "اللّٰه",
-      latin: "Allāh",
-      hint: "achte auf den langen ā-Laut",
+      arabic: "الْعَالَمِينَ",
+      latin: "al-ʿālamīna → al-ʿālamīn",
+      hint: "die letzte Vokalendung wird beim Stopp nicht gesprochen",
     },
     {
       type: "wordCard",
-      arabic: "رَحْمٰن",
-      latin: "raḥmān",
-      hint: "das kleine Zeichen ersetzt hier den langen Laut",
+      arabic: "نَسْتَعِينُ",
+      latin: "nastaʿīnu → nastaʿīn",
+      hint: "beim Pauselesen hörst du den Schlusskonsonanten ohne Endvokal",
     },
     {
       type: "wordCard",
-      arabic: "طٰه",
-      latin: "ṭāhā",
-      hint: "auch hier hörst du ein langes ā",
+      arabic: "جَنَّةٌ",
+      latin: "jannatun → jannah",
+      hint: "Tāʾ marbūṭa wird beim Anhalten wie h gelesen",
     },
 
     { type: "patternTitle" },
     {
       type: "patternCard",
-      arabic: "هٰذَا",
-      latin: "hādhā",
-      hint: "das kleine Zeichen hilft dir beim langen Laut",
+      arabic: "ـُ / ـِ / ـَ → Stopp",
+      latin: "u / i / a → stop",
+      hint: "die kurze Endvokalendung wird beim Pauselesen meist nicht gesprochen",
     },
     {
       type: "patternCard",
-      arabic: "اللّٰه",
-      latin: "Allāh",
-      hint: "achte auf Shadda und langen Vokal zusammen",
+      arabic: "ـٌ / ـٍ / ـً → Stopp",
+      latin: "un / in / an → stop",
+      hint: "auch Tanwīn fällt beim Stopp meist weg",
     },
     {
       type: "patternCard",
-      arabic: "رَحْمٰن",
-      latin: "raḥmān",
-      hint: "lies den Laut lang, auch wenn kein normales ا da ist",
+      arabic: "ـة → هْ",
+      latin: "tāʾ marbūṭa → h",
+      hint: "am Wortende klingt Tāʾ marbūṭa beim Pauselesen meist wie h",
     },
 
     { type: "exercise" },
@@ -118,7 +118,7 @@ export default function LevelAlifKhanjariya() {
       ]}
       edges={["top"]}
     >
-      <FlatList<LevelAlifKhanjariyaSectionItem>
+      <FlatList<LevelPauseReadingSectionItem>
         data={sections}
         keyExtractor={(_, index) => index.toString()}
         showsVerticalScrollIndicator={false}
@@ -133,7 +133,7 @@ export default function LevelAlifKhanjariya() {
                   { color: Colors[colorScheme].text },
                 ]}
               >
-                Die Alif khanǧarīya
+                Das Pauselesen
               </Text>
             </View>
           </View>
@@ -157,9 +157,9 @@ export default function LevelAlifKhanjariya() {
                       { color: Colors[colorScheme].text },
                     ]}
                   >
-                    Jetzt lernst du ein sehr kleines Zeichen kennen. Es zeigt
-                    dir oft einen langen a-Laut, obwohl kein normales Alif
-                    geschrieben ist.
+                    Jetzt lernst du das Pauselesen. Wenn du bei einem Wort
+                    anhältst, werden die Endungen oft anders gelesen als beim
+                    normalen Weiterlesen.
                   </Text>
                 </ThemedView>
 
@@ -178,7 +178,7 @@ export default function LevelAlifKhanjariya() {
                       { color: Colors[colorScheme].text },
                     ]}
                   >
-                    So liest du das kleine Alif
+                    So funktioniert das Pauselesen
                   </Text>
                   <Text
                     style={[
@@ -186,8 +186,9 @@ export default function LevelAlifKhanjariya() {
                       { color: Colors[colorScheme].text },
                     ]}
                   >
-                    Achte auf das kleine Zeichen über dem Buchstaben. Es hilft
-                    dir, den Laut lang zu lesen.
+                    Wenn du auf einem Wort stoppst, fällt die letzte kurze
+                    Endung oft weg. Manche Wörter mit Tāʾ marbūṭa enden beim
+                    Stopp dann wie ein h-Laut.
                   </Text>
                   <Text
                     style={[
@@ -195,7 +196,7 @@ export default function LevelAlifKhanjariya() {
                       { color: Colors[colorScheme].text },
                     ]}
                   >
-                    هٰذَا{"\n"}hādhā
+                    رَحْمَةٌ{"\n"}raḥmatun → raḥmah
                   </Text>
                 </ThemedView>
               </View>
@@ -210,7 +211,7 @@ export default function LevelAlifKhanjariya() {
                   { color: Colors[colorScheme].text },
                 ]}
               >
-                Das neue Zeichen
+                Die Grundidee
               </Text>
             );
           }
@@ -262,7 +263,7 @@ export default function LevelAlifKhanjariya() {
                   { color: Colors[colorScheme].text },
                 ]}
               >
-                Wörter mit Alif khanǧarīya
+                Beispiele zum Pauselesen
               </Text>
             );
           }
@@ -314,7 +315,7 @@ export default function LevelAlifKhanjariya() {
                   { color: Colors[colorScheme].text },
                 ]}
               >
-                So liest du es
+                Darauf musst du achten
               </Text>
             );
           }
@@ -384,7 +385,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  Lies laut:
+                  Lies erst normal, dann mit Stopp:
                 </Text>
 
                 <Text
@@ -393,7 +394,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  هٰذَا
+                  كِتَابٌ
                 </Text>
                 <Text
                   style={[
@@ -401,7 +402,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  هٰذِهِ
+                  رَحْمَةٌ
                 </Text>
                 <Text
                   style={[
@@ -409,7 +410,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  اللّٰه
+                  الْعَالَمِينَ
                 </Text>
                 <Text
                   style={[
@@ -417,7 +418,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  رَحْمٰن
+                  نَسْتَعِينُ
                 </Text>
                 <Text
                   style={[
@@ -425,7 +426,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  طٰه
+                  جَنَّةٌ
                 </Text>
 
                 <Text
@@ -434,8 +435,8 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  Frage dich: Wo siehst du das kleine Zeichen, das den langen
-                  Laut zeigt?
+                  Frage dich: Welche Endung hörst du beim Weiterlesen, und was
+                  bleibt übrig, wenn du auf dem Wort anhältst?
                 </Text>
               </ThemedView>
             );
@@ -453,7 +454,7 @@ export default function LevelAlifKhanjariya() {
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={() => router.push("/(arabicLevels)/level12")}
+              onPress={() => router.push("/(arabicLevels)/level19")}
               style={[styles.button, styles.primaryButton]}
             >
               <ThemedText>Weiter</ThemedText>
@@ -543,11 +544,11 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   arabicBig: {
-    fontSize: 40,
+    fontSize: 32,
     textAlign: "center",
   },
   latinText: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: "700",
     textAlign: "center",
   },
@@ -565,7 +566,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   patternArabic: {
-    fontSize: 28,
+    fontSize: 26,
     textAlign: "center",
     fontWeight: "700",
   },

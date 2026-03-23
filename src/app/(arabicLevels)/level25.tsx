@@ -14,7 +14,7 @@ import HeaderLeftBackButton from "@/components/HeaderLeftBackButton";
 import { router } from "expo-router";
 import { ThemedText } from "@/components/ThemedText";
 
-type LevelAlifKhanjariyaSectionItem =
+type LevelIrregularLongVowelsSectionItem =
   | { type: "intro" }
   | { type: "signTitle" }
   | { type: "signCard"; arabic: string; latin: string; label: string }
@@ -29,82 +29,82 @@ type LevelAlifKhanjariyaSectionItem =
   | { type: "patternCard"; arabic: string; latin: string; hint: string }
   | { type: "exercise" };
 
-export default function LevelAlifKhanjariya() {
+export default function LevelIrregularLongVowels() {
   const colorScheme = useColorScheme() || "light";
 
-  const sections: LevelAlifKhanjariyaSectionItem[] = [
+  const sections: LevelIrregularLongVowelsSectionItem[] = [
     { type: "intro" },
 
     { type: "signTitle" },
     {
       type: "signCard",
-      arabic: "ٰ",
-      latin: "ā",
-      label: "dieses kleine Zeichen zeigt oft einen langen a-Laut",
-    },
-    {
-      type: "signCard",
-      arabic: "هٰذَا",
+      arabic: "هَٰذَا",
       latin: "hādhā",
-      label: "ein häufiges Wort mit Alif khanǧarīya",
+      label: "manchmal hörst du einen langen Vokal, obwohl die Schreibweise etwas besonders aussieht",
     },
     {
       type: "signCard",
-      arabic: "اللّٰه",
-      latin: "Allāh",
-      label: "auch in sehr wichtigen Wörtern kommt es vor",
+      arabic: "ذَٰلِكَ",
+      latin: "dhālika",
+      label: "nicht jeder lange Vokal erscheint in einer ganz regelmäßigen Standardform",
+    },
+    {
+      type: "signCard",
+      arabic: "الرَّحْمَٰن",
+      latin: "ar-raḥmān",
+      label: "ein langer Vokal kann auch durch ein kleines Zusatzzeichen angezeigt werden",
     },
 
     { type: "wordTitle" },
     {
       type: "wordCard",
-      arabic: "هٰذَا",
+      arabic: "هَٰذَا",
       latin: "hādhā",
-      hint: "dieses",
+      hint: "hier hörst du ein langes ā, auch wenn die Form etwas besonders aussieht",
     },
     {
       type: "wordCard",
-      arabic: "هٰذِهِ",
-      latin: "hādhihi",
-      hint: "diese",
+      arabic: "ذَٰلِكَ",
+      latin: "dhālika",
+      hint: "der lange Vokal wird erkannt, obwohl das Wortbild nicht ganz regelmäßig ist",
     },
     {
       type: "wordCard",
-      arabic: "اللّٰه",
-      latin: "Allāh",
-      hint: "achte auf den langen ā-Laut",
+      arabic: "الرَّحْمَٰن",
+      latin: "ar-raḥmān",
+      hint: "das kleine Zeichen hilft dir, den langen ā-Laut richtig zu lesen",
     },
     {
       type: "wordCard",
-      arabic: "رَحْمٰن",
-      latin: "raḥmān",
-      hint: "das kleine Zeichen ersetzt hier den langen Laut",
+      arabic: "لَٰكِن",
+      latin: "lākin",
+      hint: "auch hier ist der lange Vokal da, obwohl die Schreibweise speziell gelernt werden muss",
     },
     {
       type: "wordCard",
-      arabic: "طٰه",
-      latin: "ṭāhā",
-      hint: "auch hier hörst du ein langes ā",
+      arabic: "أُولَٰئِكَ",
+      latin: "ulāʾika",
+      hint: "achte darauf, wo der lange Vokal liegt und lies das Wort als bekannte Form",
     },
 
     { type: "patternTitle" },
     {
       type: "patternCard",
-      arabic: "هٰذَا",
-      latin: "hādhā",
-      hint: "das kleine Zeichen hilft dir beim langen Laut",
+      arabic: "langer Vokal trotz Spezialform",
+      latin: "long vowel in special form",
+      hint: "manchmal ist der lange Vokal hörbar, auch wenn die Schreibweise nicht ganz gewöhnlich ist",
     },
     {
       type: "patternCard",
-      arabic: "اللّٰه",
-      latin: "Allāh",
-      hint: "achte auf Shadda und langen Vokal zusammen",
+      arabic: "kleines Zeichen, langer Klang",
+      latin: "small sign, long sound",
+      hint: "kleine Zusatzzeichen können dir einen langen Vokal anzeigen",
     },
     {
       type: "patternCard",
-      arabic: "رَحْمٰن",
-      latin: "raḥmān",
-      hint: "lies den Laut lang, auch wenn kein normales ا da ist",
+      arabic: "Wortbild merken",
+      latin: "memorize the word shape",
+      hint: "solche Wörter lernst du am besten als bekannte Gesamtform",
     },
 
     { type: "exercise" },
@@ -118,7 +118,7 @@ export default function LevelAlifKhanjariya() {
       ]}
       edges={["top"]}
     >
-      <FlatList<LevelAlifKhanjariyaSectionItem>
+      <FlatList<LevelIrregularLongVowelsSectionItem>
         data={sections}
         keyExtractor={(_, index) => index.toString()}
         showsVerticalScrollIndicator={false}
@@ -133,7 +133,7 @@ export default function LevelAlifKhanjariya() {
                   { color: Colors[colorScheme].text },
                 ]}
               >
-                Die Alif khanǧarīya
+                Unregelmäßige lange Vokale
               </Text>
             </View>
           </View>
@@ -157,9 +157,10 @@ export default function LevelAlifKhanjariya() {
                       { color: Colors[colorScheme].text },
                     ]}
                   >
-                    Jetzt lernst du ein sehr kleines Zeichen kennen. Es zeigt
-                    dir oft einen langen a-Laut, obwohl kein normales Alif
-                    geschrieben ist.
+                    Jetzt lernst du unregelmäßige lange Vokale. Manche Wörter
+                    haben einen langen Laut, aber die Schreibweise sieht nicht
+                    ganz so aus wie bei den normalen langen Vokalen. Deshalb
+                    achtest du auf das Wortbild und auf kleine Zusatzzeichen.
                   </Text>
                 </ThemedView>
 
@@ -178,7 +179,7 @@ export default function LevelAlifKhanjariya() {
                       { color: Colors[colorScheme].text },
                     ]}
                   >
-                    So liest du das kleine Alif
+                    So erkennst du diese Vokale
                   </Text>
                   <Text
                     style={[
@@ -186,8 +187,10 @@ export default function LevelAlifKhanjariya() {
                       { color: Colors[colorScheme].text },
                     ]}
                   >
-                    Achte auf das kleine Zeichen über dem Buchstaben. Es hilft
-                    dir, den Laut lang zu lesen.
+                    Höre beim Lesen genau hin: Klingt der Vokal lang, obwohl die
+                    Form etwas ungewohnt aussieht? Dann lernst du dieses Wort am
+                    besten als bekannte Lesefigur. Kleine Zusatzzeichen helfen
+                    dir dabei.
                   </Text>
                   <Text
                     style={[
@@ -195,7 +198,7 @@ export default function LevelAlifKhanjariya() {
                       { color: Colors[colorScheme].text },
                     ]}
                   >
-                    هٰذَا{"\n"}hādhā
+                    هَٰذَا{"\n"}hādhā
                   </Text>
                 </ThemedView>
               </View>
@@ -210,7 +213,7 @@ export default function LevelAlifKhanjariya() {
                   { color: Colors[colorScheme].text },
                 ]}
               >
-                Das neue Zeichen
+                Die Grundidee
               </Text>
             );
           }
@@ -262,7 +265,7 @@ export default function LevelAlifKhanjariya() {
                   { color: Colors[colorScheme].text },
                 ]}
               >
-                Wörter mit Alif khanǧarīya
+                Beispiele
               </Text>
             );
           }
@@ -314,7 +317,7 @@ export default function LevelAlifKhanjariya() {
                   { color: Colors[colorScheme].text },
                 ]}
               >
-                So liest du es
+                Darauf musst du achten
               </Text>
             );
           }
@@ -384,7 +387,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  Lies laut:
+                  Lies die Wörter und achte auf den langen Vokal:
                 </Text>
 
                 <Text
@@ -393,7 +396,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  هٰذَا
+                  هَٰذَا
                 </Text>
                 <Text
                   style={[
@@ -401,7 +404,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  هٰذِهِ
+                  ذَٰلِكَ
                 </Text>
                 <Text
                   style={[
@@ -409,7 +412,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  اللّٰه
+                  الرَّحْمَٰن
                 </Text>
                 <Text
                   style={[
@@ -417,7 +420,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  رَحْمٰن
+                  لَٰكِن
                 </Text>
                 <Text
                   style={[
@@ -425,7 +428,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  طٰه
+                  أُولَٰئِكَ
                 </Text>
 
                 <Text
@@ -434,8 +437,8 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  Frage dich: Wo siehst du das kleine Zeichen, das den langen
-                  Laut zeigt?
+                  Frage dich: Wo hörst du den langen Vokal, obwohl die
+                  Schreibweise etwas besonders aussieht?
                 </Text>
               </ThemedView>
             );
@@ -453,7 +456,7 @@ export default function LevelAlifKhanjariya() {
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={() => router.push("/(arabicLevels)/level12")}
+              onPress={() => router.push("/(arabicLevels)/level26")}
               style={[styles.button, styles.primaryButton]}
             >
               <ThemedText>Weiter</ThemedText>
@@ -543,11 +546,11 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   arabicBig: {
-    fontSize: 40,
+    fontSize: 32,
     textAlign: "center",
   },
   latinText: {
-    fontSize: 22,
+    fontSize: 18,
     fontWeight: "700",
     textAlign: "center",
   },
@@ -565,7 +568,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   patternArabic: {
-    fontSize: 28,
+    fontSize: 26,
     textAlign: "center",
     fontWeight: "700",
   },

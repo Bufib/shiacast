@@ -47,17 +47,6 @@ const IndexArabic = () => {
             <ThemedText type="subtitle" style={styles.cardTitle}>
               {level.title}
             </ThemedText>
-
-            <View style={styles.moduleContainer}>
-              <ThemedText style={styles.moduleHeading}>Module</ThemedText>
-
-              {level.modules.map((module, index) => (
-                <View key={index} style={[styles.moduleRow, {}]}>
-                  <View style={styles.bullet} />
-                  <ThemedText style={styles.moduleText}>{module}</ThemedText>
-                </View>
-              ))}
-            </View>
           </Pressable>
         ))}
       </ScrollView>

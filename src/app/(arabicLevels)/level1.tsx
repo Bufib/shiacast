@@ -60,7 +60,7 @@ export default function Level1() {
         }
         ListFooterComponent={
           <TouchableOpacity
-            onPress={() => router.push("/(arabicLevels)/level13")}
+            onPress={() => router.push("/(arabicLevels)/level2")}
             style={styles.continueButton}
           >
             <ThemedText>Weiter</ThemedText>

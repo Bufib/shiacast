@@ -14,7 +14,7 @@ import HeaderLeftBackButton from "@/components/HeaderLeftBackButton";
 import { router } from "expo-router";
 import { ThemedText } from "@/components/ThemedText";
 
-type LevelAlifKhanjariyaSectionItem =
+type LevelAlifMaqsuraSectionItem =
   | { type: "intro" }
   | { type: "signTitle" }
   | { type: "signCard"; arabic: string; latin: string; label: string }
@@ -29,82 +29,82 @@ type LevelAlifKhanjariyaSectionItem =
   | { type: "patternCard"; arabic: string; latin: string; hint: string }
   | { type: "exercise" };
 
-export default function LevelAlifKhanjariya() {
+export default function LevelAlifMaqsura() {
   const colorScheme = useColorScheme() || "light";
 
-  const sections: LevelAlifKhanjariyaSectionItem[] = [
+  const sections: LevelAlifMaqsuraSectionItem[] = [
     { type: "intro" },
 
     { type: "signTitle" },
     {
       type: "signCard",
-      arabic: "ٰ",
+      arabic: "ى",
       latin: "ā",
-      label: "dieses kleine Zeichen zeigt oft einen langen a-Laut",
+      label: "das ist Alif maqṣūra",
     },
     {
       type: "signCard",
-      arabic: "هٰذَا",
-      latin: "hādhā",
-      label: "ein häufiges Wort mit Alif khanǧarīya",
+      arabic: "هُدَى",
+      latin: "hudā",
+      label: "am Wortende hörst du einen langen ā-Laut",
     },
     {
       type: "signCard",
-      arabic: "اللّٰه",
-      latin: "Allāh",
-      label: "auch in sehr wichtigen Wörtern kommt es vor",
+      arabic: "مُوسَى",
+      latin: "mūsā",
+      label: "sie sieht wie ein Yāʾ ohne Punkte aus",
     },
 
     { type: "wordTitle" },
     {
       type: "wordCard",
-      arabic: "هٰذَا",
-      latin: "hādhā",
-      hint: "dieses",
+      arabic: "هُدَى",
+      latin: "hudā",
+      hint: "am Ende steht Alif maqṣūra",
     },
     {
       type: "wordCard",
-      arabic: "هٰذِهِ",
-      latin: "hādhihi",
-      hint: "diese",
+      arabic: "مُوسَى",
+      latin: "mūsā",
+      hint: "auch hier hörst du am Ende ein langes ā",
     },
     {
       type: "wordCard",
-      arabic: "اللّٰه",
-      latin: "Allāh",
-      hint: "achte auf den langen ā-Laut",
+      arabic: "عِيسَى",
+      latin: "ʿīsā",
+      hint: "achte auf die Form am Wortende",
     },
     {
       type: "wordCard",
-      arabic: "رَحْمٰن",
-      latin: "raḥmān",
-      hint: "das kleine Zeichen ersetzt hier den langen Laut",
+      arabic: "فَتَى",
+      latin: "fatā",
+      hint: "sie sieht aus wie ى, wird aber ā gelesen",
     },
     {
       type: "wordCard",
-      arabic: "طٰه",
-      latin: "ṭāhā",
-      hint: "auch hier hörst du ein langes ā",
+      arabic: "ذِكْرَى",
+      latin: "dhikrā",
+      hint: "die Form ist nicht y, sondern ein langes ā",
     },
 
     { type: "patternTitle" },
     {
       type: "patternCard",
-      arabic: "هٰذَا",
-      latin: "hādhā",
-      hint: "das kleine Zeichen hilft dir beim langen Laut",
+      arabic: "ى",
+      latin: "ā",
+      hint: "am Wortende liest du diese Form als langes ā",
     },
     {
       type: "patternCard",
-      arabic: "اللّٰه",
-      latin: "Allāh",
-      hint: "achte auf Shadda und langen Vokal zusammen",
+      arabic: "ي / ى",
+      latin: "y / ā",
+      hint: "achte auf den Unterschied zwischen Yāʾ und Alif maqṣūra",
     },
     {
       type: "patternCard",
-      arabic: "رَحْمٰن",
-      latin: "raḥmān",
-      hint: "lies den Laut lang, auch wenn kein normales ا da ist",
+      arabic: "هُدَى / فَتَى",
+      latin: "hudā / fatā",
+      hint: "beide enden auf Alif maqṣūra",
     },
 
     { type: "exercise" },
@@ -118,7 +118,7 @@ export default function LevelAlifKhanjariya() {
       ]}
       edges={["top"]}
     >
-      <FlatList<LevelAlifKhanjariyaSectionItem>
+      <FlatList<LevelAlifMaqsuraSectionItem>
         data={sections}
         keyExtractor={(_, index) => index.toString()}
         showsVerticalScrollIndicator={false}
@@ -133,7 +133,7 @@ export default function LevelAlifKhanjariya() {
                   { color: Colors[colorScheme].text },
                 ]}
               >
-                Die Alif khanǧarīya
+                Die Alif maqṣūra
               </Text>
             </View>
           </View>
@@ -157,9 +157,9 @@ export default function LevelAlifKhanjariya() {
                       { color: Colors[colorScheme].text },
                     ]}
                   >
-                    Jetzt lernst du ein sehr kleines Zeichen kennen. Es zeigt
-                    dir oft einen langen a-Laut, obwohl kein normales Alif
-                    geschrieben ist.
+                    Jetzt lernst du eine besondere Form des Alif kennen. Sie
+                    steht oft am Wortende, sieht aus wie ein Yāʾ ohne Punkte und
+                    wird als langer ā-Laut gelesen.
                   </Text>
                 </ThemedView>
 
@@ -178,7 +178,7 @@ export default function LevelAlifKhanjariya() {
                       { color: Colors[colorScheme].text },
                     ]}
                   >
-                    So liest du das kleine Alif
+                    So liest du Alif maqṣūra
                   </Text>
                   <Text
                     style={[
@@ -186,8 +186,8 @@ export default function LevelAlifKhanjariya() {
                       { color: Colors[colorScheme].text },
                     ]}
                   >
-                    Achte auf das kleine Zeichen über dem Buchstaben. Es hilft
-                    dir, den Laut lang zu lesen.
+                    Achte auf die Form ى am Wortende. Sie sieht ähnlich aus wie
+                    ein Yāʾ, wird hier aber als langes ā gelesen.
                   </Text>
                   <Text
                     style={[
@@ -195,7 +195,7 @@ export default function LevelAlifKhanjariya() {
                       { color: Colors[colorScheme].text },
                     ]}
                   >
-                    هٰذَا{"\n"}hādhā
+                    هُدَى{"\n"}hudā
                   </Text>
                 </ThemedView>
               </View>
@@ -210,7 +210,7 @@ export default function LevelAlifKhanjariya() {
                   { color: Colors[colorScheme].text },
                 ]}
               >
-                Das neue Zeichen
+                Das neue Zeichenbild
               </Text>
             );
           }
@@ -262,7 +262,7 @@ export default function LevelAlifKhanjariya() {
                   { color: Colors[colorScheme].text },
                 ]}
               >
-                Wörter mit Alif khanǧarīya
+                Wörter mit Alif maqṣūra
               </Text>
             );
           }
@@ -393,7 +393,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  هٰذَا
+                  هُدَى
                 </Text>
                 <Text
                   style={[
@@ -401,7 +401,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  هٰذِهِ
+                  مُوسَى
                 </Text>
                 <Text
                   style={[
@@ -409,7 +409,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  اللّٰه
+                  عِيسَى
                 </Text>
                 <Text
                   style={[
@@ -417,7 +417,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  رَحْمٰن
+                  فَتَى
                 </Text>
                 <Text
                   style={[
@@ -425,7 +425,7 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  طٰه
+                  ذِكْرَى
                 </Text>
 
                 <Text
@@ -434,8 +434,8 @@ export default function LevelAlifKhanjariya() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  Frage dich: Wo siehst du das kleine Zeichen, das den langen
-                  Laut zeigt?
+                  Frage dich: Wo siehst du am Ende die Form ى, die als langes ā
+                  gelesen wird?
                 </Text>
               </ThemedView>
             );
@@ -453,7 +453,7 @@ export default function LevelAlifKhanjariya() {
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={() => router.push("/(arabicLevels)/level12")}
+              onPress={() => router.push("/(arabicLevels)/level17")}
               style={[styles.button, styles.primaryButton]}
             >
               <ThemedText>Weiter</ThemedText>

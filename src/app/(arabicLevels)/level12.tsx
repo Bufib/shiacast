@@ -452,7 +452,7 @@ export default function LevelLamAlifLigature() {
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={() => router.push("/(arabicLevels)/level11")}
+              onPress={() => router.push("/(arabicLevels)/level13")}
               style={[styles.button, styles.primaryButton]}
             >
               <ThemedText>Weiter</ThemedText>
