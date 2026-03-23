@@ -78,7 +78,7 @@ export default function TopNavigationKnowledge() {
       {
         key: "arabicScreen",
         title: "",
-        icon: require("@/assets/images/arabic3.png"),
+        icon: require("@/assets/images/arabic.png"),
       },
     ],
     [],

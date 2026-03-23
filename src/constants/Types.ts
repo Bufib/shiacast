@@ -820,3 +820,14 @@ export type SectionType = {
   backgroundImage: any;
   levels: HistoryDataType[];
 };
+
+
+// Arabic
+
+export type ArabicCurriculumLevel = {
+  id: string;
+  title: string;
+  shortTitle: string;
+  description: string;
+  modules: string[];
+};
