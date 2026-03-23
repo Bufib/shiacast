@@ -14,8 +14,9 @@ export default async function syncCalendar(): Promise<void> {
         .select(
           `
           id, title, islamic_date, gregorian_date,
-          description, legend_type, created_at, language_code
-        `
+          description, recommended_acts, legend_type,
+          created_at, language_code
+          `
         )
         .order("id", { ascending: true }),
     ]);
@@ -38,15 +39,14 @@ export default async function syncCalendar(): Promise<void> {
       db.withTransactionAsync.bind(db);
 
     await runTx(async (txn: any) => {
-      // wipe
       await txn.runAsync(`DELETE FROM calendar;`);
       await txn.runAsync(`DELETE FROM calendarLegend;`);
 
       // legends
       const typeStmt = await txn.prepareAsync(
         `INSERT OR REPLACE INTO calendarLegend
-           (id, created_at, legend_type, language_code, color)  -- ⬅️ add color
-         VALUES (?, ?, ?, ?, ?);` // ⬅️ 5 values
+           (id, created_at, legend_type, language_code, color)
+         VALUES (?, ?, ?, ?, ?);`
       );
       for (const t of legends) {
         await typeStmt.executeAsync([
@@ -54,17 +54,17 @@ export default async function syncCalendar(): Promise<void> {
           t.created_at,
           t.legend_type,
           t.language_code,
-          t.color, // ⬅️ make sure Supabase has this; NOT NULL in schema
+          t.color,
         ]);
       }
       await typeStmt.finalizeAsync();
 
-      // calendar rows (unchanged)
+      // calendar rows
       const calStmt = await txn.prepareAsync(
         `INSERT OR REPLACE INTO calendar
            (id, title, islamic_date, gregorian_date, description,
-            legend_type, created_at, language_code)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?);`
+            recommended_acts, legend_type, created_at, language_code)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`
       );
       for (const r of rows) {
         await calStmt.executeAsync([
@@ -73,6 +73,7 @@ export default async function syncCalendar(): Promise<void> {
           r.islamic_date,
           r.gregorian_date,
           r.description ?? null,
+          r.recommended_acts ? JSON.stringify(r.recommended_acts) : null,
           r.legend_type,
           r.created_at,
           r.language_code,

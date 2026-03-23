@@ -445,6 +445,13 @@ const ar = {
   },
 
   // Arabic
+  recommendedActs: "الأعمال الموصى بها",
+  addToPlan: "إضافة إلى الخطة الأسبوعية",
+  selectActsTitle: "اختر الأعمال",
+  selectDay: "اختر اليوم",
+  addSelected: "إضافة المحدد",
+  selectAll: "تحديد الكل",
+  deselectAll: "إلغاء تحديد الكل",
 
   calendarTitle: "التقويم الإسلامي",
   calendarYearRange: "{{range}} هـ",

@@ -1,11 +1,12 @@
 // calendar/calendarDayDetail.tsx
-import React, { useEffect, useState } from "react";
-import { View, ScrollView, StyleSheet, useColorScheme } from "react-native";
+import React, { useEffect, useMemo, useState } from "react";
+import { View, ScrollView, StyleSheet, TouchableOpacity } from "react-native";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import CalendarEventCard from "@/components/CalendarEventCard";
 import HeaderLeftBackButton from "@/components/HeaderLeftBackButton";
+import { AddRecommendedActsModal } from "@/components/AddRecommendedActsModal";
 import { LoadingIndicator } from "@/components/LoadingIndicator";
 import { useLanguage } from "../../../../../contexts/LanguageContext";
 import { useTranslation } from "react-i18next";
@@ -14,6 +15,9 @@ import {
   getCalendarLegendColorById,
 } from "../../../../../db/queries/calendar";
 import { CalendarType } from "@/constants/Types";
+import { Colors } from "@/constants/Colors";
+import { Ionicons } from "@expo/vector-icons";
+import { useColorScheme } from "react-native";
 
 export default function CalendarDayDetail() {
   const { date } = useLocalSearchParams<{
@@ -22,12 +26,14 @@ export default function CalendarDayDetail() {
   }>();
   const { lang } = useLanguage();
   const { t } = useTranslation();
+  const colorScheme = useColorScheme() || "light";
 
   const [events, setEvents] = useState<CalendarType[]>([]);
   const [legendColorMap, setLegendColorMap] = useState<Record<number, string>>(
     {},
   );
   const [loading, setLoading] = useState(true);
+  const [addActsModalVisible, setAddActsModalVisible] = useState(false);
 
   // Format the date for display in the header
   const formattedDate = (() => {
@@ -80,6 +86,21 @@ export default function CalendarDayDetail() {
     return Math.round((dateObj.getTime() - todayStart.getTime()) / 86400000);
   })();
 
+  // Aggregate unique recommended acts from all events for this day
+  const recommendedActs = useMemo(() => {
+    const seen = new Set<string>();
+    const acts: string[] = [];
+    for (const event of events) {
+      for (const act of event.recommended_acts ?? []) {
+        if (act && !seen.has(act)) {
+          seen.add(act);
+          acts.push(act);
+        }
+      }
+    }
+    return acts;
+  }, [events]);
+
   return (
     <ThemedView style={styles.container}>
       <Stack.Screen
@@ -116,8 +137,85 @@ export default function CalendarDayDetail() {
               <ThemedText style={styles.emptyText}>{t("noData")}</ThemedText>
             </View>
           )}
+
+          {/* Recommended Acts Section */}
+          {recommendedActs.length > 0 && (
+            <View
+              style={[
+                styles.actsSection,
+                {
+                  backgroundColor:
+                    colorScheme === "dark"
+                      ? Colors.dark.contrast
+                      : Colors.light.contrast,
+                  borderColor:
+                    colorScheme === "dark"
+                      ? "rgba(255,255,255,0.06)"
+                      : "rgba(0,0,0,0.06)",
+                },
+              ]}
+            >
+              {/* Section header */}
+              <View style={styles.actsSectionHeader}>
+                <View style={styles.actsSectionTitleRow}>
+                  <Ionicons
+                    name="star"
+                    size={15}
+                    color={Colors.universal.primary}
+                  />
+                  <ThemedText style={styles.actsSectionTitle}>
+                    {t("recommendedActs")}
+                  </ThemedText>
+                </View>
+                <TouchableOpacity
+                  style={[
+                    styles.addToPlanButton,
+                    { backgroundColor: Colors.universal.primary },
+                  ]}
+                  onPress={() => setAddActsModalVisible(true)}
+                  activeOpacity={0.8}
+                >
+                  <Ionicons name="add" size={16} color="#fff" />
+                  <ThemedText style={styles.addToPlanText}>
+                    {t("addToPlan")}
+                  </ThemedText>
+                </TouchableOpacity>
+              </View>
+
+              {/* Acts list */}
+              {recommendedActs.map((act, index) => (
+                <View
+                  key={act}
+                  style={[
+                    styles.actItem,
+                    index < recommendedActs.length - 1 && {
+                      borderBottomWidth: StyleSheet.hairlineWidth,
+                      borderBottomColor:
+                        colorScheme === "dark"
+                          ? "rgba(255,255,255,0.07)"
+                          : "rgba(0,0,0,0.07)",
+                    },
+                  ]}
+                >
+                  <View
+                    style={[
+                      styles.actBullet,
+                      { backgroundColor: Colors.universal.primary },
+                    ]}
+                  />
+                  <ThemedText style={styles.actText}>{act}</ThemedText>
+                </View>
+              ))}
+            </View>
+          )}
         </ScrollView>
       )}
+
+      <AddRecommendedActsModal
+        visible={addActsModalVisible}
+        onClose={() => setAddActsModalVisible(false)}
+        acts={recommendedActs}
+      />
     </ThemedView>
   );
 }
@@ -163,5 +261,69 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontStyle: "italic",
     opacity: 0.5,
+  },
+  actsSection: {
+    marginTop: 8,
+    borderRadius: 16,
+    borderWidth: 1,
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    elevation: 3,
+  },
+  actsSectionHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  actsSectionTitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  actsSectionTitle: {
+    fontSize: 14,
+    fontWeight: "700",
+    textTransform: "uppercase",
+    letterSpacing: 0.6,
+    opacity: 0.75,
+  },
+  addToPlanButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 20,
+  },
+  addToPlanText: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: "#fff",
+  },
+  actItem: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    gap: 10,
+  },
+  actBullet: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    marginTop: 8,
+    flexShrink: 0,
+  },
+  actText: {
+    fontSize: 14,
+    lineHeight: 22,
+    flex: 1,
   },
 });

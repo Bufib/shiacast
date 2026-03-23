@@ -627,6 +627,7 @@ export type CalendarType = {
   created_at: string;
   language_code: string;
   legend_type: number;
+  recommended_acts?: string[] | null;
 };
 export type calendarLegendType = {
   id: number;

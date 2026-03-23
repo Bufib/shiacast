@@ -463,6 +463,13 @@ const en = {
   },
 
   // calendar:
+  recommendedActs: "Recommended Acts",
+  addToPlan: "Add to weekly plan",
+  selectActsTitle: "Select acts",
+  selectDay: "Select day",
+  addSelected: "Add selected",
+  selectAll: "Select all",
+  deselectAll: "Deselect all",
   calendarTitle: "Islamic Calendar",
   calendarYearRange: "{{range}} AH" /* example: “1445–1446 AH” */,
   legend: "LEGEND",

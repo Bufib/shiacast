@@ -65,7 +65,7 @@ const useWeeklyTodosStore = create<WeeklyTodosStore>()((set, get) => ({
     if (!trimmed && cleanLinks.length === 0) return;
 
     const newTodo: TodoItemType = {
-      id: Date.now(),
+      id: Date.now() + Math.floor(Math.random() * 1000),
       text: trimmed,
       completed: false,
       ...(cleanLinks.length ? { internal_urls: cleanLinks } : {}),

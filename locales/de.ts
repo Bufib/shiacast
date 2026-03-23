@@ -454,6 +454,13 @@ const de = {
   },
 
   // Calendar
+  recommendedActs: "Empfohlene Handlungen",
+  addToPlan: "Zum Wochenplan hinzufügen",
+  selectActsTitle: "Handlungen auswählen",
+  selectDay: "Tag auswählen",
+  addSelected: "Hinzufügen",
+  selectAll: "Alle auswählen",
+  deselectAll: "Alle abwählen",
   calendarTitle: "Islamischer Kalender",
   calendarYearRange: "{{range}} n. H.",
   legend: "LEGENDE",
