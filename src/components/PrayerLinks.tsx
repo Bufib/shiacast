@@ -635,20 +635,20 @@ const PrayerLinks = () => {
         </View>
       </View>
 
-        <WeeklyCalendarSection
-          todosByDay={todosByDay}
-          loading={loading}
-          onToggleTodo={toggleTodo}
-          onUndoAll={undoAllForDay}
-          onShowAddModal={() => setAddModalVisible(true)}
-          onShowDeleteModal={showDeleteConfirmation}
-          selectedDay={selectedDay}
-          currentDayIndex={getCurrentDayIndex()}
-          onSelectDay={handleSelectDay}
-          onNavigateToFullCalendar={() =>
-            router.push("/knowledge/prayers/weeklyCalendar")
-          }
-        />
+      <WeeklyCalendarSection
+        todosByDay={todosByDay}
+        loading={loading}
+        onToggleTodo={toggleTodo}
+        onUndoAll={undoAllForDay}
+        onShowAddModal={() => setAddModalVisible(true)}
+        onShowDeleteModal={showDeleteConfirmation}
+        selectedDay={selectedDay}
+        currentDayIndex={getCurrentDayIndex()}
+        onSelectDay={handleSelectDay}
+        onNavigateToFullCalendar={() =>
+          router.push("/knowledge/prayers/weeklyCalendar")
+        }
+      />
 
       {selectedDay !== null && (
         <>
@@ -674,13 +674,13 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "column",
     paddingTop: 10,
-    paddingBottom: 4,
+    paddingBottom: 10,
   },
 
   categoriesContainer: {
-    flex: 1,
     flexDirection: "column",
     gap: 15,
+    marginBottom: 25,
   },
 
   categories: {

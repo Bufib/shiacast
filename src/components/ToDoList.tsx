@@ -266,7 +266,6 @@
 //   emptyDayIcon: {},
 // });
 
-// components/ToDoList.tsx
 import React, { useState } from "react";
 import {
   View,
@@ -359,7 +358,7 @@ export const TodoList = ({
             text: t("cancel"),
             style: "cancel",
           },
-        ]
+        ],
       );
     } else {
       setSelectedTodo({
@@ -427,13 +426,13 @@ export const TodoList = ({
         style={scrollEnabled ? styles.scrollStyle : styles.staticStyle}
         scrollEnabled={scrollEnabled}
       >
-        {todos.map((todo) => {
+        {todos.map((todo, index) => {
           const reminder = reminders[String(todo.id)];
           const hasReminder = !!reminder;
 
           return (
             <View
-              key={todo.id}
+              key={`${todo.id}-${index}`}
               style={[
                 styles.todoItem,
                 { backgroundColor: Colors[colorScheme].contrast },
