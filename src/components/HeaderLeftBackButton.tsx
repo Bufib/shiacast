@@ -8,16 +8,24 @@ const HeaderLeftBackButton = ({
   size,
   style,
   route,
+  dismiss = false,
 }: {
   color?: string | null;
   size?: number | null;
   style?: any;
   route?: any;
+  dismiss?: boolean;
 }) => {
   const colorScheme = useColorScheme() || "light";
   return (
     <TouchableOpacity
-      onPress={() => (route ? router.replace(route) : router.back())}
+      onPress={() =>
+        route
+          ? dismiss
+            ? router.dismissTo(route)
+            : router.replace(route)
+          : router.back()
+      }
       hitSlop={10}
       style={style}
     >

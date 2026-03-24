@@ -44,7 +44,12 @@ export default function Level1() {
               marginBottom: 15,
             }}
           >
-            <HeaderLeftBackButton size={30} color={Colors.universal.link} />
+            <HeaderLeftBackButton
+              size={30}
+              color={Colors.universal.link}
+              route={"/knowledge/"}
+              dismiss={true}
+            />
             <Text
               style={[
                 styles.headerTitle,

@@ -201,7 +201,12 @@ export default function Level1_4() {
         ListHeaderComponent={
           <View style={styles.headerWrapper}>
             <View style={styles.headerRow}>
-              <HeaderLeftBackButton size={30} color={Colors.universal.link} />
+              <HeaderLeftBackButton
+                size={30}
+                color={Colors.universal.link}
+                route={"/knowledge/"}
+                dismiss={true}
+              />
               <Text
                 style={[
                   styles.headerTitle,
