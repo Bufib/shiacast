@@ -135,8 +135,8 @@ export type PrayerInformationModalPropsType = {
   language: LanguageCode;
   rtl: boolean;
   colorScheme: "light" | "dark";
-  fontSize: number;
-  lineHeight: number;
+  getFontSize: (type: "latin" | "arabic" | "transliteration") => number
+  getLineHeight: (type: "latin" | "arabic" | "transliteration") => number;
   snapPoints?: (string | number)[];
   onChange?: (index: number) => void;
   onRequestClose?: () => void;
@@ -426,7 +426,7 @@ export type PrayerWithTranslationType = {
   id: number;
   prayer_id: number;
   language_code: string;
-  translated_title: string;
+  translated_title: string | null;
   translated_introduction?: string;
   translated_text?: string;
   source?: string;

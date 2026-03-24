@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import {
   View,
@@ -39,7 +38,7 @@ function RenderQuestionSubCategoryItems() {
         const qs = await getQuestionsForSubcategory(
           category,
           subcategory,
-          lang
+          lang,
         );
         if (cancelled) return;
 
@@ -110,7 +109,12 @@ function RenderQuestionSubCategoryItems() {
               })
             }
           >
-            <ThemedView style={[styles.item, Colors[colorScheme].contrast]}>
+            <ThemedView
+              style={[
+                styles.item,
+                { backgroundColor: Colors[colorScheme].contrast },
+              ]}
+            >
               <View style={styles.questionContainer}>
                 <ThemedText style={styles.titleText}>{item.title}</ThemedText>
                 <ThemedText style={styles.questionText} numberOfLines={1}>
@@ -136,8 +140,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    textAlign: "center"
-
+    textAlign: "center",
   },
   flatListStyle: {
     paddingTop: 15,

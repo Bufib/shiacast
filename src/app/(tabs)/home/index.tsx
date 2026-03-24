@@ -849,6 +849,7 @@ import {
   Animated,
   FlatList,
   Platform,
+  Pressable,
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -985,7 +986,7 @@ export default function HomeScreen() {
         {
           backgroundColor: Colors[colorScheme].background,
           paddingTop: insets.top,
-          paddingBottom: insets.bottom ,
+          paddingBottom: insets.bottom,
         },
       ]}
     >
@@ -1235,16 +1236,17 @@ export default function HomeScreen() {
                 {t("podcastsTitle").toUpperCase()}
               </ThemedText>
 
-              <TouchableOpacity
-                onPress={() => router.push("/(tabs)/home/allPodcasts")}
+              <Pressable
+                onPressIn={() => router.push("/(tabs)/home/allPodcasts")}
                 hitSlop={styles.showAllHitSlop}
+                style={({ pressed }) => pressed && { opacity: 0.6 }}
               >
                 <Text
                   style={[styles.showAllText, { color: Colors.universal.link }]}
                 >
                   {t("showAll")}
                 </Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
 
             {podcastsLoading && (
@@ -1308,16 +1310,17 @@ export default function HomeScreen() {
                 {t("pdfsTitle").toUpperCase()}
               </ThemedText>
 
-              <TouchableOpacity
-                onPress={() => router.push("/(tabs)/home/allPdfs")}
+              <Pressable
+                onPressIn={() => router.push("/(tabs)/home/allPdfs")}
                 hitSlop={styles.showAllHitSlop}
+                style={({ pressed }) => pressed && { opacity: 0.6 }}
               >
                 <Text
                   style={[styles.showAllText, { color: Colors.universal.link }]}
                 >
                   {t("showAll")}
                 </Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
 
             {pdfsLoading && (
@@ -1390,7 +1393,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     gap: 30,
-    paddingBottom: 30
+    paddingBottom: 30,
   },
 
   headerContainer: {

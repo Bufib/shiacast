@@ -37,7 +37,6 @@ const RenderQuestion = ({
   const [relatedQuestions, setRelatedQuestions] = useState<
     QuestionType[] | null
   >(null);
-  const { fontSize, lineHeight } = useFontSizeStore();
   const colorScheme = useColorScheme() || "light";
   const [hasCopiedSingleAnswer, setHasCopiedSingleAnswer] = useState(false);
   const [hasCopiedKhamenei, setHasCopiedKhamenei] = useState(false);
@@ -45,11 +44,10 @@ const RenderQuestion = ({
   const { t } = useTranslation();
   const { lang } = useLanguage();
   const timeoutsRef = useRef<number[]>([]);
+  const { getFontSize, getLineHeight } = useFontSizeStore();
 
   const baseText = {
     color: Colors[colorScheme].text,
-    width: "90%",
-    alignSelf: "center",
   } as const;
 
   useEffect(() => {
@@ -103,16 +101,16 @@ const RenderQuestion = ({
 
   const copyToClipboardMarja = async (
     answer: string | undefined,
-    marja: string
+    marja: string,
   ) => {
     if (answer) {
       if (marja === "khamenei") {
         await Clipboard.setStringAsync(
-          `Gemäß der Ansicht von Sayid Khamenei: ${answer}`
+          `Gemäß der Ansicht von Sayid Khamenei: ${answer}`,
         );
       } else {
         await Clipboard.setStringAsync(
-          `Gemäß der Ansicht von Sayid Sistani: ${answer}`
+          `Gemäß der Ansicht von Sayid Sistani: ${answer}`,
         );
       }
     } else {
@@ -193,15 +191,17 @@ const RenderQuestion = ({
         contentContainerStyle={styles.scrollViewContent}
         showsVerticalScrollIndicator={false}
       >
-        <View style={[styles.questionContainer, Colors[colorScheme].contrast]}>
-          <ThemedText style={[styles.questionText, { fontSize, lineHeight }]}>
+        <View style={[styles.questionContainer, {backgroundColor: Colors[colorScheme].contrast}]}>
+          <ThemedText type="defaultWithFontsize" style={[styles.questionText]}>
             {question?.question}
           </ThemedText>
         </View>
 
         <View style={styles.answerContainer}>
           {question?.answer ? (
-            <ThemedView style={[styles.singleAnswer, Colors[colorScheme].contrast]}>
+            <ThemedView
+              style={[styles.singleAnswer, Colors[colorScheme].contrast]}
+            >
               <View style={styles.textIconContainer}>
                 {hasCopiedSingleAnswer ? (
                   <View style={styles.hasCopiedContainer}>
@@ -228,8 +228,8 @@ const RenderQuestion = ({
                   style={{
                     body: {
                       ...baseText,
-                      fontSize: fontSize,
-                      lineHeight: lineHeight,
+                      fontSize: getFontSize("latin"),
+                      lineHeight: getLineHeight("latin"),
                     },
                   }}
                 >
@@ -259,7 +259,7 @@ const RenderQuestion = ({
                       onPress={() => {
                         copyToClipboardMarja(
                           question?.answer_khamenei,
-                          "khamenei"
+                          "khamenei",
                         );
                         copyIconChangeMarja("khamenei");
                       }}
@@ -269,8 +269,8 @@ const RenderQuestion = ({
                     style={{
                       body: {
                         ...baseText,
-                        fontSize: fontSize,
-                        lineHeight: lineHeight,
+                        fontSize: getFontSize("latin"),
+                        lineHeight: getLineHeight("latin"),
                       },
                     }}
                   >
@@ -299,7 +299,7 @@ const RenderQuestion = ({
                       onPress={() => {
                         copyToClipboardMarja(
                           question?.answer_sistani,
-                          "sistani"
+                          "sistani",
                         );
                         copyIconChangeMarja("sistani");
                       }}
@@ -309,8 +309,8 @@ const RenderQuestion = ({
                     style={{
                       body: {
                         ...baseText,
-                        fontSize: fontSize,
-                        lineHeight: lineHeight,
+                        fontSize: getFontSize("latin"),
+                        lineHeight: getLineHeight("latin"),
                       },
                     }}
                   >
@@ -345,7 +345,7 @@ const RenderQuestion = ({
                       category,
                       subcategory,
                       related.id.toString(),
-                      related.title
+                      related.title,
                     );
                     router.push({
                       pathname: "/(displayQuestion)",
@@ -440,6 +440,8 @@ const styles = StyleSheet.create({
   answerText: {},
   textIconContainer: {
     flexDirection: "column",
+    paddingHorizontal: 12,
+    flexShrink: 1,
   },
   hasCopiedContainer: {
     flexDirection: "row",

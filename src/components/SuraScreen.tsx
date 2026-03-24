@@ -1,4 +1,5 @@
-//! Last worked without the button
+// //! Last worked
+// // SuraScreen.tsx
 // import React, {
 //   useEffect,
 //   useMemo,
@@ -25,35 +26,41 @@
 //   BottomSheetBackdrop,
 //   BottomSheetScrollView,
 // } from "@gorhom/bottom-sheet";
+// import { Asset } from "expo-asset";
+
 // import { ThemedView } from "@/components/ThemedView";
 // import { ThemedText } from "@/components/ThemedText";
 // import { LoadingIndicator } from "@/components/LoadingIndicator";
 // import VerseCard from "@/components/VerseCard";
-// import { useLastSuraStore } from "@/stores/useLastSura";
+
+// import { useLastSuraStore } from "../../stores/useLastSura";
 // import { Colors } from "@/constants/Colors";
-// import { useLanguage } from "@/contexts/LanguageContext";
+// import { useLanguage } from "../../contexts/LanguageContext";
 // import { QuranVerseType } from "@/constants/Types";
-// import { getPageStart, getSajdaForSurah } from "@/db/queries/quran";
-// import { useReadingProgressQuran } from "@/stores/useReadingProgressQuran";
-// import { useFontSizeStore } from "@/stores/fontSizeStore";
-// import { seedPageIndex } from "@/utils/quranIndex";
+// import { getPageStart, getSajdaForSurah } from "../../db/queries/quran";
+// import { useReadingProgressQuran } from "../../stores/useReadingProgressQuran";
+// import { useFontSizeStore } from "../../stores/fontSizeStore";
+// import { seedPageIndex } from "../../utils/quranIndex";
 // import { StickyHeaderQuran } from "./StickyHeaderQuran";
-// import { useSuraData } from "@/hooks/useSuraData";
-// import { useBookmarks } from "@/hooks/useBookmarks";
-// import { vkey } from "@/stores/suraStore";
+// import { useSuraData } from "../../hooks/useSuraData";
+// import { useBookmarks } from "../../hooks/useBookmarks";
+// import { vkey } from "../../stores/suraStore";
 // import BasmalaRow from "./BasmalaRow";
+// import { useDataVersionStore } from "../../stores/dataVersionStore";
+// import { useQuranAudio, RECITERS, type ReciterId } from "../../hooks/useQuranAudio";
+// import { useScreenFadeIn } from "../../hooks/useScreenFadeIn";
 // import ArrowUp from "./ArrowUp";
-// import { useDataVersionStore } from "@/stores/dataVersionStore";
-// import { useQuranAudio } from "@/hooks/useQuranAudio";
-// import { RECITERS, type ReciterId } from "@/hooks/useQuranAudio";
-// import { useScreenFadeIn } from "@/hooks/useScreenFadeIn";
-// import { Asset } from "expo-asset";
+
+// // ✅ IMPORTANT: import from the correct file
+
+// const clamp = (v: number, min: number, max: number) =>
+//   Math.max(min, Math.min(v, max));
 
 // const SuraScreen: React.FC = () => {
 //   const colorScheme = useColorScheme() || "light";
 //   const { lang, rtl } = useLanguage();
-
 //   const { t } = useTranslation();
+
 //   const { suraId, juzId, pageId, verseId } = useLocalSearchParams<{
 //     suraId?: string;
 //     juzId?: string;
@@ -63,27 +70,27 @@
 
 //   const hasTafsir = true;
 //   const { fontSize } = useFontSizeStore();
+
 //   const [nextPage, setNextPage] = useState<number | null>(null);
 //   const [prevPage, setPrevPage] = useState<number | null>(null);
 //   const [jumping, setJumping] = useState(false);
+//   const [showScrollUp, setShowScrollUp] = useState(false);
+//   const showUpRef = useRef(false);
 //   const [reciter, setReciter] = useState<ReciterId>("alafasy");
 //   const [pendingPlay, setPendingPlay] = useState<{
 //     v: QuranVerseType;
 //     i: number;
 //   } | null>(null);
+
 //   const logoAsset = Asset.fromModule(require("@/assets/images/logo.png"));
 //   const artworkUri = logoAsset.uri;
+
 //   const [reciterPicker, setReciterPicker] = useState<{
 //     visible: boolean;
 //     verse: QuranVerseType | null;
 //     index: number;
-//   }>({
-//     visible: false,
-//     verse: null,
-//     index: -1,
-//   });
+//   }>({ visible: false, verse: null, index: -1 });
 
-//   // Sajda verses state
 //   const [sajdaVerses, setSajdaVerses] = useState<Set<number>>(new Set());
 
 //   const isPageMode = !!pageId;
@@ -91,31 +98,8 @@
 //   const juzNumber = isJuzMode ? Number(juzId) : null;
 //   const pageNumber = isPageMode ? Number(pageId) : null;
 //   const suraNumber = useMemo(() => Number(suraId ?? 1), [suraId]);
+
 //   const flatListRef = useRef<FlatList<QuranVerseType>>(null);
-//   const [showArrow, setShowArrow] = useState(false);
-//   const showArrowRef = useRef(false);
-//   const { fadeAnim, onLayout } = useScreenFadeIn(800);
-
-//   const quranDataVersion = useDataVersionStore((s) => s.quranDataVersion);
-
-//   const handleScroll = useCallback(
-//     (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-//       const y = e.nativeEvent.contentOffset.y;
-//       // hysteresis to avoid flicker near the threshold
-//       const THRESH = 200;
-//       const HYST = 16;
-//       const next = showArrowRef.current ? y > THRESH - HYST : y > THRESH + HYST;
-//       if (next !== showArrowRef.current) {
-//         showArrowRef.current = next;
-//         setShowArrow(next);
-//       }
-//     },
-//     [],
-//   );
-
-//   const scrollToTop = () => {
-//     flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
-//   };
 
 //   const [selectedVerse, setSelectedVerse] = useState<QuranVerseType | null>(
 //     null,
@@ -126,6 +110,10 @@
 //   const bottomSheetRef = useRef<BottomSheet>(null);
 //   const snapPoints = useMemo(() => ["75%"], []);
 
+//   const { fadeAnim, onLayout } = useScreenFadeIn(800);
+
+//   const quranDataVersion = useDataVersionStore((s) => s.quranDataVersion);
+
 //   const setTotalVerses = useReadingProgressQuran((s) => s.setTotalVerses);
 //   const setTotalVersesForJuz = useReadingProgressQuran(
 //     (s) => s.setTotalVersesForJuz,
@@ -134,7 +122,7 @@
 //     (s) => s.setTotalVersesForPage,
 //   );
 
-//   // Use custom hooks
+//   // ----- data
 //   const {
 //     loading,
 //     verses,
@@ -157,7 +145,7 @@
 //     quranDataVersion,
 //   });
 
-//   // Inside SuraScreen component, after your other hooks:
+//   // ----- audio
 //   const { toggleVerse, isVersePlaying } = useQuranAudio(verses, {
 //     getTitleFor: (v) =>
 //       isJuzMode
@@ -168,11 +156,7 @@
 //   });
 
 //   const openReciterPicker = useCallback((v: QuranVerseType, i: number) => {
-//     setReciterPicker({
-//       visible: true,
-//       verse: v,
-//       index: i,
-//     });
+//     setReciterPicker({ visible: true, verse: v, index: i });
 //   }, []);
 
 //   const handleSelectReciter = useCallback(
@@ -197,10 +181,30 @@
 //     [reciterPicker, reciter, toggleVerse],
 //   );
 
+//   const handleScroll = useCallback(
+//     (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+//       const y = e.nativeEvent.contentOffset.y;
+//       // hysteresis to avoid flicker near the threshold
+//       const THRESH = 200;
+//       const HYST = 16;
+//       const next = showArrowRef.current ? y > THRESH - HYST : y > THRESH + HYST;
+//       if (next !== showArrowRef.current) {
+//         showArrowRef.current = next;
+//         setShowArrow(next);
+//       }
+//     },
+//     [],
+//   );
+
+//   const scrollToTop = () => {
+//     flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
+//   };
+
 //   const handleCloseReciterPicker = useCallback(() => {
 //     setReciterPicker({ visible: false, verse: null, index: -1 });
 //   }, []);
 
+//   // ----- last sura tracking
 //   const setLastSura = useLastSuraStore((s) => s.setLastSura);
 //   const firstSura = verses?.[0]?.sura;
 
@@ -214,7 +218,6 @@
 //     ({ viewableItems }: { viewableItems: { item: QuranVerseType }[] }) => {
 //       const top = viewableItems?.[0]?.item;
 //       if (top) {
-//         // avoid redundant writes
 //         useLastSuraStore.setState((prev) =>
 //           prev.lastSura === top.sura ? prev : { lastSura: top.sura },
 //         );
@@ -222,11 +225,9 @@
 //     },
 //   ).current;
 
-//   // Handle pending play after reciter state update
+//   // Play after reciter updates
 //   useEffect(() => {
 //     if (!pendingPlay) return;
-
-//     // No timeout needed - React batches updates
 //     toggleVerse(pendingPlay.v, pendingPlay.i);
 //     setPendingPlay(null);
 //   }, [pendingPlay, toggleVerse]);
@@ -237,7 +238,7 @@
 //     setBookmarksBySura,
 //   });
 
-//   // Fetch sajda verses
+//   // ----- sajda fetch
 //   useEffect(() => {
 //     let cancelled = false;
 
@@ -246,23 +247,17 @@
 //         if (!cancelled) setSajdaVerses(new Set());
 //         return;
 //       }
-
 //       try {
-//         // Get unique sura numbers from current verses
 //         const suraNumbers = [...new Set(verses.map((v) => v.sura))];
+//         const sajdaResults = await Promise.all(
+//           suraNumbers.map((s) => getSajdaForSurah(s)),
+//         );
 
-//         // Fetch sajda for all suras in view
-//         const sajdaPromises = suraNumbers.map((sura) => getSajdaForSurah(sura));
-//         const sajdaResults = await Promise.all(sajdaPromises);
-
-//         // Build a set of verse keys that have sajda (type === 1)
 //         const sajdaSet = new Set<number>();
 //         sajdaResults.flat().forEach((sajda) => {
-//           if (sajda.type === 1) {
-//             // Store as "sura * 10000 + aya" for unique key
-//             sajdaSet.add(sajda.sura * 10000 + sajda.aya);
-//           }
+//           if (sajda.type === 1) sajdaSet.add(sajda.sura * 10000 + sajda.aya);
 //         });
+
 //         if (!cancelled) setSajdaVerses(sajdaSet);
 //       } catch (error) {
 //         console.error("Error fetching sajda:", error);
@@ -275,7 +270,7 @@
 //     };
 //   }, [verses, quranDataVersion]);
 
-//   // Page navigation logic (kept in main component)
+//   // ----- page navigation
 //   useEffect(() => {
 //     let cancelled = false;
 
@@ -311,6 +306,7 @@
 //     };
 //   }, [isPageMode, pageNumber, quranDataVersion]);
 
+//   // scroll to verseId
 //   useEffect(() => {
 //     if (!verseId || loading || !verses.length) return;
 
@@ -337,9 +333,9 @@
 //   );
 
 //   const handleOpenInfo = useCallback(
-//     (verse: QuranVerseType, arabicVerse: QuranVerseType | undefined) => {
+//     (verse: QuranVerseType, ar: QuranVerseType | undefined) => {
 //       setSelectedVerse(verse);
-//       setSelectedArabicVerse(arabicVerse || null);
+//       setSelectedArabicVerse(ar || null);
 //       bottomSheetRef.current?.expand();
 //     },
 //     [],
@@ -388,7 +384,6 @@
 //     [],
 //   );
 
-//   // Helper: should we show basmala before this row?
 //   const shouldShowBasmala = useCallback(
 //     (v: QuranVerseType, index: number) => {
 //       if (v.sura === 1 || v.sura === 9) return false;
@@ -397,6 +392,107 @@
 //     },
 //     [isJuzMode, isPageMode],
 //   );
+
+//   const THRESH = 200;
+//   const HYST = 16;
+//   const DIR_EPS = 2;
+
+//   const [showArrow, setShowArrow] = useState(false);
+//   const showArrowRef = useRef(false);
+
+//   const [scrollDir, setScrollDir] = useState<"up" | "down">("up");
+//   const scrollDirRef = useRef<"up" | "down">("up");
+
+//   const lastYRef = useRef(0);
+//   const currentOffsetRef = useRef(0);
+
+//   const listHeightRef = useRef(0);
+//   const contentHeightRef = useRef(0);
+
+//   const scrollToIndexFailedTimerRef = useRef<ReturnType<
+//     typeof setTimeout
+//   > | null>(null);
+
+//   const scrollToEndTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+//     null,
+//   );
+
+//   const clearScrollToIndexFailedTimer = useCallback(() => {
+//     if (scrollToIndexFailedTimerRef.current) {
+//       clearTimeout(scrollToIndexFailedTimerRef.current);
+//       scrollToIndexFailedTimerRef.current = null;
+//     }
+//   }, []);
+
+//   const clearScrollToEndTimer = useCallback(() => {
+//     if (scrollToEndTimerRef.current) {
+//       clearTimeout(scrollToEndTimerRef.current);
+//       scrollToEndTimerRef.current = null;
+//     }
+//   }, []);
+
+//   useEffect(() => {
+//     return () => {
+//       clearScrollToIndexFailedTimer();
+//       clearScrollToEndTimer();
+//     };
+//   }, [clearScrollToIndexFailedTimer, clearScrollToEndTimer]);
+
+//   const handleListLayout = useCallback((e: any) => {
+//     const h = e?.nativeEvent?.layout?.height ?? 0;
+//     if (h > 0) listHeightRef.current = h;
+//   }, []);
+
+//   const handleContentSizeChange = useCallback((_: number, h: number) => {
+//     contentHeightRef.current = h;
+//   }, []);
+
+//   // ✅ NEW: only show button while actively scrolling (keep your current logic)
+//   const [isScrolling, setIsScrolling] = useState(false);
+//   const isScrollingRef = useRef(false);
+//   const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+//   const clearIdle = useCallback(() => {
+//     if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+//     idleTimerRef.current = null;
+//   }, []);
+
+//   const setScrolling = useCallback((v: boolean) => {
+//     isScrollingRef.current = v;
+//     setIsScrolling(v);
+//   }, []);
+
+//   const scheduleStopScrolling = useCallback(() => {
+//     clearIdle();
+//     idleTimerRef.current = setTimeout(() => setScrolling(false), 400);
+//   }, [clearIdle, setScrolling]);
+
+//   useEffect(() => {
+//     return () => clearIdle();
+//   }, [clearIdle]);
+
+//   const scrollToEdge = useCallback(() => {
+//     if (!verses.length) return;
+
+//     clearScrollToEndTimer();
+
+//     if (scrollDirRef.current === "down") {
+//       const lastIndex = verses.length - 1;
+
+//       flatListRef.current?.scrollToIndex({
+//         index: lastIndex,
+//         animated: true,
+//         viewPosition: 1,
+//       });
+
+//       scrollToEndTimerRef.current = setTimeout(() => {
+//         flatListRef.current?.scrollToEnd?.({ animated: true });
+//         scrollToEndTimerRef.current = null;
+//       }, 0);
+//     } else {
+//       flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
+//     }
+//   }, [verses.length, clearScrollToEndTimer]);
 
 //   const renderVerse = useCallback(
 //     ({ item, index }: { item: QuranVerseType; index: number }) => {
@@ -439,14 +535,14 @@
 //       handleBookmarkVerse,
 //       handleOpenInfo,
 //       lang,
+//       rtl,
+//       t,
+//       fontSize,
+//       shouldShowBasmala,
+//       sajdaVerses,
 //       isVersePlaying,
 //       toggleVerse,
 //       openReciterPicker,
-//       fontSize,
-//       rtl,
-//       t,
-//       shouldShowBasmala,
-//       sajdaVerses,
 //     ],
 //   );
 
@@ -466,25 +562,45 @@
 //         <FlatList
 //           ref={flatListRef}
 //           data={verses}
-//           onScroll={handleScroll}
 //           keyExtractor={(v) => `${v.sura}-${v.aya}`}
+//           renderItem={renderVerse}
+//           onScroll={handleScroll}
+//           scrollEventThrottle={16}
+//           onLayout={handleListLayout}
+//           onContentSizeChange={handleContentSizeChange}
 //           bounces={false}
 //           overScrollMode="never"
 //           alwaysBounceVertical={false}
 //           contentContainerStyle={{ paddingBottom: 30 }}
-//           renderItem={renderVerse}
 //           onViewableItemsChanged={onViewableItemsChanged}
+//           viewabilityConfig={viewabilityConfig}
 //           onScrollToIndexFailed={(info) => {
-//             // Retry after a short delay
-//             setTimeout(() => {
+//             clearScrollToIndexFailedTimer();
+
+//             scrollToIndexFailedTimerRef.current = setTimeout(() => {
 //               flatListRef.current?.scrollToIndex({
 //                 index: info.index,
 //                 animated: true,
 //                 viewPosition: 0.2,
 //               });
+//               scrollToIndexFailedTimerRef.current = null;
 //             }, 500);
 //           }}
-//           viewabilityConfig={viewabilityConfig}
+//           // ✅ NEW: active scrolling tracking (doesn't change your showArrow logic)
+//           onScrollBeginDrag={() => {
+//             clearIdle();
+//             setScrolling(true);
+//           }}
+//           onScrollEndDrag={() => {
+//             scheduleStopScrolling();
+//           }}
+//           onMomentumScrollBegin={() => {
+//             clearIdle();
+//             setScrolling(true);
+//           }}
+//           onMomentumScrollEnd={() => {
+//             scheduleStopScrolling();
+//           }}
 //           ListHeaderComponent={
 //             <StickyHeaderQuran
 //               suraNumber={suraNumber}
@@ -497,13 +613,13 @@
 //           }
 //           stickyHeaderIndices={[0]}
 //           stickyHeaderHiddenOnScroll
-//           ListHeaderComponentStyle={{}}
 //           showsVerticalScrollIndicator={false}
-//           scrollEventThrottle={16}
 //           ListEmptyComponent={
-//             <ThemedText style={[styles.emptyText, { fontSize: fontSize }]}>
-//               {t("noData")}
-//             </ThemedText>
+//             <View style={{ paddingHorizontal: 10 }}>
+//               <ThemedText style={[styles.emptyText, { fontSize }]}>
+//                 {t("noData")}
+//               </ThemedText>
+//             </View>
 //           }
 //           ListFooterComponent={
 //             isPageMode && !loading ? (
@@ -548,7 +664,7 @@
 //         />
 //       )}
 
-//       {showArrow && <ArrowUp scrollToTop={scrollToTop} />}
+//        {showArrow && <ArrowUp scrollToTop={scrollToTop} />}
 
 //       {/* Bottom Sheet for Verse Info */}
 //       <BottomSheet
@@ -556,7 +672,7 @@
 //         index={-1}
 //         snapPoints={snapPoints}
 //         backdropComponent={renderBackdrop}
-//         enablePanDownToClose={true}
+//         enablePanDownToClose
 //         backgroundStyle={{ backgroundColor: Colors[colorScheme].background }}
 //         handleIndicatorStyle={{
 //           backgroundColor: Colors[colorScheme].defaultIcon,
@@ -566,15 +682,12 @@
 //           {selectedVerse && (
 //             <>
 //               <View style={styles.bottomSheetHeader}>
-//                 <ThemedText
-//                   style={[styles.bottomSheetTitle, { fontSize: fontSize }]}
-//                 >
+//                 <ThemedText style={[styles.bottomSheetTitle, { fontSize }]}>
 //                   {juzHeader
-//                     ? `${juzHeader.title} – ${t("ayah")} ${
-//                         selectedVerse.sura
-//                       }:${selectedVerse.aya}`
+//                     ? `${juzHeader.title} – ${t("ayah")} ${selectedVerse.sura}:${selectedVerse.aya}`
 //                     : `${displayName} - ${t("ayah")} ${selectedVerse.aya}`}
 //                 </ThemedText>
+
 //                 <TouchableOpacity
 //                   onPress={() => bottomSheetRef.current?.close()}
 //                   style={styles.closeButton}
@@ -598,19 +711,12 @@
 //                 {selectedArabicVerse && (
 //                   <View style={styles.infoSection}>
 //                     <ThemedText
-//                       style={[styles.infoLabel, { fontSize: fontSize }]}
+//                       type="defaultWithFontsize"
+//                       style={[styles.infoLabel]}
 //                     >
 //                       {t("arabicText")}:
 //                     </ThemedText>
-//                     <ThemedText
-//                       style={[
-//                         styles.infoArabicText,
-//                         {
-//                           fontSize: fontSize * 1.3,
-//                           lineHeight: fontSize * 1.3 * 2.0,
-//                         },
-//                       ]}
-//                     >
+//                     <ThemedText type="arabic" style={[styles.infoArabicText]}>
 //                       {selectedArabicVerse.text}
 //                     </ThemedText>
 //                   </View>
@@ -619,15 +725,14 @@
 //                 {lang !== "ar" && (
 //                   <View style={styles.infoSection}>
 //                     <ThemedText
-//                       style={[styles.infoLabel, { fontSize: fontSize }]}
+//                       type="defaultWithFontsize"
+//                       style={[styles.infoLabel]}
 //                     >
 //                       {t("translation")}:
 //                     </ThemedText>
 //                     <ThemedText
-//                       style={[
-//                         styles.infoTranslation,
-//                         { fontSize: fontSize, lineHeight: fontSize * 1.85 },
-//                       ]}
+//                       type="defaultWithFontsize"
+//                       style={[styles.infoTranslation]}
 //                     >
 //                       {selectedVerse.text}
 //                     </ThemedText>
@@ -636,14 +741,15 @@
 
 //                 <View style={styles.infoSection}>
 //                   <ThemedText
-//                     style={[styles.infoLabel, { fontSize: fontSize }]}
+//                     type="defaultWithFontsize"
+//                     style={[styles.infoLabel]}
 //                   >
 //                     {t("tafsir")}:
 //                   </ThemedText>
 //                   <ThemedText
 //                     style={[
 //                       styles.infoTafsir,
-//                       { fontSize: fontSize, lineHeight: fontSize * 1.85 },
+//                       { fontSize, lineHeight: fontSize * 1.85 },
 //                     ]}
 //                   >
 //                     {t("tafsirPlaceholder") ||
@@ -653,28 +759,25 @@
 
 //                 <View style={styles.infoSection}>
 //                   <ThemedText
-//                     style={[styles.infoLabel, { fontSize: fontSize }]}
+//                     type="defaultWithFontsize"
+//                     style={[styles.infoLabel]}
 //                   >
 //                     {t("additionalInfo")}:
 //                   </ThemedText>
 //                   <View style={styles.metaInfo}>
 //                     {!juzHeader && (
-//                       <ThemedText
-//                         style={[styles.metaText, { fontSize: fontSize }]}
-//                       >
+//                       <ThemedText style={[styles.metaText, { fontSize }]}>
 //                         • {t("surahNumber")}: {suraNumber}
 //                       </ThemedText>
 //                     )}
-//                     <ThemedText
-//                       style={[styles.metaText, { fontSize: fontSize }]}
-//                     >
+
+//                     <ThemedText style={[styles.metaText, { fontSize }]}>
 //                       • {t("verseNumber")}: {selectedVerse.sura}:
 //                       {selectedVerse.aya}
 //                     </ThemedText>
+
 //                     {!juzHeader && (
-//                       <ThemedText
-//                         style={[styles.metaText, { fontSize: fontSize }]}
-//                       >
+//                       <ThemedText style={[styles.metaText, { fontSize }]}>
 //                         • {t("revelation")}:{" "}
 //                         {suraInfo?.makki ? t("makki") : t("madani")}
 //                       </ThemedText>
@@ -687,7 +790,7 @@
 //         </BottomSheetScrollView>
 //       </BottomSheet>
 
-//       {/* Reciter Picker - Custom iOS-like dialog */}
+//       {/* Reciter Picker */}
 //       <Modal
 //         visible={reciterPicker.visible}
 //         transparent
@@ -700,6 +803,7 @@
 //             activeOpacity={1}
 //             onPress={handleCloseReciterPicker}
 //           />
+
 //           <ThemedView
 //             style={[
 //               styles.reciterCard,
@@ -815,6 +919,7 @@
 //     gap: 4,
 //   },
 //   metaText: {},
+
 //   footerContainer: {
 //     flexDirection: "row",
 //     paddingHorizontal: 16,
@@ -850,16 +955,7 @@
 //     elevation: 4,
 //     zIndex: 2000,
 //   },
-//   arrowUp: {
-//     position: "absolute",
-//     bottom: "60%",
-//     right: "3%",
-//     borderWidth: 2.5,
-//     borderRadius: 99,
-//     padding: 5,
-//     backgroundColor: Colors.universal.primary,
-//     borderColor: Colors.universal.primary,
-//   },
+
 //   reciterBackdrop: {
 //     flex: 1,
 //     backgroundColor: "rgba(0,0,0,0.35)",
@@ -916,7 +1012,9 @@
 //   },
 // });
 
+//! Last worked
 // SuraScreen.tsx
+
 import React, {
   useEffect,
   useMemo,
@@ -964,14 +1062,13 @@ import { useBookmarks } from "../../hooks/useBookmarks";
 import { vkey } from "../../stores/suraStore";
 import BasmalaRow from "./BasmalaRow";
 import { useDataVersionStore } from "../../stores/dataVersionStore";
-import { useQuranAudio, RECITERS, type ReciterId } from "../../hooks/useQuranAudio";
+import {
+  useQuranAudio,
+  RECITERS,
+  type ReciterId,
+} from "../../hooks/useQuranAudio";
 import { useScreenFadeIn } from "../../hooks/useScreenFadeIn";
 import ArrowUp from "./ArrowUp";
-
-// ✅ IMPORTANT: import from the correct file
-
-const clamp = (v: number, min: number, max: number) =>
-  Math.max(min, Math.min(v, max));
 
 const SuraScreen: React.FC = () => {
   const colorScheme = useColorScheme() || "light";
@@ -986,13 +1083,16 @@ const SuraScreen: React.FC = () => {
   }>();
 
   const hasTafsir = true;
-  const { fontSize } = useFontSizeStore();
+
+  // ── Font size store ──────────────────────────────────────────────────
+  const { getFontSize, getLineHeight, fontSize } = useFontSizeStore();
+
+  const fontSizeLatin = getFontSize("latin");
+  const lineHeightLatin = getLineHeight("latin");
 
   const [nextPage, setNextPage] = useState<number | null>(null);
   const [prevPage, setPrevPage] = useState<number | null>(null);
   const [jumping, setJumping] = useState(false);
-  const [showScrollUp, setShowScrollUp] = useState(false);
-  const showUpRef = useRef(false);
   const [reciter, setReciter] = useState<ReciterId>("alafasy");
   const [pendingPlay, setPendingPlay] = useState<{
     v: QuranVerseType;
@@ -1098,12 +1198,26 @@ const SuraScreen: React.FC = () => {
     [reciterPicker, reciter, toggleVerse],
   );
 
+  const THRESH = 200;
+  const HYST = 16;
+
+  const [showArrow, setShowArrow] = useState(false);
+  const showArrowRef = useRef(false);
+
+  const listHeightRef = useRef(0);
+  const contentHeightRef = useRef(0);
+
+  const scrollToIndexFailedTimerRef = useRef<ReturnType<
+    typeof setTimeout
+  > | null>(null);
+
+  const scrollToEndTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
+
   const handleScroll = useCallback(
     (e: NativeSyntheticEvent<NativeScrollEvent>) => {
       const y = e.nativeEvent.contentOffset.y;
-      // hysteresis to avoid flicker near the threshold
-      const THRESH = 200;
-      const HYST = 16;
       const next = showArrowRef.current ? y > THRESH - HYST : y > THRESH + HYST;
       if (next !== showArrowRef.current) {
         showArrowRef.current = next;
@@ -1310,30 +1424,6 @@ const SuraScreen: React.FC = () => {
     [isJuzMode, isPageMode],
   );
 
-  const THRESH = 200;
-  const HYST = 16;
-  const DIR_EPS = 2;
-
-  const [showArrow, setShowArrow] = useState(false);
-  const showArrowRef = useRef(false);
-
-  const [scrollDir, setScrollDir] = useState<"up" | "down">("up");
-  const scrollDirRef = useRef<"up" | "down">("up");
-
-  const lastYRef = useRef(0);
-  const currentOffsetRef = useRef(0);
-
-  const listHeightRef = useRef(0);
-  const contentHeightRef = useRef(0);
-
-  const scrollToIndexFailedTimerRef = useRef<ReturnType<
-    typeof setTimeout
-  > | null>(null);
-
-  const scrollToEndTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
-    null,
-  );
-
   const clearScrollToIndexFailedTimer = useCallback(() => {
     if (scrollToIndexFailedTimerRef.current) {
       clearTimeout(scrollToIndexFailedTimerRef.current);
@@ -1364,8 +1454,8 @@ const SuraScreen: React.FC = () => {
     contentHeightRef.current = h;
   }, []);
 
-  // ✅ NEW: only show button while actively scrolling (keep your current logic)
-  const [isScrolling, setIsScrolling] = useState(false);
+  // ✅ Active scrolling tracking
+  const [, setIsScrolling] = useState(false);
   const isScrollingRef = useRef(false);
   const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -1374,43 +1464,19 @@ const SuraScreen: React.FC = () => {
     idleTimerRef.current = null;
   }, []);
 
-  const setScrolling = useCallback((v: boolean) => {
+  const setScrollingState = useCallback((v: boolean) => {
     isScrollingRef.current = v;
     setIsScrolling(v);
   }, []);
 
   const scheduleStopScrolling = useCallback(() => {
     clearIdle();
-    idleTimerRef.current = setTimeout(() => setScrolling(false), 400);
-  }, [clearIdle, setScrolling]);
+    idleTimerRef.current = setTimeout(() => setScrollingState(false), 400);
+  }, [clearIdle, setScrollingState]);
 
   useEffect(() => {
     return () => clearIdle();
   }, [clearIdle]);
-
-
-  const scrollToEdge = useCallback(() => {
-    if (!verses.length) return;
-
-    clearScrollToEndTimer();
-
-    if (scrollDirRef.current === "down") {
-      const lastIndex = verses.length - 1;
-
-      flatListRef.current?.scrollToIndex({
-        index: lastIndex,
-        animated: true,
-        viewPosition: 1,
-      });
-
-      scrollToEndTimerRef.current = setTimeout(() => {
-        flatListRef.current?.scrollToEnd?.({ animated: true });
-        scrollToEndTimerRef.current = null;
-      }, 0);
-    } else {
-      flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
-    }
-  }, [verses.length, clearScrollToEndTimer]);
 
   const renderVerse = useCallback(
     ({ item, index }: { item: QuranVerseType; index: number }) => {
@@ -1423,7 +1489,7 @@ const SuraScreen: React.FC = () => {
       return (
         <View style={{ paddingHorizontal: 10 }}>
           {shouldShowBasmala(item, index) && (
-            <BasmalaRow fontSize={fontSize} lang={lang} rtl={rtl} t={t} />
+            <BasmalaRow fontSize={fontSizeLatin} lang={lang} rtl={rtl} t={t} />
           )}
           <VerseCard
             item={item}
@@ -1439,6 +1505,7 @@ const SuraScreen: React.FC = () => {
             isPlaying={isCurrentlyPlaying}
             onPlayAudio={() => toggleVerse(item, index)}
             onPickReciter={() => openReciterPicker(item, index)}
+            fontSize={fontSize}
           />
         </View>
       );
@@ -1455,12 +1522,13 @@ const SuraScreen: React.FC = () => {
       lang,
       rtl,
       t,
-      fontSize,
+      fontSizeLatin,
       shouldShowBasmala,
       sajdaVerses,
       isVersePlaying,
       toggleVerse,
       openReciterPicker,
+      fontSize,
     ],
   );
 
@@ -1481,7 +1549,9 @@ const SuraScreen: React.FC = () => {
           ref={flatListRef}
           data={verses}
           keyExtractor={(v) => `${v.sura}-${v.aya}`}
+          // keyExtractor={(v) => `${v.sura}-${v.aya}-${fontSize}`}
           renderItem={renderVerse}
+          extraData={fontSize}
           onScroll={handleScroll}
           scrollEventThrottle={16}
           onLayout={handleListLayout}
@@ -1504,17 +1574,16 @@ const SuraScreen: React.FC = () => {
               scrollToIndexFailedTimerRef.current = null;
             }, 500);
           }}
-          // ✅ NEW: active scrolling tracking (doesn't change your showArrow logic)
           onScrollBeginDrag={() => {
             clearIdle();
-            setScrolling(true);
+            setScrollingState(true);
           }}
           onScrollEndDrag={() => {
             scheduleStopScrolling();
           }}
           onMomentumScrollBegin={() => {
             clearIdle();
-            setScrolling(true);
+            setScrollingState(true);
           }}
           onMomentumScrollEnd={() => {
             scheduleStopScrolling();
@@ -1534,7 +1603,9 @@ const SuraScreen: React.FC = () => {
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
             <View style={{ paddingHorizontal: 10 }}>
-              <ThemedText style={[styles.emptyText, { fontSize }]}>
+              <ThemedText
+                style={[styles.emptyText, { fontSize: fontSizeLatin }]}
+              >
                 {t("noData")}
               </ThemedText>
             </View>
@@ -1582,7 +1653,7 @@ const SuraScreen: React.FC = () => {
         />
       )}
 
-       {showArrow && <ArrowUp scrollToTop={scrollToTop} />}
+      {showArrow && <ArrowUp scrollToTop={scrollToTop} />}
 
       {/* Bottom Sheet for Verse Info */}
       <BottomSheet
@@ -1600,7 +1671,9 @@ const SuraScreen: React.FC = () => {
           {selectedVerse && (
             <>
               <View style={styles.bottomSheetHeader}>
-                <ThemedText style={[styles.bottomSheetTitle, { fontSize }]}>
+                <ThemedText
+                  style={[styles.bottomSheetTitle, { fontSize: fontSizeLatin }]}
+                >
                   {juzHeader
                     ? `${juzHeader.title} – ${t("ayah")} ${selectedVerse.sura}:${selectedVerse.aya}`
                     : `${displayName} - ${t("ayah")} ${selectedVerse.aya}`}
@@ -1667,7 +1740,10 @@ const SuraScreen: React.FC = () => {
                   <ThemedText
                     style={[
                       styles.infoTafsir,
-                      { fontSize, lineHeight: fontSize * 1.85 },
+                      {
+                        fontSize: fontSizeLatin,
+                        lineHeight: lineHeightLatin,
+                      },
                     ]}
                   >
                     {t("tafsirPlaceholder") ||
@@ -1684,18 +1760,24 @@ const SuraScreen: React.FC = () => {
                   </ThemedText>
                   <View style={styles.metaInfo}>
                     {!juzHeader && (
-                      <ThemedText style={[styles.metaText, { fontSize }]}>
+                      <ThemedText
+                        style={[styles.metaText, { fontSize: fontSizeLatin }]}
+                      >
                         • {t("surahNumber")}: {suraNumber}
                       </ThemedText>
                     )}
 
-                    <ThemedText style={[styles.metaText, { fontSize }]}>
+                    <ThemedText
+                      style={[styles.metaText, { fontSize: fontSizeLatin }]}
+                    >
                       • {t("verseNumber")}: {selectedVerse.sura}:
                       {selectedVerse.aya}
                     </ThemedText>
 
                     {!juzHeader && (
-                      <ThemedText style={[styles.metaText, { fontSize }]}>
+                      <ThemedText
+                        style={[styles.metaText, { fontSize: fontSizeLatin }]}
+                      >
                         • {t("revelation")}:{" "}
                         {suraInfo?.makki ? t("makki") : t("madani")}
                       </ThemedText>

@@ -1,17 +1,14 @@
 // import React, { forwardRef, useMemo } from "react";
-// import { StyleSheet, View } from "react-native";
+// import { StyleSheet } from "react-native";
 // import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 // import AntDesign from "@expo/vector-icons/AntDesign";
 // import Markdown from "react-native-markdown-display";
 // import { Colors } from "@/constants/Colors";
-// import type {
-//   LanguageCode,
-//   PrayerInformationModalPropsType,
-// } from "@/constants/Types";
-// import { Ionicons } from "@expo/vector-icons";
+// import type { PrayerInformationModalPropsType } from "@/constants/Types";
+// import { BottomSheetMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
 
 // const PrayerInformationModal = forwardRef<
-//   BottomSheet,
+//   BottomSheetMethods,
 //   PrayerInformationModalPropsType
 // >(
 //   (
@@ -36,23 +33,25 @@
 //     );
 
 //     const handleClose = () => {
-//       if (onRequestClose) onRequestClose();
-//       // if parent didn't pass a closer, try closing the sheet via ref
-//       const anyRef = ref as React.RefObject<BottomSheet> | null;
-//       anyRef?.current?.close?.();
+//       // inform parent
+//       onRequestClose?.();
+//       // try closing sheet via forwarded ref (object ref only)
+//       if (ref && typeof ref !== "function") {
+//         ref.current?.close?.();
+//       }
 //     };
 
 //     return (
 //       <BottomSheet
 //         ref={ref}
-//         index={-1}
+//         index={-1} // start closed
 //         snapPoints={snapPoints}
 //         enablePanDownToClose
 //         onChange={onChange}
 //         backgroundStyle={{ backgroundColor: Colors[colorScheme].background }}
 //       >
-//         <Ionicons
-//           name="close-circle-outline"
+//         <AntDesign
+//           name="close-circle"
 //           size={24}
 //           color={Colors[colorScheme].defaultIcon}
 //           onPress={handleClose}
@@ -88,6 +87,8 @@
 //   }
 // );
 
+// PrayerInformationModal.displayName = "PrayerInformationModal";
+
 // export default PrayerInformationModal;
 
 // const styles = StyleSheet.create({
@@ -105,7 +106,7 @@ import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Markdown from "react-native-markdown-display";
 import { Colors } from "@/constants/Colors";
-import type { PrayerInformationModalPropsType } from "@/constants/Types";
+import { PrayerInformationModalPropsType } from "@/constants/Types";
 import { BottomSheetMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
 
 const PrayerInformationModal = forwardRef<
@@ -118,25 +119,34 @@ const PrayerInformationModal = forwardRef<
       language,
       rtl,
       colorScheme,
-      fontSize,
-      lineHeight,
+      getFontSize,
+      getLineHeight,
       snapPoints = ["70%"],
       onChange,
       onRequestClose,
     },
-    ref
+    ref,
   ) => {
     const intro = useMemo(
       () =>
         prayer?.translations.find((t) => t.language_code === language)
           ?.translated_introduction || "",
-      [prayer, language]
+      [prayer, language],
+    );
+
+    const mdStyle = useMemo(
+      () => ({
+        body: {
+          getFontSize,
+          lineHeight: getLineHeight("latin"),
+          color: Colors[colorScheme].text,
+        },
+      }),
+      [getFontSize, getLineHeight, colorScheme],
     );
 
     const handleClose = () => {
-      // inform parent
       onRequestClose?.();
-      // try closing sheet via forwarded ref (object ref only)
       if (ref && typeof ref !== "function") {
         ref.current?.close?.();
       }
@@ -145,11 +155,13 @@ const PrayerInformationModal = forwardRef<
     return (
       <BottomSheet
         ref={ref}
-        index={-1} // start closed
+        index={-1}
         snapPoints={snapPoints}
         enablePanDownToClose
         onChange={onChange}
-        backgroundStyle={{ backgroundColor: Colors[colorScheme].background }}
+        backgroundStyle={{
+          backgroundColor: Colors[colorScheme].background,
+        }}
       >
         <AntDesign
           name="close-circle"
@@ -162,34 +174,20 @@ const PrayerInformationModal = forwardRef<
               : { alignSelf: "flex-end", marginRight: 15, marginBottom: 5 }
           }
         />
-
         <BottomSheetView
           style={[
             styles.bottomSheet,
             rtl ? { flexDirection: "row-reverse" } : { flexDirection: "row" },
           ]}
         >
-          {!!intro && (
-            <Markdown
-              style={{
-                body: {
-                  fontSize,
-                  lineHeight,
-                  color: Colors[colorScheme].text,
-                },
-              }}
-            >
-              {intro}
-            </Markdown>
-          )}
+          {!!intro && <Markdown style={mdStyle}>{intro}</Markdown>}
         </BottomSheetView>
       </BottomSheet>
     );
-  }
+  },
 );
 
 PrayerInformationModal.displayName = "PrayerInformationModal";
-
 export default PrayerInformationModal;
 
 const styles = StyleSheet.create({
