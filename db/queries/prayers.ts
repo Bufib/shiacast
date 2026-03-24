@@ -11,12 +11,12 @@ import {
 } from "@/constants/Types";
 
 export async function getPrayerWithTranslations(
-  prayerId: number
+  prayerId: number,
 ): Promise<FullPrayer | null> {
   const db = getDatabase();
   const row = await db.getFirstAsync<PrayerRow>(
     `SELECT * FROM prayers WHERE id = ? LIMIT 1;`,
-    [prayerId]
+    [prayerId],
   );
   if (!row) return null;
 
@@ -24,7 +24,7 @@ export async function getPrayerWithTranslations(
 
   const translations = await db.getAllAsync<PrayerWithTranslationType>(
     `SELECT * FROM prayer_translations WHERE prayer_id = ?;`,
-    [prayerId]
+    [prayerId],
   );
 
   const prayer: PrayerType = {
@@ -50,7 +50,7 @@ export async function getPrayerWithTranslations(
 
 export async function getPrayersForCategory(
   categoryId: number,
-  languageCode: string
+  languageCode: string,
 ): Promise<PrayerWithCategory[]> {
   const db = getDatabase();
   return await db.getAllAsync<PrayerWithCategory>(
@@ -65,12 +65,12 @@ export async function getPrayersForCategory(
        AND t.language_code = ?
      WHERE p.category_id = ?
      ORDER BY p.name COLLATE NOCASE;`,
-    [languageCode, categoryId]
+    [languageCode, categoryId],
   );
 }
 
 export const getFavoritePrayersForFolder = async (
-  folderName: string
+  folderName: string,
 ): Promise<PrayerType[]> => {
   const db = getDatabase();
   return await db.getAllAsync<PrayerType>(
@@ -81,12 +81,12 @@ export const getFavoritePrayersForFolder = async (
     WHERE f.folder_name = ?
     ORDER BY datetime(f.created_at) DESC;
     `,
-    [folderName]
+    [folderName],
   );
 };
 
 export async function getAllPrayersForArabic(
-  categoryId: number
+  categoryId: number,
 ): Promise<PrayerWithCategory[]> {
   const db = getDatabase();
   return await db.getAllAsync<PrayerWithCategory>(
@@ -98,17 +98,17 @@ export async function getAllPrayersForArabic(
      FROM prayers
      WHERE category_id = ?
      ORDER BY name COLLATE NOCASE;`,
-    [categoryId]
+    [categoryId],
   );
 }
 
 export const getFoldersForPrayer = async (
-  prayerId: number
+  prayerId: number,
 ): Promise<string[]> => {
   const db = getDatabase();
   const rows = await db.getAllAsync<{ folder_name: string }>(
     `SELECT DISTINCT folder_name FROM favorite_prayers WHERE prayer_id = ?;`,
-    [prayerId]
+    [prayerId],
   );
   return rows.map((r) => r.folder_name);
 };
@@ -165,14 +165,14 @@ export const createFolder = async (name: string, color: string) => {
   const db = getDatabase();
   await db.runAsync(
     `INSERT OR IGNORE INTO prayer_folders (name, color) VALUES (?, ?);`,
-    [name, color]
+    [name, color],
   );
   return { name, color };
 };
 
 export const addPrayerToFolder = async (
   prayerId: number,
-  folder: { name: string; color: string }
+  folder: { name: string; color: string },
 ): Promise<void> => {
   const db = getDatabase();
   await db.runAsync(
@@ -180,13 +180,13 @@ export const addPrayerToFolder = async (
     INSERT OR IGNORE INTO favorite_prayers (prayer_id, folder_name, folder_color)
     VALUES (?, ?, ?);
     `,
-    [prayerId, folder.name, folder.color]
+    [prayerId, folder.name, folder.color],
   );
 };
 
 export async function removePrayerFromFolder(
   prayerId: number,
-  folderName: string
+  folderName: string,
 ): Promise<void> {
   const db = getDatabase();
   await db.runAsync(
@@ -194,41 +194,41 @@ export async function removePrayerFromFolder(
     DELETE FROM favorite_prayers
     WHERE prayer_id = ? AND folder_name = ?;
     `,
-    [prayerId, folderName]
+    [prayerId, folderName],
   );
 }
 
 export const togglePrayerFavorite = async (
   prayerId: number,
-  folder: { name: string; color: string }
+  folder: { name: string; color: string },
 ): Promise<boolean> => {
   const db = getDatabase();
   const row = await db.getFirstAsync<{ count: number }>(
     `SELECT COUNT(*) AS count
        FROM favorite_prayers
       WHERE prayer_id = ? AND folder_name = ?;`,
-    [prayerId, folder.name]
+    [prayerId, folder.name],
   );
   const exists = (row?.count ?? 0) > 0;
 
   if (exists) {
     await db.runAsync(
       `DELETE FROM favorite_prayers WHERE prayer_id = ? AND folder_name = ?;`,
-      [prayerId, folder.name]
+      [prayerId, folder.name],
     );
     return false;
   } else {
     await db.runAsync(
       `INSERT OR IGNORE INTO favorite_prayers (prayer_id, folder_name, folder_color)
        VALUES (?, ?, ?);`,
-      [prayerId, folder.name, folder.color]
+      [prayerId, folder.name, folder.color],
     );
     return true;
   }
 };
 
 export async function getCategoryByTitle(
-  title: string
+  title: string,
 ): Promise<PrayerCategoryType | null> {
   const db = getDatabase();
   const row = await db.getFirstAsync<PrayerCategoryType>(
@@ -236,13 +236,13 @@ export async function getCategoryByTitle(
      FROM prayer_categories
      WHERE title = ?
      LIMIT 1;`,
-    [title]
+    [title],
   );
   return row ?? null;
 }
 
 export async function getChildCategories(
-  parentId: number
+  parentId: number,
 ): Promise<PrayerCategoryType[]> {
   const db = getDatabase();
   return await db.getAllAsync<PrayerCategoryType>(
@@ -251,13 +251,13 @@ export async function getChildCategories(
           json_each(pc.parent_id) AS j
      WHERE j.value = ?
      ORDER BY pc.title;`,
-    [parentId]
+    [parentId],
   );
 }
 
 // Removes a folder and all favorites in it, atomically.
 export async function removeFolder(
-  name: string
+  name: string,
 ): Promise<{ deletedFolder: boolean; removedFavorites: number }> {
   const db = getDatabase();
 
@@ -269,14 +269,14 @@ export async function removeFolder(
       // Delete favorites and get how many were removed
       const favRes = await txn.runAsync(
         `DELETE FROM favorite_prayers WHERE folder_name = ?;`,
-        [name]
+        [name],
       );
       removedFavorites = favRes?.changes ?? 0;
 
       // Delete the folder and infer whether it existed
       const folderRes = await txn.runAsync(
         `DELETE FROM prayer_folders WHERE name = ?;`,
-        [name]
+        [name],
       );
       deletedFolder = (folderRes?.changes ?? 0) > 0;
     });
@@ -287,7 +287,7 @@ export async function removeFolder(
     throw new Error(
       `Failed to remove folder "${name}": ${
         (err as Error)?.message ?? String(err)
-      }`
+      }`,
     );
   }
 }
@@ -307,7 +307,7 @@ export async function getCategoryTreeIds(rootId: number): Promise<number[]> {
     )
     SELECT id FROM cat_tree;
     `,
-    [rootId]
+    [rootId],
   );
   return rows.map((r) => r.id);
 }
@@ -315,7 +315,7 @@ export async function getCategoryTreeIds(rootId: number): Promise<number[]> {
 // Localized prayers in root + all descendants
 export async function getPrayersForCategoryTree(
   rootCategoryId: number,
-  languageCode: string
+  languageCode: string,
 ): Promise<PrayerWithCategory[]> {
   const db = getDatabase();
   return db.getAllAsync<PrayerWithCategory>(
@@ -331,6 +331,8 @@ export async function getPrayersForCategoryTree(
     SELECT
       p.id,
       p.name,
+      p.arabic_title,
+      t.translated_title,
       COALESCE(t.translated_text, p.arabic_text, '') AS prayer_text,
       p.category_id
     FROM prayers p
@@ -339,13 +341,13 @@ export async function getPrayersForCategoryTree(
     WHERE p.category_id IN (SELECT id FROM cat_tree)
     ORDER BY p.name COLLATE NOCASE;
     `,
-    [rootCategoryId, languageCode]
+    [rootCategoryId, languageCode],
   );
 }
 
 // Arabic-only prayers in root + all descendants
 export async function getAllPrayersForArabicTree(
-  rootCategoryId: number
+  rootCategoryId: number,
 ): Promise<PrayerWithCategory[]> {
   const db = getDatabase();
   return db.getAllAsync<PrayerWithCategory>(
@@ -361,16 +363,16 @@ export async function getAllPrayersForArabicTree(
     SELECT
       p.id,
       p.name,
+      p.arabic_title,
       p.arabic_text AS prayer_text,
       p.category_id
     FROM prayers p
     WHERE p.category_id IN (SELECT id FROM cat_tree)
     ORDER BY p.name COLLATE NOCASE;
     `,
-    [rootCategoryId]
+    [rootCategoryId],
   );
 }
-
 /**
  * Resolve a prayer for internal links.
  *
@@ -383,7 +385,7 @@ export async function getAllPrayersForArabicTree(
  */
 export const getPrayerInternalURL = async (
   identifier: string | number,
-  lang: LanguageCode
+  lang: LanguageCode,
 ): Promise<PrayerType | null> => {
   try {
     const id =
@@ -394,7 +396,7 @@ export const getPrayerInternalURL = async (
     if (!Number.isFinite(id)) {
       console.warn(
         "getPrayerInternalURL: Invalid prayer id identifier",
-        identifier
+        identifier,
       );
       return null;
     }
@@ -408,7 +410,7 @@ export const getPrayerInternalURL = async (
       WHERE id = ?
       LIMIT 1;
       `,
-      [id]
+      [id],
     );
 
     return row ?? null;

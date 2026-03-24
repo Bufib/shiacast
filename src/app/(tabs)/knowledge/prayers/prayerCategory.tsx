@@ -34,11 +34,11 @@ export default function CategoryScreen() {
   const { t } = useTranslation();
   const { lang, rtl } = useLanguage();
   const [childCategories, setChildCategories] = useState<PrayerCategoryType[]>(
-    []
+    [],
   );
   const [allPrayers, setAllPrayers] = useState<PrayerWithCategory[]>([]);
   const [filteredPrayers, setFilteredPrayers] = useState<PrayerWithCategory[]>(
-    []
+    [],
   );
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -74,7 +74,7 @@ export default function CategoryScreen() {
         } else {
           const prayerRows = await getPrayersForCategoryTree(
             categoryData.id,
-            lang
+            lang,
           );
           setAllPrayers(prayerRows);
           setFilteredPrayers(prayerRows);
@@ -91,7 +91,6 @@ export default function CategoryScreen() {
 
   // Handle subcategory selection
   const handleSubcategoryPress = async (cat: PrayerCategoryType) => {
-
     if (selectedSubcategory?.id === cat.id) {
       setSelectedSubcategory(null);
       setFilteredPrayers(allPrayers);
@@ -104,7 +103,7 @@ export default function CategoryScreen() {
       setFilteredPrayers(subcategoryPrayers);
     } catch {
       const filtered = allPrayers.filter(
-        (prayer) => prayer.category_id === cat.id
+        (prayer) => prayer.category_id === cat.id,
       );
       setFilteredPrayers(filtered.length ? filtered : allPrayers);
     }
@@ -246,7 +245,9 @@ export default function CategoryScreen() {
                         ]}
                         numberOfLines={1}
                       >
-                        {prayer.name}
+                        {prayer.translated_title ??
+                          prayer.arabic_title ??
+                          prayer.name}
                       </ThemedText>
                     </View>
                   </View>
