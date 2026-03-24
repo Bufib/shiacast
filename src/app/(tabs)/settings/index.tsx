@@ -447,7 +447,6 @@
 
 // export default Settings;
 
-
 import DeleteUserModal from "@/components/DeleteUserModal";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { ThemedText } from "@/components/ThemedText";
@@ -462,7 +461,7 @@ import { useLogout } from "../../../../utils/useLogout";
 import Constants from "expo-constants";
 import { Image } from "expo-image";
 import { router } from "expo-router";
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Alert,
@@ -484,8 +483,7 @@ import { useDataVersionStore } from "../../../../stores/dataVersionStore";
 import { useScreenFadeIn } from "../../../../hooks/useScreenFadeIn";
 import ClearAppCacheButton from "@/components/ClearCacheButton";
 import FeedbackButton from "@/components/FeedbackButton";
-
-const ARABIC_DATE_OFFSET_KEY = "arabicDateOffset";
+import { useCalendarSettingsStore } from "../../../../stores/useCalendarSettingsStore";
 
 const Settings = () => {
   const colorScheme = useColorScheme() || "light";
@@ -497,7 +495,18 @@ const Settings = () => {
   const [version, setVersion] = useState<string | null>("");
   const [questionCount, setQuestionCount] = useState<number>(0);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
-  const [arabicDateOffset, setArabicDateOffset] = useState<number>(0);
+
+  const arabicDateOffset = useCalendarSettingsStore((s) => s.arabicDateOffset);
+  const incrementArabicDate = useCalendarSettingsStore(
+    (s) => s.incrementArabicDateOffset
+  );
+  const decrementArabicDate = useCalendarSettingsStore(
+    (s) => s.decrementArabicDateOffset
+  );
+  const resetArabicDate = useCalendarSettingsStore(
+    (s) => s.resetArabicDateOffset
+  );
+
   const { getNotifications, toggleGetNotifications, permissionStatus } =
     useNotificationStore();
   const { rtl } = useLanguage();
@@ -522,7 +531,6 @@ const Settings = () => {
     });
   };
 
-  // 2) Get version, PayPal, question count, and arabic date offset
   useEffect(() => {
     (async () => {
       try {
@@ -531,45 +539,18 @@ const Settings = () => {
 
         const count = await getQuestionCount();
         setQuestionCount(count);
-
-        const storedOffset = await AsyncStorage.getItem(ARABIC_DATE_OFFSET_KEY);
-        if (storedOffset !== null) {
-          setArabicDateOffset(parseInt(storedOffset, 10));
-        }
       } catch (error: any) {
         Alert.alert("Fehler", error.message);
       }
     })();
   }, [paypallinkVersion]);
 
-  // 3) Toggle dark mode (persist + set scheme)
   const toggleDarkMode = async () => {
     const newDarkMode = !isDarkMode;
     await AsyncStorage.setItem("isDarkMode", `${newDarkMode}`);
     setIsDarkMode(newDarkMode);
     Appearance.setColorScheme(newDarkMode ? "dark" : "light");
   };
-
-  const updateArabicDateOffset = useCallback(async (newOffset: number) => {
-    try {
-      setArabicDateOffset(newOffset);
-      await AsyncStorage.setItem(ARABIC_DATE_OFFSET_KEY, `${newOffset}`);
-    } catch (error: any) {
-      Alert.alert("Fehler", error.message);
-    }
-  }, []);
-
-  const incrementArabicDate = useCallback(() => {
-    updateArabicDateOffset(arabicDateOffset + 1);
-  }, [arabicDateOffset, updateArabicDateOffset]);
-
-  const decrementArabicDate = useCallback(() => {
-    updateArabicDateOffset(arabicDateOffset - 1);
-  }, [arabicDateOffset, updateArabicDateOffset]);
-
-  const resetArabicDate = useCallback(() => {
-    updateArabicDateOffset(0);
-  }, [updateArabicDateOffset]);
 
   const onSettingsHeaderPress = () => {
     countRef.current += 1;
@@ -619,7 +600,7 @@ const Settings = () => {
                 },
               ]}
             >
-              <ThemedText style={[styles.loginButtonText]}>
+              <ThemedText style={styles.loginButtonText}>
                 {isLoggedIn ? t("logout") : t("login")}
               </ThemedText>
             </Pressable>
@@ -657,6 +638,7 @@ const Settings = () => {
                 thumbColor={Colors[colorScheme].thumbColor}
               />
             </View>
+
             <View style={[styles.settingRow, rtl && styles.rtl]}>
               <View>
                 <ThemedText
@@ -689,7 +671,6 @@ const Settings = () => {
               />
             </View>
 
-            {/* Arabic Date Adjustment */}
             <View style={[styles.arabicDateSection, rtl && styles.rtl]}>
               <View style={{ flex: 1 }}>
                 <ThemedText
@@ -706,6 +687,7 @@ const Settings = () => {
                   {t("arabicDateAdjustmentDescription")}
                 </ThemedText>
               </View>
+
               <View style={[styles.dateAdjustControls, rtl && styles.rtl]}>
                 <Pressable
                   onPress={decrementArabicDate}
@@ -775,7 +757,7 @@ const Settings = () => {
                 style={styles.settingButton}
                 onPress={() => router.push("/(auth)/forgotPassword")}
               >
-                <Text style={[styles.settingButtonText]}>
+                <Text style={styles.settingButtonText}>
                   {t("changePassword")}
                 </Text>
               </Pressable>
@@ -805,13 +787,11 @@ const Settings = () => {
 
           <View style={styles.infoSection}>
             {isAdmin && isLoggedIn && (
-              <>
-                <ThemedText
-                  style={[styles.versionText, rtl && { textAlign: "right" }]}
-                >
-                  {t("appVersion", { version: Constants.expoConfig?.version })}
-                </ThemedText>
-              </>
+              <ThemedText
+                style={[styles.versionText, rtl && { textAlign: "right" }]}
+              >
+                {t("appVersion", { version: Constants.expoConfig?.version })}
+              </ThemedText>
             )}
           </View>
 
@@ -825,7 +805,7 @@ const Settings = () => {
             <Pressable
               onPress={() =>
                 handleOpenExternalUrl(
-                  "https://bufib.github.io/Islam-Fragen-App-rechtliches/datenschutz",
+                  "https://bufib.github.io/Islam-Fragen-App-rechtliches/datenschutz"
                 )
               }
             >
@@ -974,7 +954,6 @@ const styles = StyleSheet.create({
   rtl: {
     flexDirection: "row-reverse",
   },
-  // Arabic Date Adjustment styles
   arabicDateSection: {
     flexDirection: "row",
     justifyContent: "space-between",

@@ -1503,7 +1503,6 @@ import {
 } from "@/components/QuranProgressBadges";
 import { ThemedView } from "./ThemedView";
 import { ThemedText } from "./ThemedText";
-import { LoadingIndicator } from "./LoadingIndicator";
 import { router } from "expo-router";
 import { useLastSuraStore } from "../../stores/useLastSura";
 import { LinearGradient } from "expo-linear-gradient";
@@ -1517,6 +1516,7 @@ import {
 } from "../../utils/quranIndex";
 import { useDataVersionStore } from "../../stores/dataVersionStore";
 import { LastReadHeader, Tabs } from "./SuraListHeaderAndTabs";
+import { SuraListSkeleton } from "./SuraListSkeleton";
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 const { badgeSize } = returnSize(screenWidth, screenHeight);
 
@@ -1545,31 +1545,6 @@ async function preseedPagesForSurah(info: SuraRowType, firstBatchSize = 3) {
     }, 0);
   }
 }
-
-const SuraListSkeleton: React.FC<{ colorScheme: "light" | "dark" }> = ({ colorScheme }) => {
-  const anim = useRef(new Animated.Value(0)).current;
-  useEffect(() => {
-    const loop = Animated.loop(
-      Animated.sequence([
-        Animated.timing(anim, { toValue: 1, duration: 850, useNativeDriver: true }),
-        Animated.timing(anim, { toValue: 0, duration: 850, useNativeDriver: true }),
-      ]),
-    );
-    loop.start();
-    return () => loop.stop();
-  }, [anim]);
-  const opacity = anim.interpolate({ inputRange: [0, 1], outputRange: [0.35, 0.7] });
-  const bg = colorScheme === "dark" ? "rgba(255,255,255,0.09)" : "rgba(0,0,0,0.07)";
-  return (
-    <ThemedView style={{ flex: 1, paddingHorizontal: 16, paddingTop: 12 }}>
-      <Animated.View style={{ height: 140, borderRadius: 24, backgroundColor: bg, opacity, marginBottom: 16 }} />
-      <Animated.View style={{ height: 44, borderRadius: 22, backgroundColor: bg, opacity, marginBottom: 16 }} />
-      {Array.from({ length: 9 }).map((_, i) => (
-        <Animated.View key={i} style={{ height: 68, borderRadius: 14, backgroundColor: bg, opacity, marginBottom: 10 }} />
-      ))}
-    </ThemedView>
-  );
-};
 
 const SuraList: React.FC = () => {
   const { t } = useTranslation();
@@ -1620,7 +1595,7 @@ const SuraList: React.FC = () => {
 
   useEffect(() => {
     let alive = true;
-    let loadingTimer: number | undefined;
+    let loadingTimer: any;
 
     (async () => {
       try {

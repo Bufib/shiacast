@@ -178,32 +178,33 @@ import { LoadingIndicator } from "@/components/LoadingIndicator";
 import { useLanguage } from "../../contexts/LanguageContext";
 import HeaderLeftBackButton from "@/components/HeaderLeftBackButton";
 import { useTranslation } from "react-i18next";
+import { VideosSkeleton } from "./VideosSkeleton";
 
-const VideosSkeleton: React.FC<{ colorScheme: "light" | "dark" }> = ({ colorScheme }) => {
-  const anim = useRef(new Animated.Value(0)).current;
-  useEffect(() => {
-    const loop = Animated.loop(
-      Animated.sequence([
-        Animated.timing(anim, { toValue: 1, duration: 850, useNativeDriver: true }),
-        Animated.timing(anim, { toValue: 0, duration: 850, useNativeDriver: true }),
-      ]),
-    );
-    loop.start();
-    return () => loop.stop();
-  }, [anim]);
-  const opacity = anim.interpolate({ inputRange: [0, 1], outputRange: [0.35, 0.7] });
-  const bg = colorScheme === "dark" ? "rgba(255,255,255,0.09)" : "rgba(0,0,0,0.07)";
-  return (
-    <View style={{ flex: 1, paddingTop: 10, paddingHorizontal: 10 }}>
-      {Array.from({ length: 8 }).map((_, i) => (
-        <Animated.View
-          key={i}
-          style={{ height: 64, borderRadius: 10, backgroundColor: bg, opacity, marginBottom: 15 }}
-        />
-      ))}
-    </View>
-  );
-};
+// const VideosSkeleton: React.FC<{ colorScheme: "light" | "dark" }> = ({ colorScheme }) => {
+//   const anim = useRef(new Animated.Value(0)).current;
+//   useEffect(() => {
+//     const loop = Animated.loop(
+//       Animated.sequence([
+//         Animated.timing(anim, { toValue: 1, duration: 850, useNativeDriver: true }),
+//         Animated.timing(anim, { toValue: 0, duration: 850, useNativeDriver: true }),
+//       ]),
+//     );
+//     loop.start();
+//     return () => loop.stop();
+//   }, [anim]);
+//   const opacity = anim.interpolate({ inputRange: [0, 1], outputRange: [0.35, 0.7] });
+//   const bg = colorScheme === "dark" ? "rgba(255,255,255,0.09)" : "rgba(0,0,0,0.07)";
+//   return (
+//     <View style={{ flex: 1, paddingTop: 10, paddingHorizontal: 10 }}>
+//       {Array.from({ length: 8 }).map((_, i) => (
+//         <Animated.View
+//           key={i}
+//           style={{ height: 64, borderRadius: 10, backgroundColor: bg, opacity, marginBottom: 15 }}
+//         />
+//       ))}
+//     </View>
+//   );
+// };
 
 export default function RenderQuestionVideosCategories() {
   const colorScheme = useColorScheme() || "light";

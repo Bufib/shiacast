@@ -824,6 +824,7 @@
 //     fontWeight: "500",
 //   },
 // });
+
 import { LoadingIndicator } from "@/components/LoadingIndicator";
 import { NewsItem } from "@/components/NewsItem";
 import PdfPreviewCard from "@/components/PdfPreviewCard";
@@ -859,6 +860,7 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useCalendarSettingsStore } from "../../../../stores/useCalendarSettingsStore";
 
 export default function HomeScreen() {
   const colorScheme = useColorScheme() ?? "light";
@@ -908,13 +910,14 @@ export default function HomeScreen() {
   const calendarVersion = useDataVersionStore((s) => s.calendarVersion);
   const [calendarEvent, setCalendarEvent] = useState<CalendarType | null>(null);
   const [calendarEventDiff, setCalendarEventDiff] = useState<number>(0);
+  const arabicDateOffset = useCalendarSettingsStore((s) => s.arabicDateOffset);
 
   useEffect(() => {
     let cancelled = false;
 
     (async () => {
       try {
-        const events = await getAllCalendarDates(lang);
+        const events = await getAllCalendarDates(lang, arabicDateOffset);
         if (cancelled) return;
 
         const today = new Date();
@@ -962,7 +965,7 @@ export default function HomeScreen() {
     return () => {
       cancelled = true;
     };
-  }, [calendarVersion, lang]);
+  }, [calendarVersion, lang, arabicDateOffset]);
 
   const parseIslamicDate = (islamicDate: string) => {
     const match = islamicDate.match(/^(\d+)\.\s*(.+?)(?:\s+\d+)?$/);

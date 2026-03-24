@@ -163,7 +163,6 @@ import { Stack, useLocalSearchParams } from "expo-router";
 import { VideoView, useVideoPlayer } from "expo-video";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
-import { LoadingIndicator } from "@/components/LoadingIndicator";
 import { Collapsible } from "@/components/Collapsible";
 import HeaderLeftBackButton from "./HeaderLeftBackButton";
 import { Colors } from "@/constants/Colors";
@@ -171,6 +170,7 @@ import { useLanguage } from "../../contexts/LanguageContext";
 import { useTranslation } from "react-i18next";
 import { useVideos } from "../../hooks/useVideos";
 import { hlsUrl } from "../../utils/cloudinary";
+import { VideosSkeleton } from "./VideosSkeleton";
 
 export default function RenderQuestionVideos() {
   const { categoryName } = useLocalSearchParams<{ categoryName: string }>();
@@ -199,9 +199,7 @@ export default function RenderQuestionVideos() {
       />
 
       {isLoading ? (
-        <ThemedView style={styles.centeredContainer}>
-          <LoadingIndicator size="large" />
-        </ThemedView>
+        <VideosSkeleton colorScheme={colorScheme as "light" | "dark"} />
       ) : error ? (
         <ThemedView style={styles.centeredContainer}>
           <ThemedText
