@@ -218,6 +218,13 @@ export const migrationSQL = `
   -- You'll often hit WHERE title = ? and ORDER BY title
   CREATE INDEX IF NOT EXISTS idx_prayer_categories_title_nocase ON prayer_categories(title COLLATE NOCASE);
 
+
+    CREATE TABLE IF NOT EXISTS prayer_recommendations (
+    id            INTEGER PRIMARY KEY,
+    recommendation_content         TEXT    NOT NULL,
+    language_code TEXT    NOT NULL
+);
+
   CREATE TABLE IF NOT EXISTS prayers (
     id INTEGER PRIMARY KEY,
     name TEXT,

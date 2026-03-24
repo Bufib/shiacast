@@ -147,6 +147,7 @@ const de = {
   bottomInformationRenderPrayer: "Wird wie folgt ausgesprochen: ",
   noName: "Bitte gebe einen Namen an",
   prayerTime: "Gebetszeiten",
+  showPrayerRecommendation:"Empfehlungen",
   // Tasbih
   dhikrFree: "Frei",
   dhikrSubhanallah: "Subhanallah",

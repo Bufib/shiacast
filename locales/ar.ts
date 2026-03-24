@@ -145,6 +145,7 @@ const ar = {
   bottomInformationRenderPrayer: "ينطق كما يلي: ",
   noName: "يرجى تقديم اسم",
   prayerTime: "أوقات الصلاة",
+  showPrayerRecommendation: "التوصيات",
 
   // Tasbih
   dhikrFree: "حر",

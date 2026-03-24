@@ -161,7 +161,7 @@ const en = {
   bottomInformationRenderPrayer: "is pronounced like the following: ",
   noName: "Please provide a name",
   prayerTime: "Prayer Time",
-
+  showPrayerRecommendation: "Recommendations",
   // Tasbih
   dhikrFree: "Free",
   dhikrSubhanallah: "Subhanallah",

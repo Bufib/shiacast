@@ -173,7 +173,7 @@ export const WeeklyCalendarSection: React.FC<
     <View style={styles.container}>
       <View style={styles.calendarHeader}>
         <View style={styles.calendarHeaderContainer}>
-          <AntDesign
+          {/* <AntDesign
             name="calendar"
             size={isLarge ? 45 : isMedium ? 40 : 35}
             color="#f5f6fa"
@@ -183,19 +183,12 @@ export const WeeklyCalendarSection: React.FC<
               padding: 5,
               paddingBottom: 7,
             }}
-          />
+          /> */}
           <View style={styles.calendarTextContainer}>
-            <ThemedText style={[styles.calendarTextTitle, { fontSize: 20 }]}>
+            <ThemedText style={[styles.calendarTextTitle, { fontSize: 25 }]}>
               {t("weeklyToDoTitle")}
             </ThemedText>
-            {/* <ThemedText
-              style={[
-                styles.calendarTextSubtitle,
-                { fontSize: isLarge ? 16 : isMedium ? 14 : 12 },
-              ]}
-            >
-              {t("weeklyToDoSubtitle")}
-            </ThemedText> */}
+          
             <TouchableOpacity
               onPress={onNavigateToFullCalendar}
               disabled={!onNavigateToFullCalendar}
