@@ -449,6 +449,8 @@ const en = {
     "Do you really want to delete all cached files of the app?",
   clearAppCacheSuccessMessage: "The app cache was cleared successfully.",
   clearAppCacheErrorMessage: "An error occurred while clearing the app cache.",
+arabicDateAdjustment: "Adjust Arabic date",
+arabicDateAdjustmentDescription:"Add or subtract days",
 
   // Language selector
   language: "Language",

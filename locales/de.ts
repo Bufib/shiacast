@@ -147,7 +147,7 @@ const de = {
   bottomInformationRenderPrayer: "Wird wie folgt ausgesprochen: ",
   noName: "Bitte gebe einen Namen an",
   prayerTime: "Gebetszeiten",
-  showPrayerRecommendation:"Empfehlungen",
+  showPrayerRecommendation: "Empfehlungen",
   // Tasbih
   dhikrFree: "Frei",
   dhikrSubhanallah: "Subhanallah",
@@ -422,8 +422,8 @@ const de = {
   appVersion: "App-Version: {{version}}",
   dataPrivacy: "Datenschutz",
   aboutTheApp: "Über die App",
-  recommendations:"Empfehlungen",
-  ourRecommendations:"Unsere Empfehlungen",
+  recommendations: "Empfehlungen",
+  ourRecommendations: "Unsere Empfehlungen",
   imprint: "Impressum",
   hardResetDatabase: "Datenbank neu laden",
   hardResetDatabaseText:
@@ -441,7 +441,8 @@ const de = {
   clearAppCacheSuccessMessage: "Der App-Cache wurde erfolgreich gelöscht.",
   clearAppCacheErrorMessage:
     "Beim Löschen des App-Caches ist ein Fehler aufgetreten.",
-
+  arabicDateAdjustment: "Arabisches Datum anpassen",
+  arabicDateAdjustmentDescription: "Tage hinzufügen oder subtrahieren",
   // Language selector
   language: "Sprache",
   selectAppLanguage: "App-Sprache wählen",

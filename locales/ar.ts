@@ -432,7 +432,8 @@ const ar = {
     "هل تريد حقًا حذف جميع الملفات المخزنة مؤقتًا للتطبيق؟",
   clearAppCacheSuccessMessage: "تم مسح ذاكرة التخزين المؤقت للتطبيق بنجاح.",
   clearAppCacheErrorMessage: "حدث خطأ أثناء مسح ذاكرة التخزين المؤقت للتطبيق.",
-
+  arabicDateAdjustment: "تعديل التاريخ العربي",
+  arabicDateAdjustmentDescription: "إضافة أو طرح أيام",
   // Language selector
   language: "اللغة",
   selectAppLanguage: "اختر لغة التطبيق",
