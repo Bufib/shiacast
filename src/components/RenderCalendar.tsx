@@ -441,7 +441,7 @@ export default RenderCalendar;
 const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 16,
-    paddingBottom: 40,
+    paddingBottom: 10,
   },
   legendWrap: {
     paddingTop: 16,
@@ -470,7 +470,7 @@ const styles = StyleSheet.create({
   // ── Grid ──────────────────────────────────────────────────────────────────
   grid: {
     gap: 8,
-    marginBottom: 24,
+    marginBottom: 20
   },
   gridRow: {
     flexDirection: "row",
