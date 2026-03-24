@@ -113,9 +113,7 @@ export function AddRecommendedActsModal({ visible, onClose, acts }: Props) {
             <Ionicons
               name={isAllSelected ? "checkmark-circle" : "ellipse-outline"}
               size={20}
-              color={
-                isAllSelected ? Colors.universal.primary : closeIconColor
-              }
+              color={isAllSelected ? Colors.universal.primary : closeIconColor}
             />
             <ThemedText
               style={[
@@ -209,10 +207,7 @@ export function AddRecommendedActsModal({ visible, onClose, acts }: Props) {
           {/* Buttons */}
           <View style={styles.buttons}>
             <TouchableOpacity
-              style={[
-                styles.button,
-                { backgroundColor: dayBgInactive },
-              ]}
+              style={[styles.button, { backgroundColor: dayBgInactive }]}
               onPress={onClose}
             >
               <ThemedText style={styles.buttonText}>{t("cancel")}</ThemedText>
