@@ -460,7 +460,7 @@ function VerseCard({
         )}
         {!!transliterationText && (
           <View
-            style={{ paddingHorizontal: "5%" }}
+            style={{}}
             onLayout={(e) => {
               const w = e.nativeEvent.layout.width;
               if (w > 0 && w !== htmlWidth) setHtmlWidth(w);

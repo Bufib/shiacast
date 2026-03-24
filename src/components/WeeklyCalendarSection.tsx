@@ -25,6 +25,7 @@ import {
   cancelTodoReminderNotification,
 } from "../../hooks/usePushNotifications";
 import Toast from "react-native-toast-message";
+import { EvilIcons, FontAwesome } from "@expo/vector-icons";
 
 export const WeeklyCalendarSection: React.FC<
   WeeklyCalendarSectionType & {
@@ -173,22 +174,23 @@ export const WeeklyCalendarSection: React.FC<
     <View style={styles.container}>
       <View style={styles.calendarHeader}>
         <View style={styles.calendarHeaderContainer}>
-          {/* <AntDesign
+          <FontAwesome
             name="calendar"
             size={isLarge ? 45 : isMedium ? 40 : 35}
-            color="#f5f6fa"
+            color={Colors[colorScheme].background}
             style={{
               backgroundColor: Colors.universal.primary,
               borderRadius: 10,
               padding: 5,
               paddingBottom: 7,
             }}
-          /> */}
+          />
+
           <View style={styles.calendarTextContainer}>
             <ThemedText style={[styles.calendarTextTitle, { fontSize: 25 }]}>
               {t("weeklyToDoTitle")}
             </ThemedText>
-          
+
             <TouchableOpacity
               onPress={onNavigateToFullCalendar}
               disabled={!onNavigateToFullCalendar}
