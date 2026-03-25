@@ -31,6 +31,7 @@ import { Entypo } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { ThemedView } from "./ThemedView";
 import { useCalendarSettingsStore } from "../../stores/useCalendarSettingsStore";
+import RenderCalendarSkeleton from "./RenderCalendarSkeleton";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -180,38 +181,38 @@ const RenderCalendar: React.FC = () => {
 
   // ── Data loading ───────────────────────────────────────────────────────────
 
-useEffect(() => {
-  let cancelled = false;
+  useEffect(() => {
+    let cancelled = false;
 
-  (async () => {
-    try {
-      setLoading(true);
+    (async () => {
+      try {
+        setLoading(true);
 
-      const [ev, colorMap] = await Promise.all([
-        getAllCalendarDates(lang, arabicDateOffset),
-        getCalendarLegendColors(lang),
-      ]);
+        const [ev, colorMap] = await Promise.all([
+          getAllCalendarDates(lang, arabicDateOffset),
+          getCalendarLegendColors(lang),
+        ]);
 
-      if (!cancelled) {
-        setEvents(ev ?? []);
-        setLegendColorMap(colorMap);
+        if (!cancelled) {
+          setEvents(ev ?? []);
+          setLegendColorMap(colorMap);
+        }
+      } catch {
+        if (!cancelled) {
+          setEvents([]);
+          setLegendColorMap({});
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
-    } catch {
-      if (!cancelled) {
-        setEvents([]);
-        setLegendColorMap({});
-      }
-    } finally {
-      if (!cancelled) {
-        setLoading(false);
-      }
-    }
-  })();
+    })();
 
-  return () => {
-    cancelled = true;
-  };
-}, [calendarVersion, lang, arabicDateOffset]);
+    return () => {
+      cancelled = true;
+    };
+  }, [calendarVersion, lang, arabicDateOffset]);
   // ── Date helpers ───────────────────────────────────────────────────────────
 
   const todayStart = useMemo(() => {
@@ -328,12 +329,7 @@ useEffect(() => {
   // ── Loading ────────────────────────────────────────────────────────────────
 
   if (loading) {
-    return (
-      <ThemedView style={styles.loadingWrap}>
-        <LoadingIndicator size="large" />
-        <ThemedText style={styles.loadingText}>{t("loading")}</ThemedText>
-      </ThemedView>
-    );
+    return <RenderCalendarSkeleton />;
   }
 
   // ── Render ─────────────────────────────────────────────────────────────────
@@ -349,7 +345,7 @@ useEffect(() => {
         <CalendarLegend />
       </View>
 
-      {sections.length === 0 ? (
+      {sections.length === 0 && !loading ? (
         <View style={styles.emptyWrap}>
           <ThemedText style={styles.emptyText}>{t("noData")}</ThemedText>
         </View>
@@ -470,7 +466,7 @@ const styles = StyleSheet.create({
   // ── Grid ──────────────────────────────────────────────────────────────────
   grid: {
     gap: 8,
-    marginBottom: 20
+    marginBottom: 20,
   },
   gridRow: {
     flexDirection: "row",

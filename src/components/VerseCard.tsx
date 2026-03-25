@@ -481,7 +481,7 @@ function VerseCard({
 
         {language !== "ar" && (
           <ThemedText
-            type="defaultWithFontsize"
+            type="latin"
             style={[
               styles.translation,
               {

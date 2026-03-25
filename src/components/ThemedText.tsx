@@ -93,6 +93,8 @@
 //   },
 // });
 
+
+import { useMemo } from "react";
 import { StyleSheet, Text, type TextProps } from "react-native";
 import { useThemeColor } from "../../hooks/useThemeColor";
 import { useFontSizeStore } from "../../stores/fontSizeStore";
@@ -107,11 +109,23 @@ export type ThemedTextProps = TextProps & {
     | "defaultSemiBold"
     | "arabic"
     | "transliteration"
-    | "defaultWithFontsize"
+    | "latin"
     | "subtitle"
     | "link"
     | "layoutNavigationText";
 };
+
+const LINE_HEIGHT_MULTIPLIERS = {
+  latin: 1.5,
+  arabic: 2.2,
+  transliteration: 1.8,
+} as const;
+
+const FONT_SIZE_MULTIPLIERS = {
+  latin: 1,
+  arabic: 1.3,
+  transliteration: 1,
+} as const;
 
 export function ThemedText({
   style,
@@ -121,8 +135,34 @@ export function ThemedText({
   ...rest
 }: ThemedTextProps) {
   const color = useThemeColor({ light: lightColor, dark: darkColor }, "text");
-  const { getFontSize, getLineHeight } = useFontSizeStore();
-const fontSize = useFontSizeStore((s) => s.fontSize);
+  const fontSize = useFontSizeStore((s) => s.fontSize);
+
+  const dynamicStyle = useMemo(() => {
+    switch (type) {
+      case "arabic":
+        return {
+          fontSize: Math.round(fontSize * FONT_SIZE_MULTIPLIERS.arabic),
+          lineHeight: Math.round(fontSize * LINE_HEIGHT_MULTIPLIERS.arabic),
+        };
+      case "transliteration":
+        return {
+          fontSize: Math.round(
+            fontSize * FONT_SIZE_MULTIPLIERS.transliteration
+          ),
+          lineHeight: Math.round(
+            fontSize * LINE_HEIGHT_MULTIPLIERS.transliteration
+          ),
+        };
+      case "latin":
+        return {
+          fontSize: Math.round(fontSize * FONT_SIZE_MULTIPLIERS.latin),
+          lineHeight: Math.round(fontSize * LINE_HEIGHT_MULTIPLIERS.latin),
+        };
+      default:
+        return undefined;
+    }
+  }, [type, fontSize]);
+
   return (
     <Text
       style={[
@@ -131,29 +171,12 @@ const fontSize = useFontSizeStore((s) => s.fontSize);
         type === "title" ? styles.title : undefined,
         type === "titleBiggerLessBold" ? styles.titleBiggerLessBold : undefined,
         type === "defaultSemiBold" ? styles.defaultSemiBold : undefined,
-        type === "arabic"
-          ? {
-              fontSize: getFontSize("arabic"),
-              lineHeight: getLineHeight("arabic"),
-            }
-          : undefined,
-        type === "transliteration"
-          ? {
-              fontSize: getFontSize("transliteration"),
-              lineHeight: getLineHeight("transliteration"),
-            }
-          : undefined,
-        type === "defaultWithFontsize"
-          ? {
-              fontSize: getFontSize("latin"),
-              lineHeight: getLineHeight("latin"),
-            }
-          : undefined,
         type === "subtitle" ? styles.subtitle : undefined,
         type === "link" ? styles.link : undefined,
         type === "layoutNavigationText"
           ? styles.layoutNavigationText
           : undefined,
+        dynamicStyle,
         style,
       ]}
       {...rest}

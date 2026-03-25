@@ -711,7 +711,7 @@
 //                 {selectedArabicVerse && (
 //                   <View style={styles.infoSection}>
 //                     <ThemedText
-//                       type="defaultWithFontsize"
+//                       type="latin"
 //                       style={[styles.infoLabel]}
 //                     >
 //                       {t("arabicText")}:
@@ -725,13 +725,13 @@
 //                 {lang !== "ar" && (
 //                   <View style={styles.infoSection}>
 //                     <ThemedText
-//                       type="defaultWithFontsize"
+//                       type="latin"
 //                       style={[styles.infoLabel]}
 //                     >
 //                       {t("translation")}:
 //                     </ThemedText>
 //                     <ThemedText
-//                       type="defaultWithFontsize"
+//                       type="latin"
 //                       style={[styles.infoTranslation]}
 //                     >
 //                       {selectedVerse.text}
@@ -741,7 +741,7 @@
 
 //                 <View style={styles.infoSection}>
 //                   <ThemedText
-//                     type="defaultWithFontsize"
+//                     type="latin"
 //                     style={[styles.infoLabel]}
 //                   >
 //                     {t("tafsir")}:
@@ -759,7 +759,7 @@
 
 //                 <View style={styles.infoSection}>
 //                   <ThemedText
-//                     type="defaultWithFontsize"
+//                     type="latin"
 //                     style={[styles.infoLabel]}
 //                   >
 //                     {t("additionalInfo")}:
@@ -1702,7 +1702,7 @@ const SuraScreen: React.FC = () => {
                 {selectedArabicVerse && (
                   <View style={styles.infoSection}>
                     <ThemedText
-                      type="defaultWithFontsize"
+                      type="latin"
                       style={[styles.infoLabel]}
                     >
                       {t("arabicText")}:
@@ -1716,13 +1716,13 @@ const SuraScreen: React.FC = () => {
                 {lang !== "ar" && (
                   <View style={styles.infoSection}>
                     <ThemedText
-                      type="defaultWithFontsize"
+                      type="latin"
                       style={[styles.infoLabel]}
                     >
                       {t("translation")}:
                     </ThemedText>
                     <ThemedText
-                      type="defaultWithFontsize"
+                      type="latin"
                       style={[styles.infoTranslation]}
                     >
                       {selectedVerse.text}
@@ -1732,7 +1732,7 @@ const SuraScreen: React.FC = () => {
 
                 <View style={styles.infoSection}>
                   <ThemedText
-                    type="defaultWithFontsize"
+                    type="latin"
                     style={[styles.infoLabel]}
                   >
                     {t("tafsir")}:
@@ -1753,7 +1753,7 @@ const SuraScreen: React.FC = () => {
 
                 <View style={styles.infoSection}>
                   <ThemedText
-                    type="defaultWithFontsize"
+                    type="latin"
                     style={[styles.infoLabel]}
                   >
                     {t("additionalInfo")}:

@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 24,
     paddingTop: 20,
     paddingBottom: 40,
-    maxHeight: "82%",
+    height: "85%"
   },
   header: {
     flexDirection: "row",
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   actsList: {
-    maxHeight: 260,
+    flex: 1,
   },
   actRow: {
     flexDirection: "row",

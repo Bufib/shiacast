@@ -31,7 +31,7 @@ import { Colors } from "@/constants/Colors";
 import { ThemedView } from "./ThemedView";
 import { ThemedText } from "./ThemedText";
 import { useDataVersionStore } from "../../stores/dataVersionStore";
-
+import { Zoomable } from "@likashefqet/react-native-image-zoom";
 const getPdfNumericId = (filename: string): number => {
   const asNumber = Number(filename);
   if (Number.isFinite(asNumber)) return asNumber;
@@ -393,11 +393,12 @@ const PdfViewerScreen: React.FC<PdfViewerScreenPropsType> = ({ filename }) => {
       {!error && !loading && sourceUri ? (
         <>
           {isImage ? (
-            /* ───── Image Viewer ───── */
-            <TouchableOpacity
-              activeOpacity={1}
+            <Zoomable
+              minScale={1}
+              maxScale={5}
+              doubleTapScale={3}
+              onSingleTap={toggleControls}
               style={styles.imageContainer}
-              onPress={toggleControls}
             >
               <Image
                 source={{ uri: sourceUri }}
@@ -405,7 +406,7 @@ const PdfViewerScreen: React.FC<PdfViewerScreenPropsType> = ({ filename }) => {
                 contentFit="contain"
                 transition={200}
               />
-            </TouchableOpacity>
+            </Zoomable>
           ) : (
             /* ───── PDF Viewer ───── */
             <View style={styles.pdfContainer}>

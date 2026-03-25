@@ -184,6 +184,9 @@ export const WeeklyCalendarSection: React.FC<
               padding: 5,
               paddingBottom: 7,
             }}
+              onPress={onNavigateToFullCalendar}
+              disabled={!onNavigateToFullCalendar}
+              activeOpacity={onNavigateToFullCalendar ? 0.7 : 1}
           />
 
           <View style={styles.calendarTextContainer}>

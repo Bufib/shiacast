@@ -23,8 +23,8 @@ export function Collapsible({
   useFontSize?: boolean;
 }) {
   const [isOpen, setIsOpen] = useState(false);
-  const { fontSize } = useFontSizeStore();
   const colorScheme = useColorScheme() || "light";
+  const { getFontSize, getLineHeight } = useFontSizeStore();
 
   return (
     <ThemedView style={style}>
@@ -52,9 +52,27 @@ export function Collapsible({
           />
         )}
 
-        <ThemedText type="defaultSemiBold" style={useFontSize && { fontSize }}>
-          {title}
-        </ThemedText>
+        {useFontSize ? (
+          <ThemedText
+            type="latin"
+            style={{
+              fontWeight: "600",
+            }}
+          >
+            {title}
+          </ThemedText>
+        ) : (
+          <ThemedText
+            type="defaultSemiBold"
+            style={{
+              fontSize: 16,
+              lineHeight: 24,
+              fontWeight: "600",
+            }}
+          >
+            {title}
+          </ThemedText>
+        )}
       </TouchableOpacity>
       {isOpen && (
         <View

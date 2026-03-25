@@ -1297,13 +1297,13 @@ const RenderPrayer = ({ prayerID }: { prayerID: number }) => {
               <View style={{ paddingHorizontal: 20 }}>
                 <View style={styles.titleContainer}>
                   <ThemedText
-                    type="defaultWithFontsize"
+                    type="latin"
                     style={[styles.title, { color: "#fff" }]}
                   >
                     {prayer?.translations.find((tr) => tr.language_code === lang)?.translated_title ?? prayer?.arabic_title}
                   </ThemedText>
                   <ThemedText
-                    type="defaultWithFontsize"
+                    type="latin"
                     style={[
                       styles.arabicTitle,
                       { color: "#fff", textAlign: "right" },
