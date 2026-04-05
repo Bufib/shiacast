@@ -1,8 +1,7 @@
-//! Before verschieben von datum via settings
- // calendar/calendarDayDetail.tsx
+
 // import React, { useEffect, useMemo, useState } from "react";
-// import { View, ScrollView, StyleSheet, TouchableOpacity } from "react-native";
-// import { Stack, useLocalSearchParams } from "expo-router";
+// import { View, ScrollView, StyleSheet, TouchableOpacity, Pressable } from "react-native";
+// import { router, Stack, useLocalSearchParams } from "expo-router";
 // import { ThemedText } from "@/components/ThemedText";
 // import { ThemedView } from "@/components/ThemedView";
 // import CalendarEventCard from "@/components/CalendarEventCard";
@@ -13,84 +12,106 @@
 // import { useTranslation } from "react-i18next";
 // import {
 //   getAllCalendarDates,
-//   getCalendarLegendColorById,
+//   getCalendarLegendColors,
 // } from "../../../../../db/queries/calendar";
 // import { CalendarType } from "@/constants/Types";
 // import { Colors } from "@/constants/Colors";
 // import { Ionicons } from "@expo/vector-icons";
 // import { useColorScheme } from "react-native";
+// import { useCalendarSettingsStore } from "../../../../../stores/useCalendarSettingsStore";
+// import { useDataVersionStore } from "../../../../../stores/dataVersionStore";
 
 // export default function CalendarDayDetail() {
 //   const { date } = useLocalSearchParams<{
 //     date: string;
 //     islamicDate: string;
 //   }>();
+
 //   const { lang } = useLanguage();
 //   const { t } = useTranslation();
 //   const colorScheme = useColorScheme() || "light";
 
+//   const arabicDateOffset = useCalendarSettingsStore(
+//     (s) => s.arabicDateOffset
+//   );
+//   const calendarVersion = useDataVersionStore((s) => s.calendarVersion);
+
 //   const [events, setEvents] = useState<CalendarType[]>([]);
-//   const [legendColorMap, setLegendColorMap] = useState<Record<number, string>>(
-//     {},
+//   const [legendColorMap, setLegendColorMap] = useState<Record<string, string>>(
+//     {}
 //   );
 //   const [loading, setLoading] = useState(true);
 //   const [addActsModalVisible, setAddActsModalVisible] = useState(false);
 
-//   // Format the date for display in the header
-//   const formattedDate = (() => {
+//   const formattedDate = useMemo(() => {
 //     if (!date) return "";
 //     const [y, m, d] = date.split("-").map(Number);
 //     const dateObj = new Date(y, m - 1, d);
+
 //     return dateObj.toLocaleDateString(lang, {
 //       weekday: "long",
 //       day: "numeric",
 //       month: "long",
 //       year: "numeric",
 //     });
-//   })();
+//   }, [date, lang]);
 
 //   useEffect(() => {
 //     if (!date) return;
+
 //     let cancelled = false;
+
 //     (async () => {
 //       try {
 //         setLoading(true);
+
 //         const [all, colorMap] = await Promise.all([
-//           getAllCalendarDates(lang),
-//           getCalendarLegendColorById(lang),
+//           getAllCalendarDates(lang, arabicDateOffset),
+//           getCalendarLegendColors(lang),
 //         ]);
+
 //         if (!cancelled) {
-//           setEvents(all.filter((e) => e.gregorian_date === date));
+//           setEvents(all.filter((event) => event.gregorian_date === date));
 //           setLegendColorMap(colorMap);
 //         }
 //       } catch {
-//         if (!cancelled) setEvents([]);
+//         if (!cancelled) {
+//           setEvents([]);
+//           setLegendColorMap({});
+//         }
 //       } finally {
-//         if (!cancelled) setLoading(false);
+//         if (!cancelled) {
+//           setLoading(false);
+//         }
 //       }
 //     })();
+
 //     return () => {
 //       cancelled = true;
 //     };
-//   }, [date, lang]);
+//   }, [date, lang, arabicDateOffset, calendarVersion]);
 
-//   const todayStart = (() => {
-//     const d = new Date();
-//     d.setHours(0, 0, 0, 0);
-//     return d;
-//   })();
+//   const todayStart = useMemo(() => {
+//     const currentDate = new Date();
+//     currentDate.setHours(0, 0, 0, 0);
+//     return currentDate;
+//   }, []);
 
-//   const dayDiff = (() => {
+//   const dayDiff = useMemo(() => {
 //     if (!date) return 0;
 //     const [y, m, d] = date.split("-").map(Number);
 //     const dateObj = new Date(y, m - 1, d);
 //     return Math.round((dateObj.getTime() - todayStart.getTime()) / 86400000);
-//   })();
+//   }, [date, todayStart]);
 
-//   // Aggregate unique recommended acts from all events for this day
+//   const displayedIslamicDate = useMemo(() => {
+//     return events[0]?.islamic_date ?? "";
+//   }, [events]);
+
 //   const recommendedActs = useMemo(() => {
 //     const seen = new Set<string>();
 //     const acts: string[] = [];
+
 //     for (const event of events) {
 //       for (const act of event.recommended_acts ?? []) {
 //         if (act && !seen.has(act)) {
@@ -99,6 +120,7 @@
 //         }
 //       }
 //     }
+
 //     return acts;
 //   }, [events]);
 
@@ -108,7 +130,7 @@
 //         options={{
 //           title: formattedDate,
 //           headerTitleStyle: { fontSize: 14 },
-//           headerLeft: () => <HeaderLeftBackButton />,
+//           headerLeft: () => <HeaderLeftBackButton route={"/"}/>,
 //         }}
 //       />
 
@@ -121,7 +143,14 @@
 //           contentContainerStyle={styles.scrollContent}
 //           showsVerticalScrollIndicator={false}
 //         >
-//           {/* Events */}
+//           {displayedIslamicDate ? (
+//             <View style={styles.islamicHeader}>
+//               <ThemedText style={styles.islamicHeaderText}>
+//                 {displayedIslamicDate}
+//               </ThemedText>
+//             </View>
+//           ) : null}
+
 //           {events.map((item) => (
 //             <CalendarEventCard
 //               key={item.id}
@@ -139,7 +168,6 @@
 //             </View>
 //           )}
 
-//           {/* Recommended Acts Section */}
 //           {recommendedActs.length > 0 && (
 //             <View
 //               style={[
@@ -156,7 +184,6 @@
 //                 },
 //               ]}
 //             >
-//               {/* Section header */}
 //               <View style={styles.actsSectionHeader}>
 //                 <View style={styles.actsSectionTitleRow}>
 //                   <Ionicons
@@ -168,6 +195,7 @@
 //                     {t("recommendedActs")}
 //                   </ThemedText>
 //                 </View>
+
 //                 <TouchableOpacity
 //                   style={[
 //                     styles.addToPlanButton,
@@ -183,7 +211,6 @@
 //                 </TouchableOpacity>
 //               </View>
 
-//               {/* Acts list */}
 //               {recommendedActs.map((act, index) => (
 //                 <View
 //                   key={act}
@@ -244,15 +271,6 @@
 //     fontStyle: "italic",
 //     opacity: 0.6,
 //     fontWeight: "500",
-//   },
-//   eventCount: {
-//     fontSize: 12,
-//     fontWeight: "600",
-//     opacity: 0.5,
-//     textTransform: "uppercase",
-//     letterSpacing: 0.8,
-//     marginBottom: 16,
-//     textAlign: "center",
 //   },
 //   emptyWrap: {
 //     paddingTop: 60,
@@ -329,8 +347,15 @@
 //   },
 // });
 
+
 import React, { useEffect, useMemo, useState } from "react";
-import { View, ScrollView, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  useColorScheme,
+} from "react-native";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
@@ -342,24 +367,20 @@ import { useLanguage } from "../../../../../contexts/LanguageContext";
 import { useTranslation } from "react-i18next";
 import {
   getAllCalendarDates,
-  getCalendarLegendColors,
+  getAllCalendarLegend,
 } from "../../../../../db/queries/calendar";
 import { CalendarType } from "@/constants/Types";
 import { Colors } from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
-import { useColorScheme } from "react-native";
 import { useCalendarSettingsStore } from "../../../../../stores/useCalendarSettingsStore";
 import { useDataVersionStore } from "../../../../../stores/dataVersionStore";
 
 export default function CalendarDayDetail() {
-  const { date } = useLocalSearchParams<{
-    date: string;
-    islamicDate: string;
-  }>();
+  const { date } = useLocalSearchParams<{ date: string }>();
 
   const { lang } = useLanguage();
   const { t } = useTranslation();
-  const colorScheme = useColorScheme() || "light";
+  const colorScheme = (useColorScheme() || "light") as "light" | "dark";
 
   const arabicDateOffset = useCalendarSettingsStore(
     (s) => s.arabicDateOffset
@@ -367,7 +388,10 @@ export default function CalendarDayDetail() {
   const calendarVersion = useDataVersionStore((s) => s.calendarVersion);
 
   const [events, setEvents] = useState<CalendarType[]>([]);
-  const [legendColorMap, setLegendColorMap] = useState<Record<string, string>>(
+  const [legendColorMap, setLegendColorMap] = useState<Record<number, string>>(
+    {}
+  );
+  const [legendLabelMap, setLegendLabelMap] = useState<Record<number, string>>(
     {}
   );
   const [loading, setLoading] = useState(true);
@@ -375,6 +399,7 @@ export default function CalendarDayDetail() {
 
   const formattedDate = useMemo(() => {
     if (!date) return "";
+
     const [y, m, d] = date.split("-").map(Number);
     const dateObj = new Date(y, m - 1, d);
 
@@ -395,19 +420,30 @@ export default function CalendarDayDetail() {
       try {
         setLoading(true);
 
-        const [all, colorMap] = await Promise.all([
+        const [allEvents, legends] = await Promise.all([
           getAllCalendarDates(lang, arabicDateOffset),
-          getCalendarLegendColors(lang),
+          getAllCalendarLegend(lang),
         ]);
 
         if (!cancelled) {
-          setEvents(all.filter((event) => event.gregorian_date === date));
-          setLegendColorMap(colorMap);
+          const colorById: Record<number, string> = {};
+          const labelById: Record<number, string> = {};
+
+          for (const legend of legends) {
+            colorById[legend.id] = legend.color;
+            labelById[legend.id] = legend.legend_type;
+          }
+
+          setEvents(allEvents.filter((event) => event.gregorian_date === date));
+          setLegendColorMap(colorById);
+          setLegendLabelMap(labelById);
         }
-      } catch {
+      } catch (error) {
+        console.warn("Failed to load calendar day detail:", error);
         if (!cancelled) {
           setEvents([]);
           setLegendColorMap({});
+          setLegendLabelMap({});
         }
       } finally {
         if (!cancelled) {
@@ -429,8 +465,10 @@ export default function CalendarDayDetail() {
 
   const dayDiff = useMemo(() => {
     if (!date) return 0;
+
     const [y, m, d] = date.split("-").map(Number);
     const dateObj = new Date(y, m - 1, d);
+
     return Math.round((dateObj.getTime() - todayStart.getTime()) / 86400000);
   }, [date, todayStart]);
 
@@ -460,7 +498,7 @@ export default function CalendarDayDetail() {
         options={{
           title: formattedDate,
           headerTitleStyle: { fontSize: 14 },
-          headerLeft: () => <HeaderLeftBackButton />,
+          headerLeft: () => <HeaderLeftBackButton route={"/"} />,
         }}
       />
 
@@ -486,6 +524,7 @@ export default function CalendarDayDetail() {
               key={item.id}
               item={item}
               badgeColor={legendColorMap[item.legend_type] ?? "#999"}
+              legendLabel={legendLabelMap[item.legend_type] ?? ""}
               diff={dayDiff}
               lang={lang}
               t={t}
@@ -503,10 +542,7 @@ export default function CalendarDayDetail() {
               style={[
                 styles.actsSection,
                 {
-                  backgroundColor:
-                    colorScheme === "dark"
-                      ? Colors.dark.contrast
-                      : Colors.light.contrast,
+                  backgroundColor: Colors[colorScheme].contrast,
                   borderColor:
                     colorScheme === "dark"
                       ? "rgba(255,255,255,0.06)"

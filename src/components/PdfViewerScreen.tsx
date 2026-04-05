@@ -504,7 +504,7 @@ const PdfViewerScreen: React.FC<PdfViewerScreenPropsType> = ({ filename }) => {
                 />
               </TouchableOpacity>
 
-              {/* Settings – PDFs with multiple pages only */}
+              {/* Settings – PDFs with multiple pages only
               {!isImage && pageCount > 1 && (
                 <TouchableOpacity
                   style={styles.controlButton}
@@ -512,7 +512,7 @@ const PdfViewerScreen: React.FC<PdfViewerScreenPropsType> = ({ filename }) => {
                 >
                   <Feather name="settings" size={24} color="#FFFFFF" />
                 </TouchableOpacity>
-              )}
+              )} */}
             </Animated.View>
           ) : null}
 
@@ -575,7 +575,7 @@ const PdfViewerScreen: React.FC<PdfViewerScreenPropsType> = ({ filename }) => {
           ) : null}
 
           {/* ───── Settings Menu – PDFs only ───── */}
-          {!isImage && showSettings && pageCount > 1 ? (
+          {/* {!isImage && showSettings && pageCount > 1 ? (
             <View style={styles.settingsOverlay}>
               <View style={styles.settingsContainer}>
                 <View style={styles.settingsHeader}>
@@ -648,7 +648,7 @@ const PdfViewerScreen: React.FC<PdfViewerScreenPropsType> = ({ filename }) => {
                 </View>
               </View>
             </View>
-          ) : null}
+          ) : null} */}
 
           {/* ───── Page Jump Menu – PDFs only ───── */}
           {!isImage && showPageJump ? (

@@ -50,11 +50,11 @@ export default function TopNavigationKnowledge() {
         title: "",
         icon: require("@/assets/images/qAndAHeaderLogo.png"),
       },
-      {
-        key: "prayerScreen",
-        title: "",
-        icon: require("@/assets/images/prayersHeaderLogo.png"),
-      },
+      // {
+      //   key: "prayerScreen",
+      //   title: "",
+      //   icon: require("@/assets/images/prayersHeaderLogo.png"),
+      // },
       {
         key: "calendarScreen",
         title: "",
@@ -65,16 +65,16 @@ export default function TopNavigationKnowledge() {
         title: "",
         icon: require("@/assets/images/videos.png"),
       },
-      {
-        key: "quranScreen",
-        title: "",
-        icon: require("@/assets/images/quranHeaderLogo.png"),
-      },
-      {
-        key: "historyScreen",
-        title: "",
-        icon: require("@/assets/images/historyHeaderLogo.png"),
-      },
+      // {
+      //   key: "quranScreen",
+      //   title: "",
+      //   icon: require("@/assets/images/quranHeaderLogo.png"),
+      // },
+      // {
+      //   key: "historyScreen",
+      //   title: "",
+      //   icon: require("@/assets/images/historyHeaderLogo.png"),
+      // },
       {
         key: "arabicScreen",
         title: "",

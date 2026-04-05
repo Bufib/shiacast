@@ -1,4 +1,6 @@
-//! Last worked
+
+
+// // src/components/CalendarLegend.tsx
 // import React, { useEffect, useState } from "react";
 // import {
 //   FlatList,
@@ -9,20 +11,26 @@
 // } from "react-native";
 // import { ThemedView } from "./ThemedView";
 // import { ThemedText } from "./ThemedText";
-// import { CALENDARPALLETTE, Colors } from "@/constants/Colors";
-// import { useLanguage } from "@/contexts/LanguageContext";
-// import { getCalendarLegendTypeNames } from "@/db/queries/calendar";
+// import { Colors } from "@/constants/Colors";
+// import { useLanguage } from "../../contexts/LanguageContext";
+// import { getAllCalendarLegend } from "../../db/queries/calendar";
 // import { LoadingIndicator } from "./LoadingIndicator";
 // import { useTranslation } from "react-i18next";
-// import { useDataVersionStore } from "@/stores/dataVersionStore";
+// import { useDataVersionStore } from "../../stores/dataVersionStore";
+// import { calendarLegendType } from "@/constants/Types";
 
-// const CalendarLegend = ({ style }: { style?: ViewStyle }) => {
+// type Props = {
+//   style?: ViewStyle;
+// };
+
+// const CalendarLegend: React.FC<Props> = ({ style }) => {
 //   const colorScheme = useColorScheme() || "light";
 //   const { lang } = useLanguage();
-//   const [legendNames, setLegendNames] = useState<string[]>([]);
-//   const [loading, setLoading] = useState(false);
 //   const { t } = useTranslation();
 //   const calendarVersion = useDataVersionStore((s) => s.calendarVersion);
+
+//   const [legendItems, setLegendItems] = useState<calendarLegendType[]>([]);
+//   const [loading, setLoading] = useState(false);
 
 //   const localDate = new Date().toLocaleDateString(lang, {
 //     day: "numeric",
@@ -32,36 +40,36 @@
 
 //   useEffect(() => {
 //     let cancelled = false;
+
 //     (async () => {
 //       try {
 //         setLoading(true);
-//         const names = await getCalendarLegendTypeNames(lang);
-//         if (!cancelled) setLegendNames(names);
+//         const legends = await getAllCalendarLegend(lang);
+//         if (!cancelled) {
+//           setLegendItems(legends);
+//         }
 //       } catch (e) {
-//         if (!cancelled) setLegendNames([]);
 //         console.warn("Legend load failed:", e);
+//         if (!cancelled) setLegendItems([]);
 //       } finally {
 //         if (!cancelled) setLoading(false);
 //       }
 //     })();
+
 //     return () => {
 //       cancelled = true;
 //     };
 //   }, [lang, calendarVersion]);
 
-//   const getItemColor = (index: number) => {
-//     return CALENDARPALLETTE[index % CALENDARPALLETTE.length];
-//   };
-
 //   if (loading) {
 //     return (
 //       <ThemedView style={styles.loadingContainer}>
-//         <LoadingIndicator size={"large"} />
+//         <LoadingIndicator size="large" />
 //       </ThemedView>
 //     );
 //   }
 
-//   if (!legendNames.length) {
+//   if (!legendItems.length) {
 //     return (
 //       <ThemedView style={[styles.container, style]}>
 //         <ThemedText style={styles.emptyText}>{t("noData")}</ThemedText>
@@ -77,27 +85,29 @@
 //         { backgroundColor: Colors[colorScheme].contrast },
 //       ]}
 //     >
-//       <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-//         <ThemedText style={[styles.title, {}]}>{t("legend")}</ThemedText>
-//         <ThemedText style={[styles.title, {}]}>{localDate}</ThemedText>
+//       <View style={styles.headerRow}>
+//         <ThemedText style={styles.title}>{t("legend")}</ThemedText>
+//         <ThemedText style={styles.title}>{localDate}</ThemedText>
 //       </View>
 
 //       <FlatList
-//         data={legendNames}
-//         keyExtractor={(name) => `${lang}:${name.trim().toLowerCase()}`}
+//         data={legendItems}
+//         keyExtractor={(item) => `${lang}:${item.legend_type.trim().toLowerCase()}`}
 //         scrollEnabled={false}
 //         showsVerticalScrollIndicator={false}
 //         contentContainerStyle={styles.listContent}
-//         style={{ gap: 20 }}
-//         renderItem={({ item, index }) => (
+//         ItemSeparatorComponent={() => <View style={styles.separator} />}
+//         renderItem={({ item }) => (
 //           <View style={styles.legendItem}>
 //             <View
 //               style={[
 //                 styles.colorIndicator,
-//                 { backgroundColor: getItemColor(index) },
+//                 {
+//                   backgroundColor: item.color || Colors.universal.primary,
+//                 },
 //               ]}
 //             />
-//             <ThemedText style={[styles.legendText]}>{item}</ThemedText>
+//             <ThemedText style={styles.legendText}>{item.legend_type}</ThemedText>
 //           </View>
 //         )}
 //       />
@@ -117,28 +127,32 @@
 //     paddingVertical: 20,
 //     alignItems: "center",
 //   },
+//   headerRow: {
+//     flexDirection: "row",
+//     justifyContent: "space-between",
+//     marginBottom: 12,
+//   },
 //   title: {
 //     fontSize: 14,
 //     fontWeight: "800",
-//     marginBottom: 12,
 //   },
 //   listContent: {
-//     gap: 20,
+//     paddingTop: 4,
+//   },
+//   separator: {
+//     height: 12,
 //   },
 //   legendItem: {
 //     flexDirection: "row",
 //     alignItems: "center",
-//     gap: 12,
 //   },
 //   colorIndicator: {
 //     width: 16,
 //     height: 16,
 //     borderRadius: 4,
+//     marginRight: 12,
 //     shadowColor: "#000",
-//     shadowOffset: {
-//       width: 0,
-//       height: 4,
-//     },
+//     shadowOffset: { width: 0, height: 4 },
 //     shadowOpacity: 0.1,
 //     shadowRadius: 12,
 //     elevation: 4,
@@ -156,7 +170,7 @@
 //   },
 // });
 
-// src/components/CalendarLegend.tsx
+
 import React, { useEffect, useState } from "react";
 import {
   FlatList,
@@ -173,19 +187,19 @@ import { getAllCalendarLegend } from "../../db/queries/calendar";
 import { LoadingIndicator } from "./LoadingIndicator";
 import { useTranslation } from "react-i18next";
 import { useDataVersionStore } from "../../stores/dataVersionStore";
-import { calendarLegendType } from "@/constants/Types";
+import { CalendarLegendType } from "@/constants/Types";
 
 type Props = {
   style?: ViewStyle;
 };
 
 const CalendarLegend: React.FC<Props> = ({ style }) => {
-  const colorScheme = useColorScheme() || "light";
+  const colorScheme = (useColorScheme() || "light") as "light" | "dark";
   const { lang } = useLanguage();
   const { t } = useTranslation();
   const calendarVersion = useDataVersionStore((s) => s.calendarVersion);
 
-  const [legendItems, setLegendItems] = useState<calendarLegendType[]>([]);
+  const [legendItems, setLegendItems] = useState<CalendarLegendType[]>([]);
   const [loading, setLoading] = useState(false);
 
   const localDate = new Date().toLocaleDateString(lang, {
@@ -201,6 +215,7 @@ const CalendarLegend: React.FC<Props> = ({ style }) => {
       try {
         setLoading(true);
         const legends = await getAllCalendarLegend(lang);
+
         if (!cancelled) {
           setLegendItems(legends);
         }
@@ -248,7 +263,7 @@ const CalendarLegend: React.FC<Props> = ({ style }) => {
 
       <FlatList
         data={legendItems}
-        keyExtractor={(item) => `${lang}:${item.legend_type.trim().toLowerCase()}`}
+        keyExtractor={(item) => `${lang}:${item.id}`}
         scrollEnabled={false}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContent}
@@ -263,7 +278,9 @@ const CalendarLegend: React.FC<Props> = ({ style }) => {
                 },
               ]}
             />
-            <ThemedText style={styles.legendText}>{item.legend_type}</ThemedText>
+            <ThemedText style={styles.legendText}>
+              {item.legend_type}
+            </ThemedText>
           </View>
         )}
       />
