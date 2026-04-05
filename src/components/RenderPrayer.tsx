@@ -1,4 +1,4 @@
-//! Last that worked
+
 // import React, {
 //   useState,
 //   useEffect,
@@ -14,7 +14,6 @@
 //   ScrollView,
 //   useColorScheme,
 //   Alert,
-//   TextStyle,
 //   NativeSyntheticEvent,
 //   NativeScrollEvent,
 //   Keyboard,
@@ -22,7 +21,6 @@
 // } from "react-native";
 // import { FlatList } from "react-native-gesture-handler";
 // import AsyncStorage from "@react-native-async-storage/async-storage";
-// import Markdown, { RenderRules } from "react-native-markdown-display";
 // import { StatusBar } from "expo-status-bar";
 // import { useSafeAreaInsets } from "react-native-safe-area-context";
 // import { useTranslation } from "react-i18next";
@@ -30,7 +28,6 @@
 // import Ionicons from "@expo/vector-icons/Ionicons";
 // import Octicons from "@expo/vector-icons/Octicons";
 // import { BottomSheetMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
-
 // import { getPrayerWithTranslations } from "../../db/queries/prayers";
 // import { FullPrayer } from "@/constants/Types";
 // import { useLanguage } from "../../contexts/LanguageContext";
@@ -46,28 +43,129 @@
 // import { useDataVersionStore } from "../../stores/dataVersionStore";
 // import { useScreenFadeIn } from "../../hooks/useScreenFadeIn";
 // import ArrowUp from "./ArrowUp";
+// import { RichText } from "./RichText";
 
 // const SCROLL_UP_THRESH = 120;
 // const SCROLL_UP_HYST = 16;
 
-// const makeMarkdownRules = (
-//   customFontSize: number,
-//   textColor: string,
-// ): RenderRules => ({
-//   code_inline: (_node, _children, _parent, styles) => (
-//     <Text
-//       key={_node.key}
-//       style={{
-//         fontSize: customFontSize,
-//         ...(styles.text as TextStyle),
-//         color: textColor,
-//       }}
-//     >
-//       {_node.content}
-//     </Text>
-//   ),
-// });
+// // ── Fix 1: Extracted & memoized row component ─────────────────────────
+// type PrayerLineProps = {
+//   index: number;
+//   arabic: { text: string; hasAt: boolean } | undefined;
+//   translit: { text: string; hasAt: boolean } | undefined;
+//   activeTranslations: {
+//     code: string;
+//     lines: { text: string; hasAt: boolean }[];
+//   }[];
+//   bookmark: number | null;
+//   colorScheme: "light" | "dark";
+//   rtl: boolean;
+//   fontSizeArabic: number;
+//   lineHeightArabic: number;
+//   mdStyleTranslit: any;
+//   onBookmark: (index: number) => void;
+// };
 
+// const PrayerLine = React.memo(
+//   ({
+//     index,
+//     arabic,
+//     translit,
+//     activeTranslations,
+//     bookmark,
+//     colorScheme,
+//     rtl,
+//     fontSizeArabic,
+//     lineHeightArabic,
+//     onBookmark,
+//     mdStyleTranslit,
+//   }: PrayerLineProps) => {
+//     const hasNote =
+//       arabic?.hasAt || activeTranslations.some((tr) => tr.lines[index]?.hasAt);
+
+//     return (
+//       <View
+//         style={[
+//           styles.prayerSegment,
+//           { backgroundColor: Colors[colorScheme].contrast },
+//           hasNote && { backgroundColor: Colors.universal.primary },
+//           bookmark === index + 1 && {
+//             backgroundColor: Colors[colorScheme].prayerBookmark,
+//           },
+//         ]}
+//       >
+//         <View
+//           style={[styles.lineNumberBadge, rtl ? { left: 16 } : { right: 16 }]}
+//         >
+//           <Text style={styles.lineNumber}>{index + 1}</Text>
+//         </View>
+
+//         {bookmark === index + 1 ? (
+//           <Octicons
+//             name="bookmark-slash"
+//             size={20}
+//             color={Colors[colorScheme].defaultIcon}
+//             onPress={() => onBookmark(index + 1)}
+//             style={
+//               rtl ? { alignSelf: "flex-end" } : { alignSelf: "flex-start" }
+//             }
+//           />
+//         ) : (
+//           <Octicons
+//             name="bookmark"
+//             size={20}
+//             color={Colors[colorScheme].defaultIcon}
+//             onPress={() => onBookmark(index + 1)}
+//             style={
+//               rtl ? { alignSelf: "flex-end" } : { alignSelf: "flex-start" }
+//             }
+//           />
+//         )}
+
+//         {/* ── Arabic text ── */}
+//         {arabic && (
+//           <Text
+//             style={{
+//               fontSize: fontSizeArabic,
+//               lineHeight: lineHeightArabic,
+//               color: Colors[colorScheme].prayerArabicText,
+//               alignSelf: "flex-end",
+//               textAlign: "right",
+//               marginBottom: 16,
+//             }}
+//           >
+//             {arabic.text}
+//           </Text>
+//         )}
+
+//         {/* ── Transliteration text ── */}
+//         {translit && (
+//           <RichText type="latin" style={{ fontStyle: "italic" }}>
+//             {translit.text}
+//           </RichText>
+//         )}
+
+//         {/* ── Translation text (latin) ── */}
+//         {activeTranslations.map((tr) => (
+//           <View key={tr.code} style={styles.translationBlock}>
+//             <Text
+//               style={[
+//                 styles.translationLabel,
+//                 { color: Colors[colorScheme].prayerButtonText },
+//               ]}
+//             >
+//               {tr.code.toUpperCase()}
+//             </Text>
+//             <RichText type="latin">{tr.lines[index]?.text || ""}</RichText>
+//           </View>
+//         ))}
+//       </View>
+//     );
+//   },
+// );
+// PrayerLine.displayName = "PrayerLine";
+
+// // ── Main component ──────────────────────────────────────────────────────
 // const RenderPrayer = ({ prayerID }: { prayerID: number }) => {
 //   const [isLoading, setIsLoading] = useState(false);
 //   const [showLoadingSpinner, setShowLoadingSpinner] = useState(false);
@@ -86,7 +184,12 @@
 //   const bottomSheetRef = useRef<BottomSheetMethods | null>(null);
 //   const snapPoints = useMemo(() => ["70%"], []);
 
-//   const { fontSize, getLineHeight } = useFontSizeStore();
+//   // ── Font size store ──────────────────────────────────────────────────
+//   const { getFontSize, getLineHeight, fontSize } = useFontSizeStore();
+
+//   const fontSizeArabic = getFontSize("arabic");
+//   const lineHeightArabic = getLineHeight("arabic");
+
 //   const [fontSizeModalVisible, setFontSizeModalVisible] = useState(false);
 //   const [pickerVisible, setPickerVisible] = useState(false);
 //   const insets = useSafeAreaInsets();
@@ -99,14 +202,11 @@
 //   const prayersVersion = useDataVersionStore((s) => s.prayersVersion);
 //   const { fadeAnim, onLayout } = useScreenFadeIn(600);
 
-//   // ---- Scroll tracking (direction + edges + long-list bottom offset) ----
+//   // ── Scroll tracking ──────────────────────────────────────────────────
 //   const contentHeightRef = useRef(0);
 //   const layoutHeightRef = useRef(0);
 
-//   const scrollDirRef = useRef<"up" | "down">("down");
-
-//   // ✅ NEW: only show button while actively scrolling (same logic as SuraScreen)
-//   const [isScrolling, setIsScrolling] = useState(false);
+//   const [, setIsScrolling] = useState(false);
 //   const isScrollingRef = useRef(false);
 //   const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -115,85 +215,21 @@
 //     idleTimerRef.current = null;
 //   }, []);
 
-//   const setScrolling = useCallback((v: boolean) => {
+//   const setScrollingState = useCallback((v: boolean) => {
 //     isScrollingRef.current = v;
 //     setIsScrolling(v);
 //   }, []);
 
 //   const scheduleStopScrolling = useCallback(() => {
 //     clearIdle();
-//     idleTimerRef.current = setTimeout(() => setScrolling(false), 400);
-//   }, [clearIdle, setScrolling]);
+//     idleTimerRef.current = setTimeout(() => setScrollingState(false), 400);
+//   }, [clearIdle, setScrollingState]);
 
 //   useEffect(() => {
 //     return () => clearIdle();
 //   }, [clearIdle]);
 
-//   const baseText = useMemo(
-//     () =>
-//       ({
-//         color: Colors[colorScheme].text,
-//         width: "90%",
-//         alignSelf: "center",
-//       }) as const,
-//     [colorScheme],
-//   );
-
-//   const mdRules = useMemo(
-//     () => makeMarkdownRules(fontSize, Colors[colorScheme].text),
-//     [fontSize, colorScheme],
-//   );
-
-//   const mdStyleTranslit = useMemo(
-//     () => ({
-//       body: {
-//         ...baseText,
-//         fontSize,
-//         lineHeight,
-//         color: Colors[colorScheme].prayerTransliterationText,
-//         fontStyle: "italic",
-//         marginBottom: 16,
-//         paddingBottom: 16,
-//       },
-//     }),
-//     [fontSize, colorScheme, baseText],
-//   );
-
-//   const mdStyleTranslation = useMemo(
-//     () => ({
-//       body: {
-//         ...baseText,
-//         fontSize,
-//         lineHeight,
-//         marginTop: 4,
-//         color: Colors[colorScheme].text,
-//       },
-//     }),
-//     [fontSize, lineHeight, colorScheme, baseText],
-//   );
-
-//   const mdStyleNotes = useMemo(
-//     () => ({
-//       body: {
-//         ...baseText,
-//         fontSize,
-//         lineHeight,
-//         color: Colors[colorScheme].text,
-//       },
-//     }),
-//     [fontSize, lineHeight, colorScheme, baseText],
-//   );
-
-//   const listExtraData = useMemo(
-//     () => ({
-//       prayersVersion,
-//       bookmark,
-//       selectTranslationsKey: JSON.stringify(selectTranslations),
-//     }),
-//     [prayersVersion, bookmark, selectTranslations],
-//   );
-
-//   // Load prayer (+ delayed spinner)
+//   // ── Load prayer (+ delayed spinner) ──────────────────────────────────
 //   useEffect(() => {
 //     let alive = true;
 //     let done = false;
@@ -225,7 +261,7 @@
 //     };
 //   }, [prayerID, prayersVersion]);
 
-//   // Init translation toggles
+//   // ── Init translation toggles ─────────────────────────────────────────
 //   useEffect(() => {
 //     if (!prayer) return;
 //     const initial: Record<string, boolean> = {};
@@ -235,7 +271,7 @@
 //     setSelectTranslations(initial);
 //   }, [prayer, lang]);
 
-//   // Load bookmark
+//   // ── Load bookmark ─────────────────────────────────────────────────────
 //   useEffect(() => {
 //     let canceled = false;
 //     (async () => {
@@ -256,6 +292,7 @@
 //     };
 //   }, [prayerID, prayersVersion]);
 
+//   // ── Helpers ───────────────────────────────────────────────────────────
 //   const processLines = (text?: string) =>
 //     text
 //       ? text
@@ -288,6 +325,24 @@
 //       ) || 0;
 //     return Array.from({ length: max }, (_, i) => i);
 //   }, [formatted]);
+
+//   // ── Fix 2: Pre-compute activeTranslations once ───────────────────────
+//   const activeTranslations = useMemo(
+//     () =>
+//       formatted?.translations.filter((tr) => selectTranslations[tr.code]) ?? [],
+//     [formatted, selectTranslations],
+//   );
+
+//   // ── Fix 3: Clean extraData — no JSON.stringify ───────────────────────
+//   const listExtraData = useMemo(
+//     () => ({
+//       prayersVersion,
+//       bookmark,
+//       activeTranslations,
+//       fontSize,
+//     }),
+//     [prayersVersion, bookmark, activeTranslations, fontSize],
+//   );
 
 //   const notesForLang = useMemo(() => {
 //     if (!prayer) return "";
@@ -329,10 +384,10 @@
 //     bottomSheetRef.current?.close();
 //   };
 
+//   // ── Scroll handlers ───────────────────────────────────────────────────
 //   const handleScroll = useCallback(
 //     (e: NativeSyntheticEvent<NativeScrollEvent>) => {
 //       const y = e.nativeEvent.contentOffset.y;
-//       // Hysteresis avoids flicker near the boundary
 //       const next = showUpRef.current
 //         ? y > SCROLL_UP_THRESH - SCROLL_UP_HYST
 //         : y > SCROLL_UP_THRESH + SCROLL_UP_HYST;
@@ -344,7 +399,6 @@
 //     [],
 //   );
 
-//   // Keep maxOffset up to date even when content changes without scrolling
 //   const onContentSizeChange = useCallback((_w: number, h: number) => {
 //     contentHeightRef.current = h;
 //   }, []);
@@ -353,6 +407,36 @@
 //     layoutHeightRef.current = e.nativeEvent.layout.height;
 //   }, []);
 
+//   // ── Fix 1 continued: stable renderItem using memoized component ──────
+//   const renderItem = useCallback(
+//     ({ item: index }: { item: number }) => (
+//       <PrayerLine
+//         index={index}
+//         arabic={formatted?.arabicLines[index]}
+//         translit={formatted?.translitLines[index]}
+//         activeTranslations={activeTranslations}
+//         bookmark={bookmark}
+//         colorScheme={colorScheme}
+//         rtl={rtl}
+//         fontSizeArabic={fontSizeArabic}
+//         lineHeightArabic={lineHeightArabic}
+//         mdStyleTranslit={{ fontStyle: "italic" }}
+//         onBookmark={handleBookmark}
+//       />
+//     ),
+//     [
+//       formatted,
+//       activeTranslations,
+//       bookmark,
+//       colorScheme,
+//       rtl,
+//       fontSizeArabic,
+//       lineHeightArabic,
+//       handleBookmark,
+//     ],
+//   );
+
+//   // ── Render guards ─────────────────────────────────────────────────────
 //   if (showLoadingSpinner) {
 //     return (
 //       <ThemedView style={styles.loadingAndNoDataContainer}>
@@ -369,6 +453,7 @@
 //     );
 //   }
 
+//   // ── Main render ───────────────────────────────────────────────────────
 //   return (
 //     <Animated.View
 //       onLayout={onLayout}
@@ -385,23 +470,20 @@
 //         onLayout={onListLayout}
 //         keyExtractor={(i) => i.toString()}
 //         data={indices}
-//         // stickyHeaderIndices={[0]}
-//         // stickyHeaderHiddenOnScroll
 //         bounces={false}
 //         overScrollMode="never"
 //         alwaysBounceVertical={false}
 //         extraData={listExtraData}
-//         // ✅ NEW: active scrolling tracking (same logic as SuraScreen)
 //         onScrollBeginDrag={() => {
 //           clearIdle();
-//           setScrolling(true);
+//           setScrollingState(true);
 //         }}
 //         onScrollEndDrag={() => {
 //           scheduleStopScrolling();
 //         }}
 //         onMomentumScrollBegin={() => {
 //           clearIdle();
-//           setScrolling(true);
+//           setScrollingState(true);
 //         }}
 //         onMomentumScrollEnd={() => {
 //           scheduleStopScrolling();
@@ -425,14 +507,18 @@
 //               <View style={{ paddingHorizontal: 20 }}>
 //                 <View style={styles.titleContainer}>
 //                   <ThemedText
-//                     style={[styles.title, { fontSize, color: "#fff" }]}
+//                     type="latin"
+//                     style={[styles.title, { color: "#fff" }]}
 //                   >
-//                     {prayer?.translated_title} ({indices.length} {t("lines")})
+//                     {prayer?.translations.find(
+//                       (tr) => tr.language_code === lang,
+//                     )?.translated_title ?? prayer?.arabic_title}
 //                   </ThemedText>
 //                   <ThemedText
+//                     type="latin"
 //                     style={[
 //                       styles.arabicTitle,
-//                       { fontSize, color: "#fff", textAlign: "right" },
+//                       { color: "#fff", textAlign: "right" },
 //                     ]}
 //                   >
 //                     {prayer?.arabic_title}
@@ -496,133 +582,43 @@
 //             </View>
 //           </View>
 //         }
-//         renderItem={({ item: index }) => {
-//           const arabic = formatted?.arabicLines[index];
-//           const translit = formatted?.translitLines[index];
-//           const activeTranslations = formatted?.translations.filter(
-//             (tr) => selectTranslations[tr.code],
-//           );
-//           const hasNote =
-//             arabic?.hasAt ||
-//             activeTranslations?.some((tr) => tr.lines[index]?.hasAt);
-
-//           return (
-//             <View
-//               key={index}
-//               style={[
-//                 styles.prayerSegment,
-//                 { backgroundColor: Colors[colorScheme].contrast },
-//                 hasNote && { backgroundColor: Colors.universal.primary },
-//                 bookmark === index + 1 && {
-//                   backgroundColor: Colors[colorScheme].prayerBookmark,
-//                 },
-//               ]}
-//             >
-//               <View
-//                 style={[
-//                   styles.lineNumberBadge,
-//                   rtl ? { left: 16 } : { right: 16 },
-//                 ]}
-//               >
-//                 <Text style={styles.lineNumber}>{index + 1}</Text>
-//               </View>
-
-//               {bookmark === index + 1 ? (
-//                 <Octicons
-//                   name="bookmark-slash"
-//                   size={20}
-//                   color={Colors[colorScheme].defaultIcon}
-//                   onPress={() => handleBookmark(index + 1)}
-//                   style={
-//                     rtl
-//                       ? { alignSelf: "flex-end" }
-//                       : { alignSelf: "flex-start" }
-//                   }
-//                 />
-//               ) : (
-//                 <Octicons
-//                   name="bookmark"
-//                   size={20}
-//                   color={Colors[colorScheme].defaultIcon}
-//                   onPress={() => handleBookmark(index + 1)}
-//                   style={
-//                     rtl
-//                       ? { alignSelf: "flex-end" }
-//                       : { alignSelf: "flex-start" }
-//                   }
-//                 />
-//               )}
-
-//               {arabic && (
-//                 <Text
-//                   style={{
-//                     fontSize: fontSize * 1.3,
-//                     lineHeight,
-//                     color: Colors[colorScheme].prayerArabicText,
-//                     alignSelf: "flex-end",
-//                     textAlign: "right",
-//                     marginBottom: 16,
-//                   }}
-//                 >
-//                   {arabic.text}
-//                 </Text>
-//               )}
-
-//               {translit && (
-//                 <Markdown rules={mdRules} style={mdStyleTranslit}>
-//                   {translit.text}
-//                 </Markdown>
-//               )}
-
-//               {activeTranslations?.map((tr) => (
-//                 <View key={tr.code} style={styles.translationBlock}>
-//                   <Text
-//                     style={[
-//                       styles.translationLabel,
-//                       { color: Colors[colorScheme].prayerButtonText },
-//                     ]}
-//                   >
-//                     {tr.code.toUpperCase()}
-//                   </Text>
-//                   <Markdown rules={mdRules} style={mdStyleTranslation}>
-//                     {tr.lines[index]?.text || ""}
-//                   </Markdown>
-//                 </View>
-//               ))}
-//             </View>
-//           );
-//         }}
+//         renderItem={renderItem}
 //         ListFooterComponent={
 //           notesForLang ? (
-//             <Markdown rules={mdRules} style={mdStyleNotes}>
-//               {notesForLang}
-//             </Markdown>
+//             <View style={{ paddingHorizontal: 16 }}>
+//               <RichText type="latin">{notesForLang}</RichText>
+//             </View>
 //           ) : null
 //         }
 //         ListFooterComponentStyle={{ paddingBottom: 20 }}
 //       />
+
 //       {showScrollUp && <ArrowUp scrollToTop={scrollToTop} />}
+
 //       <PrayerInformationModal
 //         ref={bottomSheetRef}
 //         prayer={prayer}
 //         language={lang}
 //         rtl={rtl}
 //         colorScheme={colorScheme}
-//         fontSize={fontSize}
-//         lineHeight={lineHeight}
+//         getFontSize={getFontSize}
+//         getLineHeight={getLineHeight}
 //         snapPoints={snapPoints}
 //         onChange={handleSheetChanges}
 //         onRequestClose={closeSheet}
 //       />
+
 //       <FontSizePickerModal
 //         visible={fontSizeModalVisible}
 //         onClose={() => setFontSizeModalVisible(false)}
 //       />
+
 //       <FavoritePrayerPickerModal
 //         visible={pickerVisible}
 //         prayerId={prayerID}
 //         onClose={() => setPickerVisible(false)}
 //       />
+
 //       <StatusBar style="light" />
 //     </Animated.View>
 //   );
@@ -699,6 +695,7 @@
 //   translationLabel: { fontSize: 12, fontWeight: "700" },
 // });
 
+
 import React, {
   useState,
   useEffect,
@@ -714,7 +711,6 @@ import {
   ScrollView,
   useColorScheme,
   Alert,
-  TextStyle,
   NativeSyntheticEvent,
   NativeScrollEvent,
   Keyboard,
@@ -722,7 +718,6 @@ import {
 } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import Markdown, { RenderRules } from "react-native-markdown-display";
 import { StatusBar } from "expo-status-bar";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
@@ -730,7 +725,6 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import Octicons from "@expo/vector-icons/Octicons";
 import { BottomSheetMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
-
 import { getPrayerWithTranslations } from "../../db/queries/prayers";
 import { FullPrayer } from "@/constants/Types";
 import { useLanguage } from "../../contexts/LanguageContext";
@@ -746,29 +740,15 @@ import PrayerInformationModal from "./PrayerInformationModal";
 import { useDataVersionStore } from "../../stores/dataVersionStore";
 import { useScreenFadeIn } from "../../hooks/useScreenFadeIn";
 import ArrowUp from "./ArrowUp";
+import { RichText } from "./RichText";
+import {
+  getScaledFontSize,
+  getScaledLineHeight,
+} from "@/constants/typography";
 
 const SCROLL_UP_THRESH = 120;
 const SCROLL_UP_HYST = 16;
 
-const makeMarkdownRules = (
-  customFontSize: number,
-  textColor: string,
-): RenderRules => ({
-  code_inline: (_node, _children, _parent, styles) => (
-    <Text
-      key={_node.key}
-      style={{
-        fontSize: customFontSize,
-        ...(styles.text as TextStyle),
-        color: textColor,
-      }}
-    >
-      {_node.content}
-    </Text>
-  ),
-});
-
-// ── Fix 1: Extracted & memoized row component ─────────────────────────
 type PrayerLineProps = {
   index: number;
   arabic: { text: string; hasAt: boolean } | undefined;
@@ -782,9 +762,6 @@ type PrayerLineProps = {
   rtl: boolean;
   fontSizeArabic: number;
   lineHeightArabic: number;
-  mdRules: RenderRules;
-  mdStyleTranslit: any;
-  mdStyleTranslation: any;
   onBookmark: (index: number) => void;
 };
 
@@ -799,9 +776,6 @@ const PrayerLine = React.memo(
     rtl,
     fontSizeArabic,
     lineHeightArabic,
-    mdRules,
-    mdStyleTranslit,
-    mdStyleTranslation,
     onBookmark,
   }: PrayerLineProps) => {
     const hasNote =
@@ -846,7 +820,6 @@ const PrayerLine = React.memo(
           />
         )}
 
-        {/* ── Arabic text ── */}
         {arabic && (
           <Text
             style={{
@@ -862,14 +835,14 @@ const PrayerLine = React.memo(
           </Text>
         )}
 
-        {/* ── Transliteration text ── */}
         {translit && (
-          <Markdown rules={mdRules} style={mdStyleTranslit}>
-            {translit.text}
-          </Markdown>
+          <View style={styles.translitWrap}>
+            <RichText type="latin" style={{ fontStyle: "italic" }}>
+              {translit.text}
+            </RichText>
+          </View>
         )}
 
-        {/* ── Translation text (latin) ── */}
         {activeTranslations.map((tr) => (
           <View key={tr.code} style={styles.translationBlock}>
             <Text
@@ -880,9 +853,7 @@ const PrayerLine = React.memo(
             >
               {tr.code.toUpperCase()}
             </Text>
-            <Markdown rules={mdRules} style={mdStyleTranslation}>
-              {tr.lines[index]?.text || ""}
-            </Markdown>
+            <RichText type="latin">{tr.lines[index]?.text || ""}</RichText>
           </View>
         ))}
       </View>
@@ -891,7 +862,6 @@ const PrayerLine = React.memo(
 );
 PrayerLine.displayName = "PrayerLine";
 
-// ── Main component ──────────────────────────────────────────────────────
 const RenderPrayer = ({ prayerID }: { prayerID: number }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showLoadingSpinner, setShowLoadingSpinner] = useState(false);
@@ -903,23 +873,18 @@ const RenderPrayer = ({ prayerID }: { prayerID: number }) => {
   const [showScrollUp, setShowScrollUp] = useState(false);
   const showUpRef = useRef(false);
 
-  const colorScheme: any = useColorScheme() || "light";
+  const colorScheme = (useColorScheme() || "light") as "light" | "dark";
   const { t } = useTranslation();
   const { lang, rtl } = useLanguage();
 
   const bottomSheetRef = useRef<BottomSheetMethods | null>(null);
   const snapPoints = useMemo(() => ["70%"], []);
 
-  // ── Font size store ──────────────────────────────────────────────────
-  const { getFontSize, getLineHeight, fontSize } = useFontSizeStore();
-
-  const fontSizeArabic = getFontSize("arabic");
-  const fontSizeLatin = getFontSize("latin");
-  const fontSizeTranslit = getFontSize("transliteration");
-
-  const lineHeightLatin = getLineHeight("latin");
-  const lineHeightArabic = getLineHeight("arabic");
-  const lineHeightTranslit = getLineHeight("transliteration");
+  const fontSize = useFontSizeStore((s) => s.fontSize);
+  const fontSizeArabic = getScaledFontSize(fontSize, "arabic");
+  const lineHeightArabic = getScaledLineHeight(fontSize, "arabic");
+  const fontSizeLatin = getScaledFontSize(fontSize, "latin");
+  const lineHeightLatin = getScaledLineHeight(fontSize, "latin");
 
   const [fontSizeModalVisible, setFontSizeModalVisible] = useState(false);
   const [pickerVisible, setPickerVisible] = useState(false);
@@ -930,10 +895,10 @@ const RenderPrayer = ({ prayerID }: { prayerID: number }) => {
   const scrollToTop = useCallback(() => {
     flashListRef.current?.scrollToOffset({ offset: 0, animated: true });
   }, []);
+
   const prayersVersion = useDataVersionStore((s) => s.prayersVersion);
   const { fadeAnim, onLayout } = useScreenFadeIn(600);
 
-  // ── Scroll tracking ──────────────────────────────────────────────────
   const contentHeightRef = useRef(0);
   const layoutHeightRef = useRef(0);
 
@@ -960,61 +925,6 @@ const RenderPrayer = ({ prayerID }: { prayerID: number }) => {
     return () => clearIdle();
   }, [clearIdle]);
 
-  // ── Memoised styles ──────────────────────────────────────────────────
-  const baseText = useMemo(
-    () =>
-      ({
-        color: Colors[colorScheme].text,
-      }) as const,
-    [colorScheme],
-  );
-
-  const mdRules = useMemo(
-    () => makeMarkdownRules(fontSizeLatin, Colors[colorScheme].text),
-    [fontSizeLatin, colorScheme],
-  );
-
-  const mdStyleTranslit = useMemo(
-    () => ({
-      body: {
-        ...baseText,
-        fontSize: fontSizeTranslit,
-        lineHeight: lineHeightTranslit,
-        color: Colors[colorScheme].prayerTransliterationText,
-        fontStyle: "italic",
-        marginBottom: 16,
-        paddingBottom: 16,
-      },
-    }),
-    [fontSizeTranslit, lineHeightTranslit, colorScheme, baseText],
-  );
-
-  const mdStyleTranslation = useMemo(
-    () => ({
-      body: {
-        ...baseText,
-        fontSize: fontSizeLatin,
-        lineHeight: lineHeightLatin,
-        marginTop: 4,
-        color: Colors[colorScheme].text,
-      },
-    }),
-    [fontSizeLatin, lineHeightLatin, colorScheme, baseText],
-  );
-
-  const mdStyleNotes = useMemo(
-    () => ({
-      body: {
-        ...baseText,
-        fontSize: fontSizeLatin,
-        lineHeight: lineHeightLatin,
-        color: Colors[colorScheme].text,
-      },
-    }),
-    [fontSizeLatin, lineHeightLatin, colorScheme, baseText],
-  );
-
-  // ── Load prayer (+ delayed spinner) ──────────────────────────────────
   useEffect(() => {
     let alive = true;
     let done = false;
@@ -1046,7 +956,6 @@ const RenderPrayer = ({ prayerID }: { prayerID: number }) => {
     };
   }, [prayerID, prayersVersion]);
 
-  // ── Init translation toggles ─────────────────────────────────────────
   useEffect(() => {
     if (!prayer) return;
     const initial: Record<string, boolean> = {};
@@ -1056,7 +965,6 @@ const RenderPrayer = ({ prayerID }: { prayerID: number }) => {
     setSelectTranslations(initial);
   }, [prayer, lang]);
 
-  // ── Load bookmark ─────────────────────────────────────────────────────
   useEffect(() => {
     let canceled = false;
     (async () => {
@@ -1077,7 +985,6 @@ const RenderPrayer = ({ prayerID }: { prayerID: number }) => {
     };
   }, [prayerID, prayersVersion]);
 
-  // ── Helpers ───────────────────────────────────────────────────────────
   const processLines = (text?: string) =>
     text
       ? text
@@ -1111,14 +1018,12 @@ const RenderPrayer = ({ prayerID }: { prayerID: number }) => {
     return Array.from({ length: max }, (_, i) => i);
   }, [formatted]);
 
-  // ── Fix 2: Pre-compute activeTranslations once ───────────────────────
   const activeTranslations = useMemo(
     () =>
       formatted?.translations.filter((tr) => selectTranslations[tr.code]) ?? [],
     [formatted, selectTranslations],
   );
 
-  // ── Fix 3: Clean extraData — no JSON.stringify ───────────────────────
   const listExtraData = useMemo(
     () => ({
       prayersVersion,
@@ -1160,16 +1065,13 @@ const RenderPrayer = ({ prayerID }: { prayerID: number }) => {
     [bookmark, prayerID, t],
   );
 
-  const handleSheetChanges = useCallback((_index: number) => {
-    /* no-op */
-  }, []);
+  const handleSheetChanges = useCallback((_index: number) => {}, []);
 
   const closeSheet = () => {
     Keyboard.dismiss();
     bottomSheetRef.current?.close();
   };
 
-  // ── Scroll handlers ───────────────────────────────────────────────────
   const handleScroll = useCallback(
     (e: NativeSyntheticEvent<NativeScrollEvent>) => {
       const y = e.nativeEvent.contentOffset.y;
@@ -1192,7 +1094,6 @@ const RenderPrayer = ({ prayerID }: { prayerID: number }) => {
     layoutHeightRef.current = e.nativeEvent.layout.height;
   }, []);
 
-  // ── Fix 1 continued: stable renderItem using memoized component ──────
   const renderItem = useCallback(
     ({ item: index }: { item: number }) => (
       <PrayerLine
@@ -1205,9 +1106,6 @@ const RenderPrayer = ({ prayerID }: { prayerID: number }) => {
         rtl={rtl}
         fontSizeArabic={fontSizeArabic}
         lineHeightArabic={lineHeightArabic}
-        mdRules={mdRules}
-        mdStyleTranslit={mdStyleTranslit}
-        mdStyleTranslation={mdStyleTranslation}
         onBookmark={handleBookmark}
       />
     ),
@@ -1219,18 +1117,14 @@ const RenderPrayer = ({ prayerID }: { prayerID: number }) => {
       rtl,
       fontSizeArabic,
       lineHeightArabic,
-      mdRules,
-      mdStyleTranslit,
-      mdStyleTranslation,
       handleBookmark,
     ],
   );
 
-  // ── Render guards ─────────────────────────────────────────────────────
   if (showLoadingSpinner) {
     return (
       <ThemedView style={styles.loadingAndNoDataContainer}>
-        <LoadingIndicator size={"large"} />
+        <LoadingIndicator size="large" />
       </ThemedView>
     );
   }
@@ -1243,7 +1137,6 @@ const RenderPrayer = ({ prayerID }: { prayerID: number }) => {
     );
   }
 
-  // ── Main render ───────────────────────────────────────────────────────
   return (
     <Animated.View
       onLayout={onLayout}
@@ -1253,12 +1146,13 @@ const RenderPrayer = ({ prayerID }: { prayerID: number }) => {
       ]}
     >
       <FlatList
+        key={`prayer-${fontSize}`}
         ref={flashListRef}
         scrollEventThrottle={16}
         onScroll={handleScroll}
         onContentSizeChange={onContentSizeChange}
         onLayout={onListLayout}
-        keyExtractor={(i) => i.toString()}
+        keyExtractor={(i) => `${i}-${fontSize}`}
         data={indices}
         bounces={false}
         overScrollMode="never"
@@ -1298,15 +1192,29 @@ const RenderPrayer = ({ prayerID }: { prayerID: number }) => {
                 <View style={styles.titleContainer}>
                   <ThemedText
                     type="latin"
-                    style={[styles.title, { color: "#fff" }]}
+                    style={[
+                      styles.title,
+                      {
+                        color: "#fff",
+                        fontSize: fontSizeLatin,
+                        lineHeight: lineHeightLatin,
+                      },
+                    ]}
                   >
-                    {prayer?.translations.find((tr) => tr.language_code === lang)?.translated_title ?? prayer?.arabic_title}
+                    {prayer?.translations.find(
+                      (tr) => tr.language_code === lang,
+                    )?.translated_title ?? prayer?.arabic_title}
                   </ThemedText>
                   <ThemedText
                     type="latin"
                     style={[
                       styles.arabicTitle,
-                      { color: "#fff", textAlign: "right" },
+                      {
+                        color: "#fff",
+                        textAlign: "right",
+                        fontSize: fontSizeArabic,
+                        lineHeight: lineHeightArabic,
+                      },
                     ]}
                   >
                     {prayer?.arabic_title}
@@ -1374,9 +1282,7 @@ const RenderPrayer = ({ prayerID }: { prayerID: number }) => {
         ListFooterComponent={
           notesForLang ? (
             <View style={{ paddingHorizontal: 16 }}>
-              <Markdown rules={mdRules} style={mdStyleNotes}>
-                {notesForLang}
-              </Markdown>
+              <RichText type="latin">{notesForLang}</RichText>
             </View>
           ) : null
         }
@@ -1391,8 +1297,8 @@ const RenderPrayer = ({ prayerID }: { prayerID: number }) => {
         language={lang}
         rtl={rtl}
         colorScheme={colorScheme}
-        getFontSize={getFontSize}
-        getLineHeight={getLineHeight}
+        getFontSize={(type) => getScaledFontSize(fontSize, type)}
+        getLineHeight={(type) => getScaledLineHeight(fontSize, type)}
         snapPoints={snapPoints}
         onChange={handleSheetChanges}
         onRequestClose={closeSheet}
@@ -1432,9 +1338,8 @@ const styles = StyleSheet.create({
   title: {
     fontWeight: "700",
     marginBottom: 4,
-    lineHeight: 35,
   },
-  arabicTitle: { fontSize: 18 },
+  arabicTitle: {},
   headerControls: {
     flexDirection: "row",
     alignItems: "center",
@@ -1476,6 +1381,9 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "700",
     color: "#fff",
+  },
+  translitWrap: {
+    marginBottom: 12,
   },
   translationBlock: {
     marginTop: 12,

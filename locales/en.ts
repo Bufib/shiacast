@@ -94,6 +94,7 @@ const en = {
   calendarScreenTitle: "Calendar",
   quranScreen: "Quran",
   historyScreen: "History",
+  allDays:"Daily",
 
   // Push-notification
 

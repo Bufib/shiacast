@@ -74,6 +74,7 @@ const ar = {
     "حدث خطأ ما أثناء إعداد التطبيق. حاول إغلاق التطبيق وفتحه مرة أخرى.",
   pdfsTitle: "لقراءة",
   feedback: "ملاحظات",
+  allDays:"جميع الأيام",
 
   // Books and PDF
   readingSettings: "التنسيق",

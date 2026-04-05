@@ -108,6 +108,7 @@ import Markdown from "react-native-markdown-display";
 import { Colors } from "@/constants/Colors";
 import { PrayerInformationModalPropsType } from "@/constants/Types";
 import { BottomSheetMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
+import { RichText } from "./RichText";
 
 const PrayerInformationModal = forwardRef<
   BottomSheetMethods,
@@ -132,17 +133,6 @@ const PrayerInformationModal = forwardRef<
         prayer?.translations.find((t) => t.language_code === language)
           ?.translated_introduction || "",
       [prayer, language],
-    );
-
-    const mdStyle = useMemo(
-      () => ({
-        body: {
-          getFontSize,
-          lineHeight: getLineHeight("latin"),
-          color: Colors[colorScheme].text,
-        },
-      }),
-      [getFontSize, getLineHeight, colorScheme],
     );
 
     const handleClose = () => {
@@ -180,7 +170,7 @@ const PrayerInformationModal = forwardRef<
             rtl ? { flexDirection: "row-reverse" } : { flexDirection: "row" },
           ]}
         >
-          {!!intro && <Markdown style={mdStyle}>{intro}</Markdown>}
+          {!!intro && <RichText type="latin">{intro}</RichText>}
         </BottomSheetView>
       </BottomSheet>
     );
