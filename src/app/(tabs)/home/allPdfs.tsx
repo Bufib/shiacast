@@ -782,6 +782,11 @@ export default function AllPdfsScreen() {
                     color={Colors[colorScheme].tint}
                   />
                 </View>
+                <Text
+                  style={[styles.metaText, { color: Colors[colorScheme].icon }]}
+                >
+                  {item.pdf_author}
+                </Text>
               </View>
 
               <View style={styles.tileTitleContainer}>
@@ -804,18 +809,8 @@ export default function AllPdfsScreen() {
                     color={Colors[colorScheme].icon}
                     style={styles.metaIcon}
                   />
-                  <Text
-                    numberOfLines={1}
-                    style={[
-                      styles.metaText,
-                      { color: Colors[colorScheme].icon },
-                    ]}
-                  >
-                    {item.pdf_author ?? t("tab_pdfs")}
-                  </Text>
-                </View>
-                {(item as any).pdf_topic ? (
-                  <View style={styles.topicBadge}>
+
+                  {(item as any).pdf_topic ? (
                     <Text
                       numberOfLines={1}
                       style={[
@@ -825,15 +820,15 @@ export default function AllPdfsScreen() {
                     >
                       {parseTopics((item as any).pdf_topic).join(", ")}
                     </Text>
-                  </View>
-                ) : null}
+                  ) : null}
+                </View>
               </View>
             </View>
           </View>
         </TouchableOpacity>
       );
     },
-    [colorScheme, previewSizes, t],
+    [colorScheme, previewSizes],
   );
 
   const activeFilterCount = (selectedTopic ? 1 : 0) + (selectedAuthor ? 1 : 0);
@@ -1061,20 +1056,21 @@ const styles = StyleSheet.create({
   modernTile: {
     borderRadius: 16,
     borderWidth: 1,
-    overflow: "hidden",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 8,
     elevation: 3,
+    padding: 10,
   },
   tileContent: {
     flex: 1,
-    padding: 10,
     justifyContent: "space-between",
   },
   tileIconContainer: {
-    marginBottom: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   iconCircle: {
     width: 44,
@@ -1095,8 +1091,6 @@ const styles = StyleSheet.create({
     letterSpacing: 0.2,
   },
   tileFooter: {
-    marginTop: 8,
-    gap: 4,
   },
   metaRow: {
     flexDirection: "row",
@@ -1107,7 +1101,7 @@ const styles = StyleSheet.create({
   },
   metaText: {
     fontSize: 11,
-    flex: 1,
+    flexShrink: 1,
   },
   topicBadge: {
     marginTop: 2,

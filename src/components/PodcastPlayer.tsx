@@ -677,7 +677,7 @@ export default function PodcastPlayer({ podcast }: PodcastPlayerPropsType) {
                 onPress={handleStream}
                 disabled={isLoading}
               >
-                <View style={styles.streamDownloadButton}>
+                <View style={[styles.streamDownloadButton, {backgroundColor: Colors[colorScheme].contrast}]}>
                   <Ionicons
                     name="play"
                     size={24}
@@ -697,7 +697,7 @@ export default function PodcastPlayer({ podcast }: PodcastPlayerPropsType) {
                 onPress={handleDownload}
                 disabled={isLoading}
               >
-                <View style={styles.streamDownloadButton}>
+                <View style={[styles.streamDownloadButton, {backgroundColor: Colors[colorScheme].contrast}]}>
                   <Ionicons
                     name="download"
                     size={24}

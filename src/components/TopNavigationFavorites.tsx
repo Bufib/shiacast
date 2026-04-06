@@ -30,12 +30,12 @@ export default function TopNavigationFavorites() {
 
   const routes = React.useMemo(
     () => [
-      {
-        key: "favoriteNewsArticles",
-        // title: t("newsArticleScreenTitle"),
-        title: "",
-        icon: require("@/assets/images/newsArticleHeaderLogo.png"),
-      },
+      // {
+      //   key: "favoriteNewsArticles",
+      //   // title: t("newsArticleScreenTitle"),
+      //   title: "",
+      //   icon: require("@/assets/images/newsArticleHeaderLogo.png"),
+      // },
       {
         key: "favoritePodcasts",
         // title: t("podcastScreenTitle"),
@@ -49,18 +49,18 @@ export default function TopNavigationFavorites() {
         title: "",
         icon: require("@/assets/images/qAndAHeaderLogo.png"),
       },
-      {
-        key: "favoritePrayers",
-        // title: t("prayerScreenTitle"),
-        title: "",
-        icon: require("@/assets/images/prayersHeaderLogo.png"),
-      },
-      {
-        key: "favoriteQuran",
-        // title: t("prayerScreenTitle"),
-        title: "",
-        icon: require("@/assets/images/quranImage.png"),
-      },
+      // {
+      //   key: "favoritePrayers",
+      //   // title: t("prayerScreenTitle"),
+      //   title: "",
+      //   icon: require("@/assets/images/prayersHeaderLogo.png"),
+      // },
+      // {
+      //   key: "favoriteQuran",
+      //   // title: t("prayerScreenTitle"),
+      //   title: "",
+      //   icon: require("@/assets/images/quranImage.png"),
+      // },
       {
         key: "favoritePdfs",
         // title: t("prayerScreenTitle"),

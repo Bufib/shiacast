@@ -35,3 +35,4 @@ export const gradientColorPalette = [
   // Volcanic Fire - Red to orange to yellow
   ["#ff416c", "#ff4b2b", "#ffb347"],
 ];
+

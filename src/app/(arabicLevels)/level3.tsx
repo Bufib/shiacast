@@ -1,3 +1,530 @@
+// import React from "react";
+// import {
+//   FlatList,
+//   StyleSheet,
+//   useColorScheme,
+//   Text,
+//   View,
+//   TouchableOpacity,
+// } from "react-native";
+// import { SafeAreaView } from "react-native-safe-area-context";
+// import { ThemedView } from "@/components/ThemedView";
+// import { Colors } from "@/constants/Colors";
+// import HeaderLeftBackButton from "@/components/HeaderLeftBackButton";
+// import { router } from "expo-router";
+// import { ThemedText } from "@/components/ThemedText";
+// import {
+//   comparePairs,
+//   longVowels,
+//   shortVowels,
+// } from "../../../utils/arabicCurriculum";
+// import { SectionItem } from "@/constants/Types";
+
+// export default function Level1_1() {
+//   const colorScheme = useColorScheme() || "light";
+
+//   const sections: SectionItem[] = [
+//     { type: "intro" },
+//     { type: "shortTitle" },
+//     ...shortVowels.map((item): SectionItem => ({ type: "shortCard", ...item })),
+//     { type: "longTitle" },
+//     ...longVowels.map((item): SectionItem => ({ type: "longCard", ...item })),
+//     { type: "compareTitle" },
+//     ...comparePairs.map(
+//       (item): SectionItem => ({ type: "compareCard", ...item }),
+//     ),
+//     { type: "exercise" },
+//   ];
+
+//   return (
+//     <SafeAreaView
+//       style={[
+//         styles.container,
+//         { backgroundColor: Colors[colorScheme].background },
+//       ]}
+//       edges={["top"]}
+//     >
+//       <FlatList
+//         data={sections}
+//         keyExtractor={(_, index) => index.toString()}
+//         showsVerticalScrollIndicator={false}
+//         contentContainerStyle={styles.listContent}
+//         ListHeaderComponent={
+//           <View style={styles.headerWrapper}>
+//             <View style={styles.headerRow}>
+//               <HeaderLeftBackButton
+//                 size={30}
+//                 color={Colors.universal.link}
+//                 route={"/knowledge/"}
+//                 dismiss={true}
+//               />
+//               <Text
+//                 style={[
+//                   styles.headerTitle,
+//                   { color: Colors[colorScheme].text },
+//                 ]}
+//               >
+//                 Lange und kurze Vokale
+//               </Text>
+//             </View>
+//           </View>
+//         }
+//         renderItem={({ item }) => {
+//           if (item.type === "intro") {
+//             return (
+//               <View style={{ gap: 10 }}>
+//                 <ThemedView
+//                   style={[
+//                     styles.infoBox,
+//                     {
+//                       backgroundColor: Colors[colorScheme].contrast,
+//                       borderColor: Colors[colorScheme].border,
+//                     },
+//                   ]}
+//                 >
+//                   <Text
+//                     style={[
+//                       styles.sectionText,
+//                       {
+//                         color: Colors[colorScheme].text,
+//                         fontSize: 18,
+//                         lineHeight: 18 * 1.7,
+//                       },
+//                     ]}
+//                   >
+//                     Im Arabischen gibt es kurze und lange Vokale. Die kurzen
+//                     Vokale sind kleine Zeichen. Die langen Vokale werden mit
+//                     Buchstaben geschrieben und länger gesprochen.
+//                   </Text>
+//                 </ThemedView>
+//                 <ThemedView
+//                   style={[
+//                     styles.heroBox,
+//                     {
+//                       backgroundColor: Colors[colorScheme].contrast,
+//                       borderColor: Colors[colorScheme].border,
+//                     },
+//                   ]}
+//                 >
+//                   <Text
+//                     style={[
+//                       styles.heroTitle,
+//                       { color: Colors[colorScheme].text },
+//                     ]}
+//                   >
+//                     So hörst du den Unterschied
+//                   </Text>
+//                   <Text
+//                     style={[
+//                       styles.heroText,
+//                       { color: Colors[colorScheme].text },
+//                     ]}
+//                   >
+//                     Kurze Vokale werden kurz gesprochen. Lange Vokale klingen
+//                     ähnlich, aber werden länger gezogen.
+//                   </Text>
+//                   <Text
+//                     style={[
+//                       styles.heroExample,
+//                       { color: Colors[colorScheme].text },
+//                     ]}
+//                   >
+//                     ba → kurz{"\n"}bā → lang
+//                   </Text>
+//                 </ThemedView>
+//               </View>
+//             );
+//           }
+
+//           if (item.type === "shortTitle") {
+//             return (
+//               <Text
+//                 style={[
+//                   styles.sectionTitle,
+//                   { color: Colors[colorScheme].text },
+//                 ]}
+//               >
+//                 Kurze Vokale
+//               </Text>
+//             );
+//           }
+
+//           if (item.type === "longTitle") {
+//             return (
+//               <Text
+//                 style={[
+//                   styles.sectionTitle,
+//                   { color: Colors[colorScheme].text },
+//                 ]}
+//               >
+//                 Lange Vokale
+//               </Text>
+//             );
+//           }
+
+//           if (item.type === "compareTitle") {
+//             return (
+//               <Text
+//                 style={[
+//                   styles.sectionTitle,
+//                   { color: Colors[colorScheme].text },
+//                 ]}
+//               >
+//                 Direkt vergleichen
+//               </Text>
+//             );
+//           }
+
+//           if (item.type === "exercise") {
+//             return (
+//               <ThemedView
+//                 style={[
+//                   styles.exerciseBox,
+//                   {
+//                     backgroundColor: Colors[colorScheme].contrast,
+//                     borderColor: Colors[colorScheme].border,
+//                   },
+//                 ]}
+//               >
+//                 <Text
+//                   style={[
+//                     styles.exerciseTitle,
+//                     { color: Colors[colorScheme].text },
+//                   ]}
+//                 >
+//                   Mini-Übung
+//                 </Text>
+//                 <Text
+//                   style={[
+//                     styles.sectionText,
+//                     { color: Colors[colorScheme].text },
+//                   ]}
+//                 >
+//                   Lies laut:
+//                 </Text>
+//                 <Text
+//                   style={[
+//                     styles.exerciseLine,
+//                     { color: Colors[colorScheme].text },
+//                   ]}
+//                 >
+//                   بَ / بَا
+//                 </Text>
+//                 <Text
+//                   style={[
+//                     styles.exerciseLine,
+//                     { color: Colors[colorScheme].text },
+//                   ]}
+//                 >
+//                   بِ / بِي
+//                 </Text>
+//                 <Text
+//                   style={[
+//                     styles.exerciseLine,
+//                     { color: Colors[colorScheme].text },
+//                   ]}
+//                 >
+//                   بُ / بُو
+//                 </Text>
+//                 <Text
+//                   style={[
+//                     styles.sectionText,
+//                     { color: Colors[colorScheme].text },
+//                   ]}
+//                 >
+//                   Frage dich: Ist der Laut kurz oder lang?
+//                 </Text>
+//               </ThemedView>
+//             );
+//           }
+
+//           if (item.type === "shortCard" || item.type === "longCard") {
+//             return (
+//               <ThemedView
+//                 style={[
+//                   styles.vowelCard,
+//                   {
+//                     backgroundColor: Colors[colorScheme].contrast,
+//                     borderColor: Colors[colorScheme].border,
+//                   },
+//                 ]}
+//               >
+//                 <Text
+//                   style={[
+//                     styles.arabicBig,
+//                     { color: Colors[colorScheme].text },
+//                   ]}
+//                 >
+//                   {item.arabic}
+//                 </Text>
+//                 <Text
+//                   style={[
+//                     styles.latinText,
+//                     { color: Colors[colorScheme].text },
+//                   ]}
+//                 >
+//                   {item.latin}
+//                 </Text>
+//                 <Text
+//                   style={[
+//                     styles.labelText,
+//                     { color: Colors[colorScheme].text },
+//                   ]}
+//                 >
+//                   {item.label}
+//                 </Text>
+//               </ThemedView>
+//             );
+//           }
+
+//           if (item.type === "compareCard") {
+//             return (
+//               <ThemedView
+//                 style={[
+//                   styles.compareCard,
+//                   {
+//                     backgroundColor: Colors[colorScheme].contrast,
+//                     borderColor: Colors[colorScheme].border,
+//                   },
+//                 ]}
+//               >
+//                 <View style={styles.compareSide}>
+//                   <Text
+//                     style={[
+//                       styles.compareLabel,
+//                       { color: Colors[colorScheme].text },
+//                     ]}
+//                   >
+//                     kurz
+//                   </Text>
+//                   <Text
+//                     style={[
+//                       styles.arabicBig,
+//                       { color: Colors[colorScheme].text },
+//                     ]}
+//                   >
+//                     {item.short}
+//                   </Text>
+//                   <Text
+//                     style={[
+//                       styles.latinText,
+//                       { color: Colors[colorScheme].text },
+//                     ]}
+//                   >
+//                     {item.shortLatin}
+//                   </Text>
+//                 </View>
+
+//                 <Text
+//                   style={[
+//                     styles.compareVs,
+//                     { color: Colors[colorScheme].text },
+//                   ]}
+//                 >
+//                   vs
+//                 </Text>
+
+//                 <View style={styles.compareSide}>
+//                   <Text
+//                     style={[
+//                       styles.compareLabel,
+//                       { color: Colors[colorScheme].text },
+//                     ]}
+//                   >
+//                     lang
+//                   </Text>
+//                   <Text
+//                     style={[
+//                       styles.arabicBig,
+//                       { color: Colors[colorScheme].text },
+//                     ]}
+//                   >
+//                     {item.long}
+//                   </Text>
+//                   <Text
+//                     style={[
+//                       styles.latinText,
+//                       { color: Colors[colorScheme].text },
+//                     ]}
+//                   >
+//                     {item.longLatin}
+//                   </Text>
+//                 </View>
+//               </ThemedView>
+//             );
+//           }
+
+//           return null;
+//         }}
+//         ListFooterComponent={
+//           <View style={styles.footerRow}>
+//             <TouchableOpacity
+//               onPress={() => router.back()}
+//               style={[styles.button, styles.secondaryButton]}
+//             >
+//               <ThemedText>Zurück</ThemedText>
+//             </TouchableOpacity>
+
+//             <TouchableOpacity
+//               onPress={() => router.push("/(arabicLevels)/level4")}
+//               style={[styles.button, styles.primaryButton]}
+//             >
+//               <ThemedText>Weiter</ThemedText>
+//             </TouchableOpacity>
+//           </View>
+//         }
+//       />
+//     </SafeAreaView>
+//   );
+// }
+
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     paddingHorizontal: 16,
+//   },
+//   listContent: {
+//     paddingBottom: 32,
+//     gap: 12,
+//   },
+//   headerWrapper: {
+//     marginBottom: 8,
+//     gap: 14,
+//   },
+//   headerRow: {
+//     flexDirection: "row",
+//     alignItems: "center",
+//     gap: 10,
+//     marginBottom: 6,
+//     flexWrap: "wrap",
+//   },
+//   headerTitle: {
+//     fontSize: 28,
+//     flexShrink: 1,
+//     textAlign: "center",
+//   },
+//   heroBox: {
+//     borderWidth: 1,
+//     borderRadius: 18,
+//     padding: 16,
+//     gap: 8,
+//   },
+//   heroTitle: {
+//     fontSize: 20,
+//     fontWeight: "700",
+//   },
+//   heroText: {
+//     fontSize: 15,
+//     lineHeight: 25,
+//   },
+//   heroExample: {
+//     fontSize: 22,
+//     lineHeight: 34,
+//     textAlign: "center",
+//     fontWeight: "700",
+//     marginTop: 4,
+//   },
+//   infoBox: {
+//     borderWidth: 1,
+//     borderRadius: 16,
+//     padding: 16,
+//     gap: 8,
+//   },
+//   sectionTitle: {
+//     fontSize: 20,
+//     fontWeight: "700",
+//     marginTop: 6,
+//     marginBottom: 2,
+//   },
+//   sectionText: {
+//     fontSize: 15,
+//     lineHeight: 15 * 2,
+//   },
+//   vowelCard: {
+//     borderWidth: 1,
+//     borderRadius: 18,
+//     paddingVertical: 18,
+//     paddingHorizontal: 16,
+//     alignItems: "center",
+//     gap: 6,
+//   },
+//   arabicBig: {
+//     fontSize: 40,
+//     textAlign: "center",
+//   },
+//   latinText: {
+//     fontSize: 22,
+//     fontWeight: "700",
+//     textAlign: "center",
+//   },
+//   labelText: {
+//     fontSize: 14,
+//     opacity: 0.75,
+//     textAlign: "center",
+//   },
+//   compareCard: {
+//     borderWidth: 1,
+//     borderRadius: 18,
+//     paddingVertical: 16,
+//     paddingHorizontal: 12,
+//     flexDirection: "row",
+//     alignItems: "center",
+//     justifyContent: "space-between",
+//   },
+//   compareSide: {
+//     flex: 1,
+//     alignItems: "center",
+//     gap: 4,
+//   },
+//   compareLabel: {
+//     fontSize: 14,
+//     fontWeight: "700",
+//     opacity: 0.7,
+//   },
+//   compareVs: {
+//     fontSize: 18,
+//     fontWeight: "700",
+//     marginHorizontal: 8,
+//     opacity: 0.6,
+//   },
+//   exerciseBox: {
+//     borderWidth: 1,
+//     borderRadius: 18,
+//     padding: 16,
+//     gap: 8,
+//     marginTop: 4,
+//   },
+//   exerciseTitle: {
+//     fontSize: 20,
+//     fontWeight: "700",
+//   },
+//   exerciseLine: {
+//     fontSize: 28,
+//     textAlign: "center",
+//     fontWeight: "700",
+//     marginVertical: 2,
+//   },
+//   footerRow: {
+//     flexDirection: "row",
+//     justifyContent: "space-between",
+//     gap: 12,
+//     marginTop: 20,
+//   },
+//   button: {
+//     flex: 1,
+//     alignItems: "center",
+//     justifyContent: "center",
+//     paddingVertical: 14,
+//     borderRadius: 12,
+//   },
+//   secondaryButton: {
+//     backgroundColor: "#BDBDBD",
+//   },
+//   primaryButton: {
+//     backgroundColor: "#E53935",
+//   },
+// });
+
 import React from "react";
 import {
   FlatList,
@@ -72,67 +599,108 @@ export default function Level1_1() {
         renderItem={({ item }) => {
           if (item.type === "intro") {
             return (
-              <View style={{ gap: 10 }}>
-                <ThemedView
+              <ThemedView
+                style={[
+                  styles.overviewBox,
+                  {
+                    backgroundColor: Colors[colorScheme].contrast,
+                    borderColor: Colors[colorScheme].border,
+                  },
+                ]}
+              >
+                <Text
                   style={[
-                    styles.infoBox,
-                    {
-                      backgroundColor: Colors[colorScheme].contrast,
-                      borderColor: Colors[colorScheme].border,
-                    },
+                    styles.overviewText,
+                    { color: Colors[colorScheme].text },
                   ]}
                 >
-                  <Text
+                  Im Arabischen gibt es kurze und lange Vokale. Kurze Vokale
+                  sind kleine Zeichen über oder unter dem Buchstaben. Lange
+                  Vokale werden mit einem zusätzlichen Buchstaben geschrieben
+                  und etwas länger gesprochen.
+                </Text>
+
+                <View style={styles.exampleRow}>
+                  <View
                     style={[
-                      styles.sectionText,
+                      styles.examplePill,
                       {
-                        color: Colors[colorScheme].text,
-                        fontSize: 18,
-                        lineHeight: 18 * 1.7,
+                        backgroundColor:
+                          colorScheme === "dark" ? "#1E293B" : "#F3F4F6",
                       },
                     ]}
                   >
-                    Im Arabischen gibt es kurze und lange Vokale. Die kurzen
-                    Vokale sind kleine Zeichen. Die langen Vokale werden mit
-                    Buchstaben geschrieben und länger gesprochen.
-                  </Text>
-                </ThemedView>
-                <ThemedView
-                  style={[
-                    styles.heroBox,
-                    {
-                      backgroundColor: Colors[colorScheme].contrast,
-                      borderColor: Colors[colorScheme].border,
-                    },
-                  ]}
-                >
+                    <Text
+                      style={[
+                        styles.exampleMain,
+                        { color: Colors[colorScheme].text },
+                      ]}
+                    >
+                      بَ
+                    </Text>
+                    <Text
+                      style={[
+                        styles.exampleSub,
+                        { color: Colors[colorScheme].text },
+                      ]}
+                    >
+                      ba
+                    </Text>
+                    <Text
+                      style={[
+                        styles.exampleHint,
+                        { color: Colors[colorScheme].text },
+                      ]}
+                    >
+                      kurz
+                    </Text>
+                  </View>
+
                   <Text
                     style={[
-                      styles.heroTitle,
+                      styles.arrow,
                       { color: Colors[colorScheme].text },
                     ]}
                   >
-                    So hörst du den Unterschied
+                    →
                   </Text>
-                  <Text
+
+                  <View
                     style={[
-                      styles.heroText,
-                      { color: Colors[colorScheme].text },
+                      styles.examplePill,
+                      {
+                        backgroundColor:
+                          colorScheme === "dark" ? "#1E293B" : "#F3F4F6",
+                      },
                     ]}
                   >
-                    Kurze Vokale werden kurz gesprochen. Lange Vokale klingen
-                    ähnlich, aber werden länger gezogen.
-                  </Text>
-                  <Text
-                    style={[
-                      styles.heroExample,
-                      { color: Colors[colorScheme].text },
-                    ]}
-                  >
-                    ba → kurz{"\n"}bā → lang
-                  </Text>
-                </ThemedView>
-              </View>
+                    <Text
+                      style={[
+                        styles.exampleMain,
+                        { color: Colors[colorScheme].text },
+                      ]}
+                    >
+                      بَا
+                    </Text>
+                    <Text
+                      style={[
+                        styles.exampleSub,
+                        { color: Colors[colorScheme].text },
+                      ]}
+                    >
+                      bā
+                    </Text>
+                    <Text
+                      style={[
+                        styles.exampleHint,
+                        { color: Colors[colorScheme].text },
+                      ]}
+                    >
+                      lang
+                    </Text>
+                  </View>
+                </View>
+              </ThemedView>
             );
           }
 
@@ -170,7 +738,7 @@ export default function Level1_1() {
                   { color: Colors[colorScheme].text },
                 ]}
               >
-                Direkt vergleichen
+                Zum Vergleich
               </Text>
             );
           }
@@ -192,15 +760,26 @@ export default function Level1_1() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  Mini-Übung
+                  Kleine Übung
                 </Text>
+
                 <Text
                   style={[
-                    styles.sectionText,
+                    styles.exerciseText,
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  Lies laut:
+                  Lies die Paare laut. Sprich die rechte Form jeweils etwas
+                  länger.
+                </Text>
+
+                <Text
+                  style={[
+                    styles.exerciseLine,
+                    { color: Colors[colorScheme].text },
+                  ]}
+                >
+                  بَ — بَا
                 </Text>
                 <Text
                   style={[
@@ -208,7 +787,7 @@ export default function Level1_1() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  بَ / بَا
+                  بِ — بِي
                 </Text>
                 <Text
                   style={[
@@ -216,23 +795,16 @@ export default function Level1_1() {
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  بِ / بِي
+                  بُ — بُو
                 </Text>
+
                 <Text
                   style={[
-                    styles.exerciseLine,
+                    styles.exerciseHint,
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  بُ / بُو
-                </Text>
-                <Text
-                  style={[
-                    styles.sectionText,
-                    { color: Colors[colorScheme].text },
-                  ]}
-                >
-                  Frage dich: Ist der Laut kurz oder lang?
+                  Achte nur auf einen Punkt: kurz oder lang?
                 </Text>
               </ThemedView>
             );
@@ -242,37 +814,42 @@ export default function Level1_1() {
             return (
               <ThemedView
                 style={[
-                  styles.vowelCard,
+                  styles.simpleRowCard,
                   {
                     backgroundColor: Colors[colorScheme].contrast,
                     borderColor: Colors[colorScheme].border,
                   },
                 ]}
               >
-                <Text
-                  style={[
-                    styles.arabicBig,
-                    { color: Colors[colorScheme].text },
-                  ]}
-                >
-                  {item.arabic}
-                </Text>
-                <Text
-                  style={[
-                    styles.latinText,
-                    { color: Colors[colorScheme].text },
-                  ]}
-                >
-                  {item.latin}
-                </Text>
-                <Text
-                  style={[
-                    styles.labelText,
-                    { color: Colors[colorScheme].text },
-                  ]}
-                >
-                  {item.label}
-                </Text>
+                <View style={styles.rowLeft}>
+                  <Text
+                    style={[
+                      styles.arabicBig,
+                      { color: Colors[colorScheme].text },
+                    ]}
+                  >
+                    {item.arabic}
+                  </Text>
+                </View>
+
+                <View style={styles.rowRight}>
+                  <Text
+                    style={[
+                      styles.latinText,
+                      { color: Colors[colorScheme].text },
+                    ]}
+                  >
+                    {item.latin}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.labelText,
+                      { color: Colors[colorScheme].text },
+                    ]}
+                  >
+                    {item.label}
+                  </Text>
+                </View>
               </ThemedView>
             );
           }
@@ -291,7 +868,7 @@ export default function Level1_1() {
                 <View style={styles.compareSide}>
                   <Text
                     style={[
-                      styles.compareLabel,
+                      styles.compareSmallLabel,
                       { color: Colors[colorScheme].text },
                     ]}
                   >
@@ -299,7 +876,7 @@ export default function Level1_1() {
                   </Text>
                   <Text
                     style={[
-                      styles.arabicBig,
+                      styles.compareArabic,
                       { color: Colors[colorScheme].text },
                     ]}
                   >
@@ -307,7 +884,7 @@ export default function Level1_1() {
                   </Text>
                   <Text
                     style={[
-                      styles.latinText,
+                      styles.compareLatin,
                       { color: Colors[colorScheme].text },
                     ]}
                   >
@@ -317,17 +894,17 @@ export default function Level1_1() {
 
                 <Text
                   style={[
-                    styles.compareVs,
+                    styles.compareDivider,
                     { color: Colors[colorScheme].text },
                   ]}
                 >
-                  vs
+                  |
                 </Text>
 
                 <View style={styles.compareSide}>
                   <Text
                     style={[
-                      styles.compareLabel,
+                      styles.compareSmallLabel,
                       { color: Colors[colorScheme].text },
                     ]}
                   >
@@ -335,7 +912,7 @@ export default function Level1_1() {
                   </Text>
                   <Text
                     style={[
-                      styles.arabicBig,
+                      styles.compareArabic,
                       { color: Colors[colorScheme].text },
                     ]}
                   >
@@ -343,7 +920,7 @@ export default function Level1_1() {
                   </Text>
                   <Text
                     style={[
-                      styles.latinText,
+                      styles.compareLatin,
                       { color: Colors[colorScheme].text },
                     ]}
                   >
@@ -385,130 +962,175 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingBottom: 32,
-    gap: 12,
   },
   headerWrapper: {
-    marginBottom: 8,
-    gap: 14,
+    marginBottom: 14,
   },
   headerRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
-    marginBottom: 6,
+    marginBottom: 4,
     flexWrap: "wrap",
   },
   headerTitle: {
-    fontSize: 28,
+    fontSize: 24,
     flexShrink: 1,
-    textAlign: "center",
   },
-  heroBox: {
-    borderWidth: 1,
-    borderRadius: 18,
-    padding: 16,
-    gap: 8,
-  },
-  heroTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-  },
-  heroText: {
-    fontSize: 15,
-    lineHeight: 25,
-  },
-  heroExample: {
-    fontSize: 22,
-    lineHeight: 34,
-    textAlign: "center",
-    fontWeight: "700",
-    marginTop: 4,
-  },
-  infoBox: {
+
+  overviewBox: {
     borderWidth: 1,
     borderRadius: 16,
     padding: 16,
-    gap: 8,
+    marginBottom: 18,
   },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    marginTop: 6,
-    marginBottom: 2,
+  overviewText: {
+    fontSize: 16,
+    lineHeight: 26,
   },
-  sectionText: {
-    fontSize: 15,
-    lineHeight: 15 * 2,
-  },
-  vowelCard: {
-    borderWidth: 1,
-    borderRadius: 18,
-    paddingVertical: 18,
-    paddingHorizontal: 16,
+  exampleRow: {
+    flexDirection: "row",
     alignItems: "center",
-    gap: 6,
+    justifyContent: "center",
+    marginTop: 16,
+    gap: 10,
+  },
+  examplePill: {
+    minWidth: 100,
+    borderRadius: 14,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    alignItems: "center",
+  },
+  exampleMain: {
+    fontSize: 28,
+    fontWeight: "700",
+    textAlign: "center",
+  },
+  exampleSub: {
+    fontSize: 18,
+    fontWeight: "700",
+    marginTop: 4,
+    textAlign: "center",
+  },
+  exampleHint: {
+    fontSize: 13,
+    opacity: 0.7,
+    marginTop: 2,
+    textAlign: "center",
+  },
+  arrow: {
+    fontSize: 24,
+    opacity: 0.7,
+  },
+
+  sectionTitle: {
+    fontSize: 19,
+    fontWeight: "700",
+    marginBottom: 8,
+    marginTop: 6,
+  },
+
+  simpleRowCard: {
+    borderWidth: 1,
+    borderRadius: 14,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    marginBottom: 10,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  rowLeft: {
+    width: 90,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  rowRight: {
+    flex: 1,
+    gap: 4,
   },
   arabicBig: {
-    fontSize: 40,
+    fontSize: 36,
     textAlign: "center",
   },
   latinText: {
     fontSize: 22,
     fontWeight: "700",
-    textAlign: "center",
   },
   labelText: {
     fontSize: 14,
     opacity: 0.75,
-    textAlign: "center",
+    lineHeight: 20,
   },
+
   compareCard: {
     borderWidth: 1,
-    borderRadius: 18,
-    paddingVertical: 16,
+    borderRadius: 14,
+    paddingVertical: 14,
     paddingHorizontal: 12,
+    marginBottom: 10,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
   },
   compareSide: {
     flex: 1,
     alignItems: "center",
     gap: 4,
   },
-  compareLabel: {
-    fontSize: 14,
-    fontWeight: "700",
-    opacity: 0.7,
+  compareSmallLabel: {
+    fontSize: 13,
+    opacity: 0.65,
+    fontWeight: "600",
   },
-  compareVs: {
+  compareArabic: {
+    fontSize: 32,
+    fontWeight: "700",
+  },
+  compareLatin: {
     fontSize: 18,
     fontWeight: "700",
-    marginHorizontal: 8,
-    opacity: 0.6,
   },
+  compareDivider: {
+    fontSize: 20,
+    opacity: 0.35,
+    marginHorizontal: 8,
+  },
+
   exerciseBox: {
     borderWidth: 1,
-    borderRadius: 18,
+    borderRadius: 16,
     padding: 16,
-    gap: 8,
-    marginTop: 4,
+    marginTop: 8,
   },
   exerciseTitle: {
-    fontSize: 20,
+    fontSize: 19,
     fontWeight: "700",
+    marginBottom: 8,
+  },
+  exerciseText: {
+    fontSize: 15,
+    lineHeight: 24,
+    marginBottom: 10,
   },
   exerciseLine: {
     fontSize: 28,
     textAlign: "center",
     fontWeight: "700",
-    marginVertical: 2,
+    marginVertical: 4,
   },
+  exerciseHint: {
+    fontSize: 14,
+    lineHeight: 22,
+    opacity: 0.75,
+    marginTop: 10,
+    textAlign: "center",
+  },
+
   footerRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     gap: 12,
-    marginTop: 20,
+    marginTop: 22,
   },
   button: {
     flex: 1,

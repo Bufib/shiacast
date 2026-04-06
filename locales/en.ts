@@ -13,7 +13,7 @@ const en = {
   newNewsAvailable: "New news available!",
 
   // Podcasts
-  podcastsTitle: "Podcast",
+  podcastsTitle: "Podcasts",
   listen: "LISTEN",
   download: "Download",
   downloading: "Downloading",

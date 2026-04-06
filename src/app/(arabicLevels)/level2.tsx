@@ -51,7 +51,7 @@ export default function Level1_1() {
                   },
                 ]}
               >
-                Buchstabenformen im Wort
+                Buchstabenformen in einem Wort
               </Text>
             </View>
 

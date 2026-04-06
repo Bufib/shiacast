@@ -55,11 +55,11 @@ export default function TopNavigationKnowledge() {
       //   title: "",
       //   icon: require("@/assets/images/prayersHeaderLogo.png"),
       // },
-      {
-        key: "calendarScreen",
-        title: "",
-        icon: require("@/assets/images/calendarHeaderLogo.png"),
-      },
+      // {
+      //   key: "calendarScreen",
+      //   title: "",
+      //   icon: require("@/assets/images/calendarHeaderLogo.png"),
+      // },
       {
         key: "videoScreen",
         title: "",

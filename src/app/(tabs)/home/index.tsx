@@ -1182,6 +1182,7 @@ export default function HomeScreen() {
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.newsHorizontalList}
+                style={{}}
               >
                 {allNews.map((item) => (
                   <NewsItem
@@ -1533,6 +1534,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 12,
     paddingHorizontal: 16,
+    marginBottom: 5,
   },
   horizontalListContent: {
     gap: 12,

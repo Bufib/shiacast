@@ -12,7 +12,7 @@ const de = {
   newNewsAvailable: "Neue Neuigkeiten verfügbar!",
 
   // Podcasts
-  podcastsTitle: "Podcast",
+  podcastsTitle: "Podcasts",
   podcastScreenTitle: "Podcasts",
   listen: "HÖREN",
   download: "Herunterladen",
