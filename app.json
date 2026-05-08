@@ -67,8 +67,7 @@
       ],
       "@react-native-community/datetimepicker",
       "expo-image",
-      "expo-asset",
-      "react-native-enriched-markdown"
+      "expo-asset"
     ],
     "experiments": {
       "typedRoutes": true,
