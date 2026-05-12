@@ -260,30 +260,41 @@ export default function PodcastPlayer({ podcast }: PodcastPlayerPropsType) {
     },
   });
 
-  const handleStream = () => {
-    setPlayerError(null);
-    if (!podcast?.filename) {
-      setPlayerError("Audio path missing.");
-      return;
-    }
-    const remote = remoteUrlFor(podcast.filename);
+ const handleStream = async () => {
+  setPlayerError(null);
+
+  if (!podcast?.filename) {
+    setPlayerError("Audio path missing.");
+    return;
+  }
+
+  try {
+    setIsStreamLoading(true);
+    setIsStream(true);
+
+    const remote = await remoteUrlFor(podcast.filename);
+
     if (!remote) {
       setPlayerError("Cannot create stream URL.");
       return;
     }
-    setIsStreamLoading(true);
-    setIsStream(true);
-    load(toSource(remote), {
+
+    await load(toSource(remote), {
       autoplay: true,
       title: podcast.title,
       artwork: artworkUri,
       podcastId: podcast.id,
       filename: podcast.filename,
       rate,
-    })
-      .catch((e) => setPlayerError(e?.message ?? "Player error"))
-      .finally(() => setIsStreamLoading(false));
-  };
+    });
+  } catch (e: any) {
+    console.log("[stream error]", e);
+    setPlayerError(e?.message ?? "Player error");
+    setIsStream(false);
+  } finally {
+    setIsStreamLoading(false);
+  }
+};
 
   const handleDownload = async () => {
     pause();
