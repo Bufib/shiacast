@@ -1,85 +1,19 @@
-// // src/components/PodcastPreviewCard.tsx
-// import { StyleSheet, Text } from "react-native";
-// import React from "react";
-// import { LinearGradient } from "expo-linear-gradient";
-// import { useGradient } from "../hooks/useGradient";
-// import { PodcastType } from "@/constants/Types";
-// import { useLanguage } from "@/contexts/LanguageContext";
-// import { PodcastProps } from "@/constants/Types";
-// import { formatDate } from "@/utils/formatDate";
-
-// export const PodcastPreviewCard: React.FC<PodcastProps> = ({ podcast }) => {
-//   const { gradientColors } = useGradient();
-//   const { language, isArabic } = useLanguage();
-//   const formatedDate = formatDate(podcast.created_at);
-
-//   return (
-//     <LinearGradient
-//       style={styles.container}
-//       colors={gradientColors}
-//       start={{ x: 0, y: 0 }}
-//       end={{ x: 1, y: 1 }}
-//     >
-//       <Text
-//         style={[
-//           styles.title,
-//           { textAlign: language === "ar" ? "right" : "left" },
-//         ]}
-//         numberOfLines={2}
-//         ellipsizeMode="tail"
-//       >
-//         {podcast.title}
-//       </Text>
-//       <Text
-//         style={[styles.createdAt, { textAlign: isArabic() ? "left" : "right" }]}
-//         numberOfLines={2}
-//         ellipsizeMode="tail"
-//       >
-//         {formatedDate}
-//       </Text>
-//     </LinearGradient>
-//   );
-// };
-
-// const styles = StyleSheet.create({
-//   container: {
-//     justifyContent: "space-between",
-//     gap: 20,
-//     height: 250,
-//     width: 200,
-//     padding: 15,
-//     borderWidth: 1,
-//     borderRadius: 15,
-//   },
-//   title: {
-//     fontSize: 20,
-//   },
-//   createdAt: {},
-// });
-
 import type { PodcastProps } from "@/constants/Types";
 import { useLanguage } from "../../contexts/LanguageContext";
-import { useGradient } from "../../hooks/useGradient";
-import { formatDate } from "../../utils/formatDate";
 import Feather from "@expo/vector-icons/Feather";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { FC } from "react";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, Text, View } from "react-native";
+import { formatDate } from "../../utils/formatDate";
+import { useGradient } from "@/hooks/useGradient";
 
 const PodcastPreviewCard: FC<PodcastProps> = ({ podcast }) => {
   const { gradientColors } = useGradient();
   const { rtl, lang } = useLanguage();
   const formattedDate = formatDate(podcast.created_at);
   const { t } = useTranslation();
-  // const soundBars = useMemo(
-  //   () =>
-  //     Array.from({ length: 8 }).map(() => ({
-  //       height: Math.random() * 20 + 10,
-  //       opacity: 0.1 + Math.random() * 0.1,
-  //     })),
-  //   []
-  // );
+
 
   return (
     <View style={styles.container}>
@@ -91,7 +25,7 @@ const PodcastPreviewCard: FC<PodcastProps> = ({ podcast }) => {
       >
         {/* Vinyl record inspired circle */}
         <View style={styles.vinylRecord}>
-            <Feather name="mic" size={20} color="rgba(255, 255, 255, 0.8)" />
+          <Feather name="mic" size={20} color="rgba(255, 255, 255, 0.8)" />
         </View>
 
         {/* Overlay */}
@@ -237,4 +171,3 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
   },
 });
-

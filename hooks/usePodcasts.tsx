@@ -7,7 +7,7 @@ import {
   useMutation,
   useQueryClient,
 } from "@tanstack/react-query";
-import * as FileSystem from "expo-file-system/legacy";
+import * as FileSystem from "../node_modules/expo-file-system/build/legacy";
 import { useCallback, useEffect } from "react";
 
 // --- CONFIGURATION ---
@@ -16,7 +16,7 @@ const CACHE_MAX_AGE_DAYS = 7;
 const CACHE_MAX_FILES = 20;
 
 // --- STORAGE CONFIG ---
-const STORAGE_BUCKET = "sounds/podcasts";
+const STORAGE_BUCKET = "podcasts";
 const USE_SIGNED_URLS = false;
 
 // --- URL HELPERS ---

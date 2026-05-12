@@ -29,24 +29,6 @@ export default function TabLayout() {
         />
       </NativeTabs.Trigger>
 
-      <NativeTabs.Trigger name="knowledge" disableTransparentOnScrollEdge>
-        <NativeTabs.Trigger.Label>{t("knowledge")}</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon
-          sf="book"
-          md="menu_book"
-          renderingMode="template"
-        />
-      </NativeTabs.Trigger>
-
-      <NativeTabs.Trigger name="search" disableTransparentOnScrollEdge>
-        <NativeTabs.Trigger.Label>{t("search")}</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon
-          sf="magnifyingglass"
-          md="search"
-          renderingMode="template"
-        />
-      </NativeTabs.Trigger>
-
       <NativeTabs.Trigger name="favorites" disableTransparentOnScrollEdge>
         <NativeTabs.Trigger.Label>{t("favorites")}</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon sf="star" md="star" renderingMode="template" />

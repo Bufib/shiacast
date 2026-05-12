@@ -1,7 +1,7 @@
 // src/utils/handleOpenExternalUrl.ts
 import { Linking } from "react-native";
 import Toast from "react-native-toast-message";
-import i18n from "../utils/i18n";
+import i18n from "./i18n";
 
 const handleOpenExternalUrl = async (url: string) => {
   if (!url) return;

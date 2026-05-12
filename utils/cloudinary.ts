@@ -1,4 +1,4 @@
-import { Cloudinary } from "@cloudinary/url-gen";
+import { Cloudinary } from "@cloudinary/url-gen/index";
 
 export const CLOUD_NAME = "dcl4xe1vw";
 export const cld = new Cloudinary({

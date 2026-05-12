@@ -105,7 +105,7 @@
 
 import React, { useCallback, useState, useRef, useEffect } from "react";
 import { Alert, StyleSheet, Text, TouchableOpacity } from "react-native";
-import * as FileSystem from "expo-file-system/legacy";
+import * as FileSystem from "../../node_modules/expo-file-system/build/legacy";
 import { useTranslation } from "react-i18next";
 import { useQueryClient } from "@tanstack/react-query";
 import AsyncStorage from "@react-native-async-storage/async-storage";

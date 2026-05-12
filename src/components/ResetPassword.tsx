@@ -13,7 +13,7 @@ import {
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
 } from "react-native";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller } from "../../node_modules/react-hook-form/dist";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Feather from "@expo/vector-icons/Feather";

@@ -148,7 +148,7 @@
 // Authstore
 import { create } from "zustand";
 import { supabase } from "../utils/supabase";
-import { Session } from "@supabase/supabase-js";
+import { Session } from "@supabase/supabase-js/dist/common.js";
 
 type AuthStore = {
   session: Session | null;
