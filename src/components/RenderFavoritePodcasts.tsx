@@ -128,7 +128,15 @@ export default function RenderFavoritePodcasts() {
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={["top"]}>
+    <SafeAreaView
+      style={[
+        styles.container,
+        {
+          backgroundColor: Colors[colorScheme].background,
+        },
+      ]}
+      edges={["top"]}
+    >
       <FlatList
         data={favoriteEpisodes}
         // extraData={listExtraData}

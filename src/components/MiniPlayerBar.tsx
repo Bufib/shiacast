@@ -398,15 +398,7 @@ export default function MiniPlayerBar({ bottomOffset = 50 }: Props) {
 
               <TouchableOpacity
                 onPress={() => {
-                  // Stop playback
-                  stopAndKeepSource();
-                  // Disable global auto-advance until a new Quran session starts
-                  useGlobalPlayer.setState({
-                    _quranNext: undefined,
-                    _quranPrev: undefined,
-                  } as any);
-                  // Optional: hide the bar (you already use this flag in `hidden`)
-                  useGlobalPlayer.setState({ stoppedByUser: true });
+                  void stopAndKeepSource();
                 }}
                 style={styles.iconBtn}
                 hitSlop={10}

@@ -31,7 +31,7 @@ export default function TabLayout() {
 
       <NativeTabs.Trigger name="favorites" disableTransparentOnScrollEdge>
         <NativeTabs.Trigger.Label>{t("favorites")}</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon sf="star" md="star" renderingMode="template" />
+        <NativeTabs.Trigger.Icon sf="heart" md="heart_smile" renderingMode="template" />
       </NativeTabs.Trigger>
 
       <NativeTabs.Trigger name="settings" disableTransparentOnScrollEdge>

@@ -1,45 +1,61 @@
-// // /player/useGlobalPlayer.ts
-// import { create } from "zustand";
 // import {
-//   createVideoPlayer,
-//   type VideoPlayer,
-//   type VideoSource,
-// } from "expo-video";
+//   createAudioPlayer,
+//   type AudioMetadata,
+//   type AudioPlayer,
+//   type AudioSource,
+// } from "expo-audio";
+// import { create } from "zustand";
 
-// const PLAYER_KEY = Symbol.for("app/globalVideoPlayer");
+// const PLAYER_KEY = Symbol.for("app/globalPodcastAudioPlayer");
+// const LOCK_SCREEN_OPTIONS: Parameters<
+//   AudioPlayer["setActiveForLockScreen"]
+// >[2] = {
+//   showSeekBackward: true,
+//   showSeekForward: true,
+// };
 
-// function getOrCreatePlayer(): VideoPlayer {
-//   const g = globalThis as any;
-//   if (!g[PLAYER_KEY]) {
-//     const p = createVideoPlayer(null);
-//     p.staysActiveInBackground = true;
-//     p.showNowPlayingNotification = true;
-//     p.audioMixingMode = "auto"; // "mixWithOthers" | "duckOthers" | "auto" | "doNotMix"
-//     p.timeUpdateEventInterval = 0.5; // seconds
-//     g[PLAYER_KEY] = p;
-//   }
-//   return g[PLAYER_KEY] as VideoPlayer;
-// }
+// type GlobalAudioObject = typeof globalThis &
+//   Record<symbol, AudioPlayer | undefined>;
 
-// export const globalPlayer = getOrCreatePlayer();
+// type LegacySourceObject = {
+//   uri?: string;
+//   assetId?: number;
+//   headers?: Record<string, string>;
+//   name?: string;
+//   metadata?: {
+//     title?: string;
+//     artist?: string;
+//     artwork?: string;
+//   };
+// };
 
-// // Keep "stopped" in the union for backwards compat, but we won't set it on keepSource
-// type PlayerStatus =
+// export type GlobalPlayerSource = AudioSource | LegacySourceObject;
+
+// export type PlayerStatus =
 //   | "idle"
-//   | "playing"
 //   | "loading"
 //   | "ready"
+//   | "playing"
 //   | "error"
 //   | "stopped";
 
+// type LoadOptions = {
+//   autoplay?: boolean;
+//   title?: string;
+//   artist?: string;
+//   albumTitle?: string;
+//   artwork?: string;
+//   podcastId?: string | number;
+//   filename?: string;
+//   rate?: number;
+// };
+
 // type PlayerState = {
-//   // playback mirrors
 //   isPlaying: boolean;
 //   position: number;
 //   duration: number;
 //   rate: number;
 
-//   // loaded media
 //   currentKey?: string;
 //   currentUri?: string;
 //   title?: string;
@@ -47,32 +63,11 @@
 //   podcastId?: string | number;
 //   filename?: string;
 
-//   // ui/flow
 //   status: PlayerStatus;
 //   error?: string | null;
 //   stoppedByUser: boolean;
 
-//   // Quran handlers (refs to avoid stale closure leaks)
-//   _quranNextRef: { current?: () => void | Promise<void> };
-//   _quranPrevRef: { current?: () => void | Promise<void> };
-//   _setQuranHandlers: (
-//     next?: () => void | Promise<void>,
-//     prev?: () => void | Promise<void>,
-//   ) => void;
-//   _clearQuranHandlers: () => void;
-
-//   // actions
-//   load: (
-//     src: VideoSource | null,
-//     opts?: {
-//       autoplay?: boolean;
-//       title?: string;
-//       artwork?: string;
-//       podcastId?: string | number;
-//       filename?: string;
-//       rate?: number;
-//     },
-//   ) => Promise<void>;
+//   load: (src: GlobalPlayerSource | null, opts?: LoadOptions) => Promise<void>;
 //   play: () => void;
 //   pause: () => void;
 //   toggle: () => void;
@@ -82,210 +77,384 @@
 //   stopAndKeepSource: () => Promise<void>;
 //   stopAndUnload: () => Promise<void>;
 
-//   // event-bridge setters
-//   _setPlaying: (b: boolean) => void;
-//   _setTime: (pos: number, dur?: number) => void;
-//   _setStatus: (s: PlayerStatus, error?: string | null) => void;
+//   _setPlaying: (isPlaying: boolean) => void;
+//   _setTime: (position: number, duration?: number) => void;
+//   _setStatus: (status: PlayerStatus, error?: string | null) => void;
 // };
 
-// function getSourceKey(src: VideoSource | null | undefined) {
-//   if (src == null) return "unknown";
-//   if (typeof src === "string") return src;
-//   if (typeof src === "number") return `asset:${src}`;
-//   if (
-//     typeof src === "object" &&
-//     "uri" in src &&
-//     typeof (src as any).uri === "string"
-//   ) {
-//     return (src as any).uri as string;
+// function getOrCreatePlayer(): AudioPlayer {
+//   const globalObject = globalThis as GlobalAudioObject;
+//   const existingPlayer = globalObject[PLAYER_KEY];
+
+//   if (existingPlayer) {
+//     return existingPlayer;
 //   }
-//   if (
-//     typeof src === "object" &&
-//     "assetId" in src &&
-//     typeof (src as any).assetId === "number"
-//   ) {
-//     return `asset:${(src as any).assetId}`;
+
+//   const player = createAudioPlayer(null);
+//   globalObject[PLAYER_KEY] = player;
+//   return player;
+// }
+
+// export const globalPlayer = getOrCreatePlayer();
+
+// function getErrorMessage(error: unknown): string {
+//   if (error instanceof Error) {
+//     return error.message;
 //   }
+
+//   if (typeof error === "string") {
+//     return error;
+//   }
+
+//   return "Podcast player error";
+// }
+
+// function reportPlayerError(error: unknown) {
+//   if (__DEV__) {
+//     console.warn("[globalPodcastAudioPlayer]", getErrorMessage(error));
+//   }
+// }
+
+// function isObjectSource(
+//   src: GlobalPlayerSource | null | undefined,
+// ): src is LegacySourceObject {
+//   return typeof src === "object" && src !== null;
+// }
+
+// function toAudioSource(src: GlobalPlayerSource | null): AudioSource {
+//   if (!isObjectSource(src)) {
+//     return src;
+//   }
+
+//   return {
+//     uri: src.uri,
+//     assetId: src.assetId,
+//     headers: src.headers,
+//     name: src.name,
+//   };
+// }
+
+// function getSourceKey(src: GlobalPlayerSource | null | undefined): string {
+//   if (src == null) {
+//     return "unknown";
+//   }
+
+//   if (typeof src === "string") {
+//     return src;
+//   }
+
+//   if (typeof src === "number") {
+//     return `asset:${src}`;
+//   }
+
+//   if (typeof src.uri === "string" && src.uri.length > 0) {
+//     return src.uri;
+//   }
+
+//   if (typeof src.assetId === "number") {
+//     return `asset:${src.assetId}`;
+//   }
+
 //   return "unknown";
+// }
+
+// function getSourceUri(src: GlobalPlayerSource | null | undefined) {
+//   if (typeof src === "string") {
+//     return src;
+//   }
+
+//   if (isObjectSource(src) && typeof src.uri === "string") {
+//     return src.uri;
+//   }
+
+//   return undefined;
+// }
+
+// function getMetadata(
+//   state: Pick<PlayerState, "title" | "artwork">,
+//   opts?: LoadOptions,
+// ): AudioMetadata {
+//   return {
+//     title: opts?.title ?? state.title ?? "Podcast",
+//     artist: opts?.artist ?? "Podcast",
+//     albumTitle: opts?.albumTitle ?? "Podcast",
+//     artworkUrl: opts?.artwork ?? state.artwork,
+//   };
+// }
+
+// function activateLockScreen(
+//   player: AudioPlayer,
+//   state: Pick<PlayerState, "title" | "artwork" | "currentKey" | "currentUri">,
+//   opts?: LoadOptions,
+// ) {
+//   if (!state.currentKey && !state.currentUri && !opts?.title) {
+//     return;
+//   }
+
+//   try {
+//     player.setActiveForLockScreen(
+//       true,
+//       getMetadata(state, opts),
+//       LOCK_SCREEN_OPTIONS,
+//     );
+//   } catch (error) {
+//     reportPlayerError(error);
+//   }
+// }
+
+// function updateLockScreenMetadata(
+//   player: AudioPlayer,
+//   state: Pick<PlayerState, "title" | "artwork">,
+//   opts?: LoadOptions,
+// ) {
+//   try {
+//     player.updateLockScreenMetadata(getMetadata(state, opts));
+//   } catch (error) {
+//     reportPlayerError(error);
+//   }
+// }
+
+// function clearLockScreenControls(player: AudioPlayer) {
+//   try {
+//     player.clearLockScreenControls();
+//   } catch (error) {
+//     reportPlayerError(error);
+//   }
+// }
+
+// function runPlayerCommand(command: () => void, onError: (message: string) => void) {
+//   try {
+//     command();
+//     return true;
+//   } catch (error) {
+//     const message = getErrorMessage(error);
+//     reportPlayerError(error);
+//     onError(message);
+//     return false;
+//   }
+// }
+
+// async function runPlayerAsyncCommand(
+//   command: () => Promise<void>,
+//   onError: (message: string) => void,
+// ) {
+//   try {
+//     await command();
+//     return true;
+//   } catch (error) {
+//     const message = getErrorMessage(error);
+//     reportPlayerError(error);
+//     onError(message);
+//     return false;
+//   }
 // }
 
 // export const useGlobalPlayer = create<PlayerState>((set, get) => ({
 //   isPlaying: false,
 //   position: 0,
 //   duration: 0,
-//   rate: 1.0,
+//   rate: 1,
+
+//   currentKey: undefined,
+//   currentUri: undefined,
+//   title: undefined,
+//   artwork: undefined,
+//   podcastId: undefined,
+//   filename: undefined,
 
 //   status: "idle",
 //   error: null,
 //   stoppedByUser: false,
 
-//   _quranNextRef: { current: undefined },
-//   _quranPrevRef: { current: undefined },
-//   _setQuranHandlers: (next, prev) => {
-//     const s = get();
-//     s._quranNextRef.current = next;
-//     s._quranPrevRef.current = prev;
-//   },
-//   _clearQuranHandlers: () => {
-//     const s = get();
-//     s._quranNextRef.current = undefined;
-//     s._quranPrevRef.current = undefined;
-//   },
-
 //   load: async (src, opts) => {
-//     const p = globalPlayer;
-//     const {
-//       autoplay = false,
-//       title,
-//       artwork,
-//       podcastId,
-//       filename,
-//       rate,
-//     } = opts ?? {};
+//     if (src === null) {
+//       await get().stopAndUnload();
+//       return;
+//     }
+
+//     const player = globalPlayer;
+//     const nextKey = getSourceKey(src);
+//     const nextUri = getSourceUri(src);
+//     const source = toAudioSource(src);
+//     const currentState = get();
+//     const sourceTitle = isObjectSource(src) ? src.metadata?.title : undefined;
+//     const sourceArtwork = isObjectSource(src)
+//       ? src.metadata?.artwork
+//       : undefined;
+//     const requestedRate = opts?.rate;
+//     const nextRate =
+//       typeof requestedRate === "number" ? requestedRate : currentState.rate;
+//     const isSameSource =
+//       currentState.currentKey === nextKey &&
+//       currentState.status !== "idle" &&
+//       currentState.status !== "error";
 
 //     set({ status: "loading", error: null });
 
-//     try {
-//       const nextKey = getSourceKey(src);
+//     if (!isSameSource) {
+//       const replaced = runPlayerCommand(
+//         () => player.replace(source),
+//         (message) => set({ status: "error", error: message, isPlaying: false }),
+//       );
 
-//       // Avoid reloading if same source already ready
-//       if (get().currentKey === nextKey && get().status === "ready") {
-//         // still update metadata (lock screen / UI)
-//         set({
-//           title: title ?? get().title,
-//           artwork: artwork ?? get().artwork,
-//           podcastId,
-//           filename,
-//         });
-
-//         if (typeof rate === "number") {
-//           try {
-//             p.playbackRate = rate;
-//           } catch {}
-//           set({ rate });
-//         }
-
-//         if (autoplay) {
-//           set({ stoppedByUser: false, isPlaying: true, status: "playing" });
-//           try {
-//             p.play();
-//           } catch {}
-//         } else {
-//           try {
-//             p.pause();
-//           } catch {}
-//           set({ isPlaying: false, status: "ready" });
-//         }
+//       if (!replaced) {
 //         return;
 //       }
+//     }
 
-//       // Replace source
-//       if (typeof (p as any).replaceAsync === "function") {
-//         await (p as any).replaceAsync(src);
-//       } else {
-//         (p as any).replace?.(src);
+//     const nextState = {
+//       currentKey: nextKey,
+//       currentUri: nextUri,
+//       title:
+//         opts?.title ??
+//         sourceTitle ??
+//         (isSameSource ? currentState.title : undefined),
+//       artwork:
+//         opts?.artwork ??
+//         sourceArtwork ??
+//         (isSameSource ? currentState.artwork : undefined),
+//       podcastId:
+//         opts?.podcastId ?? (isSameSource ? currentState.podcastId : undefined),
+//       filename:
+//         opts?.filename ?? (isSameSource ? currentState.filename : undefined),
+//       rate: nextRate,
+//       position: isSameSource ? currentState.position : 0,
+//       duration: isSameSource ? currentState.duration : 0,
+//       stoppedByUser: false,
+//       status: "ready" as PlayerStatus,
+//       error: null,
+//     };
+
+//     set(nextState);
+
+//     if (typeof requestedRate === "number") {
+//       runPlayerCommand(
+//         () => player.setPlaybackRate(requestedRate),
+//         (message) => set({ status: "error", error: message }),
+//       );
+//     }
+
+//     if (opts?.autoplay) {
+//       activateLockScreen(player, nextState, opts);
+
+//       const played = runPlayerCommand(
+//         () => player.play(),
+//         (message) => set({ status: "error", error: message, isPlaying: false }),
+//       );
+
+//       if (played) {
+//         set({
+//           isPlaying: true,
+//           status: "playing",
+//           stoppedByUser: false,
+//         });
 //       }
-
-//       // Update metadata (keep source loaded, NOT stopped)
-//       set({
-//         currentKey: nextKey,
-//         currentUri:
-//           typeof src === "string"
-//             ? src
-//             : typeof src === "object" && src && "uri" in src
-//               ? (src as any).uri
-//               : undefined,
-//         title: title ?? get().title,
-//         artwork: artwork ?? get().artwork,
-//         podcastId,
-//         filename,
-//         rate: typeof rate === "number" ? rate : get().rate,
-//         stoppedByUser: false,
-//         status: "ready",
-//         error: null,
-//       });
-
-//       if (typeof rate === "number") {
-//         try {
-//           p.playbackRate = rate;
-//         } catch {}
-//       }
-
-//       if (autoplay) {
-//         try {
-//           p.play();
-//         } catch {}
-//         set({ isPlaying: true, status: "playing", stoppedByUser: false });
-//       } else {
-//         try {
-//           p.pause();
-//         } catch {}
-//         set({ isPlaying: false, status: "ready" });
-//       }
-//     } catch (e: any) {
-//       set({ status: "error", error: e?.message ?? "Player error" });
+//     } else {
+//       runPlayerCommand(
+//         () => player.pause(),
+//         (message) => set({ status: "error", error: message }),
+//       );
+//       updateLockScreenMetadata(player, nextState, opts);
+//       set({ isPlaying: false, status: "ready" });
 //     }
 //   },
 
 //   play: () => {
-//     const p = globalPlayer;
-//     try {
-//       p.play();
-//     } catch {}
-//     set({ isPlaying: true, status: "playing", stoppedByUser: false });
+//     const player = globalPlayer;
+//     const state = get();
+
+//     activateLockScreen(player, state);
+
+//     const played = runPlayerCommand(
+//       () => player.play(),
+//       (message) => set({ status: "error", error: message, isPlaying: false }),
+//     );
+
+//     if (played) {
+//       set({
+//         isPlaying: true,
+//         status: "playing",
+//         stoppedByUser: false,
+//         error: null,
+//       });
+//     }
 //   },
 
 //   pause: () => {
-//     const p = globalPlayer;
-//     try {
-//       p.pause();
-//     } catch {}
-//     set({ isPlaying: false, status: "ready" });
+//     const paused = runPlayerCommand(
+//       () => globalPlayer.pause(),
+//       (message) => set({ status: "error", error: message }),
+//     );
+
+//     if (paused) {
+//       set({
+//         isPlaying: false,
+//         status: "ready",
+//       });
+//     }
 //   },
 
 //   toggle: () => {
-//     const { isPlaying } = get();
-//     if (isPlaying) get().pause();
-//     else get().play();
+//     if (get().isPlaying) {
+//       get().pause();
+//     } else {
+//       get().play();
+//     }
 //   },
 
-//   seekBy: (delta) => {
-//     const p = globalPlayer;
-//     try {
-//       if (typeof (p as any).seekBy === "function") {
-//         (p as any).seekBy(delta);
-//       } else {
-//         p.currentTime = Math.max(0, (p.currentTime || 0) + delta);
-//       }
-//     } catch {}
+//   seekBy: (deltaSeconds) => {
+//     const state = get();
+//     const nextPosition = Math.max(0, state.position + deltaSeconds);
+
+//     void runPlayerAsyncCommand(
+//       () => globalPlayer.seekTo(nextPosition),
+//       (message) => set({ status: "error", error: message }),
+//     );
+
+//     set({ position: nextPosition });
 //   },
 
 //   setPosition: (seconds) => {
-//     const p = globalPlayer;
-//     const safe = Math.max(0, seconds || 0);
-//     try {
-//       p.currentTime = safe;
-//     } catch {}
-//     set({ position: safe });
+//     const safePosition = Math.max(0, seconds || 0);
+
+//     void runPlayerAsyncCommand(
+//       () => globalPlayer.seekTo(safePosition),
+//       (message) => set({ status: "error", error: message }),
+//     );
+
+//     set({ position: safePosition });
 //   },
 
-//   setRate: (r) => {
-//     const p = globalPlayer;
-//     try {
-//       p.playbackRate = r;
-//     } catch {}
-//     set({ rate: r });
+//   setRate: (rate) => {
+//     const changed = runPlayerCommand(
+//       () => globalPlayer.setPlaybackRate(rate),
+//       (message) => set({ status: "error", error: message }),
+//     );
+
+//     if (changed) {
+//       set({ rate });
+//     }
 //   },
 
-//   // Keep source & controls; reset to 0; hide Mini via stoppedByUser
 //   stopAndKeepSource: async () => {
-//     const p = globalPlayer;
-//     try {
-//       p.pause();
-//     } catch {}
-//     try {
-//       p.currentTime = 0;
-//     } catch {}
+//     const player = globalPlayer;
+
+//     const paused = runPlayerCommand(
+//       () => player.pause(),
+//       (message) => set({ status: "error", error: message }),
+//     );
+
+//     if (!paused) {
+//       return;
+//     }
+
+//     await runPlayerAsyncCommand(
+//       () => player.seekTo(0),
+//       (message) => set({ status: "error", error: message }),
+//     );
+
+//     clearLockScreenControls(player);
+
 //     set({
 //       isPlaying: false,
 //       position: 0,
@@ -294,22 +463,25 @@
 //     });
 //   },
 
-//   // Fully unload and hide Mini
 //   stopAndUnload: async () => {
-//     const p = globalPlayer;
-//     try {
-//       p.pause();
-//     } catch {}
-//     try {
-//       if (typeof (p as any).replaceAsync === "function") {
-//         await (p as any).replaceAsync(null);
-//       } else {
-//         (p as any).replace?.(null);
-//       }
-//     } catch {}
-//     try {
-//       p.currentTime = 0;
-//     } catch {}
+//     const player = globalPlayer;
+
+//     runPlayerCommand(
+//       () => player.pause(),
+//       (message) => set({ status: "error", error: message }),
+//     );
+
+//     clearLockScreenControls(player);
+
+//     const unloaded = runPlayerCommand(
+//       () => player.replace(null),
+//       (message) => set({ status: "error", error: message }),
+//     );
+
+//     if (!unloaded) {
+//       return;
+//     }
+
 //     set({
 //       isPlaying: false,
 //       position: 0,
@@ -320,51 +492,95 @@
 //       artwork: undefined,
 //       podcastId: undefined,
 //       filename: undefined,
-//       stoppedByUser: true,
 //       status: "idle",
+//       error: null,
+//       stoppedByUser: true,
 //     });
 //   },
 
-//   _setPlaying: (b) => set({ isPlaying: b, status: b ? "playing" : "ready" }),
-//   _setTime: (pos, dur) => {
-//     const next: Partial<PlayerState> = {
-//       position: typeof pos === "number" ? pos : 0,
-//     };
-//     if (typeof dur === "number" && dur > 0) next.duration = dur;
-//     set(next as any);
+//   _setPlaying: (isPlaying) => {
+//     set((state) => ({
+//       isPlaying,
+//       status: isPlaying ? "playing" : state.currentKey ? "ready" : "idle",
+//     }));
 //   },
-//   _setStatus: (s, error) => set({ status: s, error: error ?? null }),
+
+//   _setTime: (position, duration) => {
+//     const safePosition =
+//       Number.isFinite(position) && position > 0 ? position : 0;
+//     const nextState: Partial<PlayerState> = {
+//       position: safePosition,
+//     };
+
+//     if (typeof duration === "number" && Number.isFinite(duration)) {
+//       nextState.duration = Math.max(0, duration);
+//     }
+
+//     set(nextState);
+//   },
+
+//   _setStatus: (status, error) => {
+//     set({
+//       status,
+//       error: error ?? null,
+//     });
+//   },
 // }));
 
-import { create } from "zustand";
+
+
 import {
-  createVideoPlayer,
-  type VideoPlayer,
-  type VideoSource,
-} from "expo-video";
+  createAudioPlayer,
+  type AudioMetadata,
+  type AudioPlayer,
+  type AudioSource,
+} from "expo-audio";
+import { create } from "zustand";
 
-const PLAYER_KEY = Symbol.for("app/globalPodcastPlayer");
+const PLAYER_KEY = Symbol.for("app/globalPodcastAudioPlayer");
 
-function getOrCreatePlayer(): VideoPlayer {
-  const globalObject = globalThis as any;
+const LOCK_SCREEN_OPTIONS: Parameters<
+  AudioPlayer["setActiveForLockScreen"]
+>[2] = {
+  showSeekBackward: true,
+  showSeekForward: true,
+};
 
-  if (!globalObject[PLAYER_KEY]) {
-    const player = createVideoPlayer(null);
+type GlobalAudioObject = typeof globalThis &
+  Record<symbol, AudioPlayer | undefined>;
 
-    player.staysActiveInBackground = true;
-    player.showNowPlayingNotification = true;
-    player.audioMixingMode = "auto";
-    player.timeUpdateEventInterval = 0.5;
+type LegacySourceObject = {
+  uri?: string;
+  assetId?: number;
+  headers?: Record<string, string>;
+  name?: string;
+  metadata?: {
+    title?: string;
+    artist?: string;
+    artwork?: string;
+  };
+};
 
-    globalObject[PLAYER_KEY] = player;
-  }
+export type GlobalPlayerSource = AudioSource | LegacySourceObject;
 
-  return globalObject[PLAYER_KEY] as VideoPlayer;
-}
+export type PlayerStatus =
+  | "idle"
+  | "loading"
+  | "ready"
+  | "playing"
+  | "error"
+  | "stopped";
 
-export const globalPlayer = getOrCreatePlayer();
-
-type PlayerStatus = "idle" | "loading" | "ready" | "playing" | "error";
+type LoadOptions = {
+  autoplay?: boolean;
+  title?: string;
+  artist?: string;
+  albumTitle?: string;
+  artwork?: string;
+  podcastId?: string | number;
+  filename?: string;
+  rate?: number;
+};
 
 type PlayerState = {
   isPlaying: boolean;
@@ -374,7 +590,6 @@ type PlayerState = {
 
   currentKey?: string;
   currentUri?: string;
-
   title?: string;
   artwork?: string;
   podcastId?: string | number;
@@ -384,26 +599,13 @@ type PlayerState = {
   error?: string | null;
   stoppedByUser: boolean;
 
-  load: (
-    src: VideoSource | null,
-    opts?: {
-      autoplay?: boolean;
-      title?: string;
-      artwork?: string;
-      podcastId?: string | number;
-      filename?: string;
-      rate?: number;
-    },
-  ) => Promise<void>;
-
+  load: (src: GlobalPlayerSource | null, opts?: LoadOptions) => Promise<void>;
   play: () => void;
   pause: () => void;
   toggle: () => void;
-
   seekBy: (deltaSeconds: number) => void;
   setPosition: (seconds: number) => void;
   setRate: (rate: number) => void;
-
   stopAndKeepSource: () => Promise<void>;
   stopAndUnload: () => Promise<void>;
 
@@ -412,36 +614,224 @@ type PlayerState = {
   _setStatus: (status: PlayerStatus, error?: string | null) => void;
 };
 
-function getSourceKey(src: VideoSource | null | undefined): string {
+function getOrCreatePlayer(): AudioPlayer {
+  const globalObject = globalThis as GlobalAudioObject;
+  const existingPlayer = globalObject[PLAYER_KEY];
+
+  if (existingPlayer) {
+    return existingPlayer;
+  }
+
+  const player = createAudioPlayer(null);
+  globalObject[PLAYER_KEY] = player;
+
+  return player;
+}
+
+export const globalPlayer = getOrCreatePlayer();
+
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  if (typeof error === "string") {
+    return error;
+  }
+
+  return "Podcast player error";
+}
+
+function reportPlayerError(error: unknown) {
+  if (__DEV__) {
+    console.warn("[globalPodcastAudioPlayer]", getErrorMessage(error));
+  }
+}
+
+function isObjectSource(
+  src: GlobalPlayerSource | null | undefined,
+): src is LegacySourceObject {
+  return typeof src === "object" && src !== null;
+}
+
+function toAudioSource(src: GlobalPlayerSource | null): AudioSource | null {
+  if (src === null || src === undefined) {
+    return null;
+  }
+
+  if (typeof src === "string") {
+    const uri = src.trim();
+    return uri.length > 0 ? uri : null;
+  }
+
+  if (typeof src === "number") {
+    return Number.isFinite(src) ? src : null;
+  }
+
+  if (!isObjectSource(src)) {
+    return null;
+  }
+
+  const uri =
+    typeof src.uri === "string" && src.uri.trim().length > 0
+      ? src.uri.trim()
+      : undefined;
+
+  const assetId = typeof src.assetId === "number" ? src.assetId : undefined;
+
+  if (!uri && assetId === undefined) {
+    return null;
+  }
+
+  const source: {
+    uri?: string;
+    assetId?: number;
+    headers?: Record<string, string>;
+    name?: string;
+  } = {};
+
+  if (uri) {
+    source.uri = uri;
+  }
+
+  if (assetId !== undefined) {
+    source.assetId = assetId;
+  }
+
+  if (src.headers) {
+    source.headers = src.headers;
+  }
+
+  if (src.name) {
+    source.name = src.name;
+  }
+
+  return source as AudioSource;
+}
+
+function getSourceKey(src: GlobalPlayerSource | null | undefined): string {
   if (src == null) {
     return "unknown";
   }
 
   if (typeof src === "string") {
-    return src;
+    const uri = src.trim();
+    return uri.length > 0 ? uri : "unknown";
   }
 
   if (typeof src === "number") {
     return `asset:${src}`;
   }
 
-  if (
-    typeof src === "object" &&
-    "uri" in src &&
-    typeof (src as any).uri === "string"
-  ) {
-    return (src as any).uri;
+  if (typeof src.uri === "string" && src.uri.trim().length > 0) {
+    return src.uri.trim();
   }
 
-  if (
-    typeof src === "object" &&
-    "assetId" in src &&
-    typeof (src as any).assetId === "number"
-  ) {
-    return `asset:${(src as any).assetId}`;
+  if (typeof src.assetId === "number") {
+    return `asset:${src.assetId}`;
   }
 
   return "unknown";
+}
+
+function getSourceUri(src: GlobalPlayerSource | null | undefined) {
+  if (typeof src === "string") {
+    const uri = src.trim();
+    return uri.length > 0 ? uri : undefined;
+  }
+
+  if (isObjectSource(src) && typeof src.uri === "string") {
+    const uri = src.uri.trim();
+    return uri.length > 0 ? uri : undefined;
+  }
+
+  return undefined;
+}
+
+function getMetadata(
+  state: Pick<PlayerState, "title" | "artwork">,
+  opts?: LoadOptions,
+): AudioMetadata {
+  return {
+    title: opts?.title ?? state.title ?? "Podcast",
+    artist: opts?.artist ?? "Podcast",
+    albumTitle: opts?.albumTitle ?? "Podcast",
+    artworkUrl: opts?.artwork ?? state.artwork,
+  };
+}
+
+function activateLockScreen(
+  player: AudioPlayer,
+  state: Pick<PlayerState, "title" | "artwork" | "currentKey" | "currentUri">,
+  opts?: LoadOptions,
+) {
+  if (!state.currentKey && !state.currentUri && !opts?.title) {
+    return;
+  }
+
+  try {
+    player.setActiveForLockScreen(
+      true,
+      getMetadata(state, opts),
+      LOCK_SCREEN_OPTIONS,
+    );
+  } catch (error) {
+    reportPlayerError(error);
+  }
+}
+
+function updateLockScreenMetadata(
+  player: AudioPlayer,
+  state: Pick<PlayerState, "title" | "artwork">,
+  opts?: LoadOptions,
+) {
+  try {
+    player.updateLockScreenMetadata(getMetadata(state, opts));
+  } catch (error) {
+    reportPlayerError(error);
+  }
+}
+
+function clearLockScreenControls(player: AudioPlayer) {
+  try {
+    player.clearLockScreenControls();
+  } catch (error) {
+    reportPlayerError(error);
+  }
+}
+
+function runPlayerCommand(
+  command: () => void,
+  onError: (message: string) => void,
+) {
+  try {
+    command();
+    return true;
+  } catch (error) {
+    const message = getErrorMessage(error);
+
+    reportPlayerError(error);
+    onError(message);
+
+    return false;
+  }
+}
+
+async function runPlayerAsyncCommand(
+  command: () => Promise<void>,
+  onError: (message: string) => void,
+) {
+  try {
+    await command();
+    return true;
+  } catch (error) {
+    const message = getErrorMessage(error);
+
+    reportPlayerError(error);
+    onError(message);
+
+    return false;
+  }
 }
 
 export const useGlobalPlayer = create<PlayerState>((set, get) => ({
@@ -452,7 +842,6 @@ export const useGlobalPlayer = create<PlayerState>((set, get) => ({
 
   currentKey: undefined,
   currentUri: undefined,
-
   title: undefined,
   artwork: undefined,
   podcastId: undefined,
@@ -463,154 +852,144 @@ export const useGlobalPlayer = create<PlayerState>((set, get) => ({
   stoppedByUser: false,
 
   load: async (src, opts) => {
-    const player = globalPlayer;
+    if (src === null) {
+      await get().stopAndUnload();
+      return;
+    }
 
-    const {
-      autoplay = false,
-      title,
-      artwork,
-      podcastId,
-      filename,
-      rate,
-    } = opts ?? {};
+    const player = globalPlayer;
+    const source = toAudioSource(src);
+
+    if (source === null) {
+      const message = "Invalid podcast audio source";
+
+      reportPlayerError(message);
+
+      set({
+        status: "error",
+        error: message,
+        isPlaying: false,
+      });
+
+      return;
+    }
+
+    const nextKey = getSourceKey(src);
+    const nextUri = getSourceUri(src);
+    const currentState = get();
+
+    const sourceTitle = isObjectSource(src) ? src.metadata?.title : undefined;
+    const sourceArtist = isObjectSource(src) ? src.metadata?.artist : undefined;
+    const sourceArtwork = isObjectSource(src)
+      ? src.metadata?.artwork
+      : undefined;
+
+    const requestedRate = opts?.rate;
+    const nextRate =
+      typeof requestedRate === "number" ? requestedRate : currentState.rate;
+
+    const isSameSource =
+      currentState.currentKey === nextKey &&
+      currentState.status !== "idle" &&
+      currentState.status !== "error";
 
     set({
       status: "loading",
       error: null,
     });
 
-    try {
-      const nextKey = getSourceKey(src);
-      const currentState = get();
-
-      const isSameSource =
-        currentState.currentKey === nextKey &&
-        currentState.status !== "idle" &&
-        currentState.status !== "error";
-
-      if (isSameSource) {
-        set({
-          title: title ?? currentState.title,
-          artwork: artwork ?? currentState.artwork,
-          podcastId: podcastId ?? currentState.podcastId,
-          filename: filename ?? currentState.filename,
-        });
-
-        if (typeof rate === "number") {
-          try {
-            player.playbackRate = rate;
-          } catch {}
-
-          set({ rate });
-        }
-
-        if (autoplay) {
-          try {
-            player.play();
-          } catch {}
-
+    if (!isSameSource) {
+      const replaced = runPlayerCommand(
+        () => player.replace(source),
+        (message) =>
           set({
-            isPlaying: true,
-            status: "playing",
-            stoppedByUser: false,
-          });
-        } else {
-          try {
-            player.pause();
-          } catch {}
-
-          set({
+            status: "error",
+            error: message,
             isPlaying: false,
-            status: "ready",
-          });
-        }
+          }),
+      );
 
+      if (!replaced) {
         return;
       }
+    }
 
-      if (typeof (player as any).replaceAsync === "function") {
-        await (player as any).replaceAsync(src);
-      } else {
-        (player as any).replace?.(src);
-      }
+    const nextState = {
+      currentKey: nextKey,
+      currentUri: nextUri,
+      title:
+        opts?.title ??
+        sourceTitle ??
+        (isSameSource ? currentState.title : undefined),
+      artwork:
+        opts?.artwork ??
+        sourceArtwork ??
+        (isSameSource ? currentState.artwork : undefined),
+      podcastId:
+        opts?.podcastId ?? (isSameSource ? currentState.podcastId : undefined),
+      filename:
+        opts?.filename ?? (isSameSource ? currentState.filename : undefined),
+      rate: nextRate,
+      position: isSameSource ? currentState.position : 0,
+      duration: isSameSource ? currentState.duration : 0,
+      stoppedByUser: false,
+      status: "ready" as PlayerStatus,
+      error: null,
+    };
 
-      const currentUri =
-        typeof src === "string"
-          ? src
-          : typeof src === "object" && src && "uri" in src
-            ? (src as any).uri
-            : undefined;
+    set(nextState);
 
-      set({
-        currentKey: nextKey,
-        currentUri,
-        title,
-        artwork,
-        podcastId,
-        filename,
-        rate: typeof rate === "number" ? rate : get().rate,
-        position: 0,
-        duration: 0,
-        stoppedByUser: false,
-        status: "ready",
-        error: null,
+    if (typeof requestedRate === "number") {
+      runPlayerCommand(
+        () => player.setPlaybackRate(requestedRate),
+        (message) =>
+          set({
+            status: "error",
+            error: message,
+          }),
+      );
+    }
+
+    if (opts?.autoplay) {
+      activateLockScreen(player, nextState, {
+        ...opts,
+        artist: opts.artist ?? sourceArtist,
       });
 
-      if (typeof rate === "number") {
-        try {
-          player.playbackRate = rate;
-        } catch {}
-      }
+      const played = runPlayerCommand(
+        () => player.play(),
+        (message) =>
+          set({
+            status: "error",
+            error: message,
+            isPlaying: false,
+          }),
+      );
 
-      if (autoplay) {
-        try {
-          player.play();
-        } catch {}
-
+      if (played) {
         set({
           isPlaying: true,
           status: "playing",
           stoppedByUser: false,
         });
-      } else {
-        try {
-          player.pause();
-        } catch {}
-
-        set({
-          isPlaying: false,
-          status: "ready",
-        });
       }
-    } catch (error: any) {
-      set({
-        isPlaying: false,
-        status: "error",
-        error: error?.message ?? "Podcast player error",
-      });
+
+      return;
     }
-  },
 
-  play: () => {
-    const player = globalPlayer;
+    runPlayerCommand(
+      () => player.pause(),
+      (message) =>
+        set({
+          status: "error",
+          error: message,
+        }),
+    );
 
-    try {
-      player.play();
-    } catch {}
-
-    set({
-      isPlaying: true,
-      status: "playing",
-      stoppedByUser: false,
+    updateLockScreenMetadata(player, nextState, {
+      ...opts,
+      artist: opts?.artist ?? sourceArtist,
     });
-  },
-
-  pause: () => {
-    const player = globalPlayer;
-
-    try {
-      player.pause();
-    } catch {}
 
     set({
       isPlaying: false,
@@ -618,71 +997,173 @@ export const useGlobalPlayer = create<PlayerState>((set, get) => ({
     });
   },
 
-  toggle: () => {
-    const { isPlaying } = get();
+  play: () => {
+    const player = globalPlayer;
+    const state = get();
 
-    if (isPlaying) {
-      get().pause();
-    } else {
-      get().play();
+    if (!state.currentKey) {
+      set({
+        isPlaying: false,
+        status: "idle",
+        error: null,
+      });
+
+      return;
+    }
+
+    activateLockScreen(player, state);
+
+    const played = runPlayerCommand(
+      () => player.play(),
+      (message) =>
+        set({
+          status: "error",
+          error: message,
+          isPlaying: false,
+        }),
+    );
+
+    if (played) {
+      set({
+        isPlaying: true,
+        status: "playing",
+        stoppedByUser: false,
+        error: null,
+      });
     }
   },
 
-  seekBy: (deltaSeconds) => {
-    const player = globalPlayer;
+  pause: () => {
+    const paused = runPlayerCommand(
+      () => globalPlayer.pause(),
+      (message) =>
+        set({
+          status: "error",
+          error: message,
+        }),
+    );
 
-    try {
-      if (typeof (player as any).seekBy === "function") {
-        (player as any).seekBy(deltaSeconds);
-      } else {
-        player.currentTime = Math.max(
-          0,
-          (player.currentTime || 0) + deltaSeconds,
-        );
-      }
-    } catch {}
+    if (paused) {
+      set({
+        isPlaying: false,
+        status: get().currentKey ? "ready" : "idle",
+      });
+    }
+  },
+
+  toggle: () => {
+    if (get().isPlaying) {
+      get().pause();
+      return;
+    }
+
+    get().play();
+  },
+
+  seekBy: (deltaSeconds) => {
+    const state = get();
+
+    if (!state.currentKey) {
+      return;
+    }
+
+    const maxDuration = state.duration > 0 ? state.duration : Number.MAX_SAFE_INTEGER;
+    const nextPosition = Math.min(
+      maxDuration,
+      Math.max(0, state.position + deltaSeconds),
+    );
+
+    void runPlayerAsyncCommand(
+      () => globalPlayer.seekTo(nextPosition),
+      (message) =>
+        set({
+          status: "error",
+          error: message,
+        }),
+    );
+
+    set({
+      position: nextPosition,
+    });
   },
 
   setPosition: (seconds) => {
-    const player = globalPlayer;
-    const safePosition = Math.max(0, seconds || 0);
+    const state = get();
 
-    try {
-      player.currentTime = safePosition;
-    } catch {}
+    if (!state.currentKey) {
+      return;
+    }
+
+    const safeSeconds = Number.isFinite(seconds) ? seconds : 0;
+    const maxDuration = state.duration > 0 ? state.duration : Number.MAX_SAFE_INTEGER;
+    const nextPosition = Math.min(maxDuration, Math.max(0, safeSeconds));
+
+    void runPlayerAsyncCommand(
+      () => globalPlayer.seekTo(nextPosition),
+      (message) =>
+        set({
+          status: "error",
+          error: message,
+        }),
+    );
 
     set({
-      position: safePosition,
+      position: nextPosition,
     });
   },
 
   setRate: (rate) => {
-    const player = globalPlayer;
+    if (!Number.isFinite(rate) || rate <= 0) {
+      return;
+    }
 
-    try {
-      player.playbackRate = rate;
-    } catch {}
+    const changed = runPlayerCommand(
+      () => globalPlayer.setPlaybackRate(rate),
+      (message) =>
+        set({
+          status: "error",
+          error: message,
+        }),
+    );
 
-    set({
-      rate,
-    });
+    if (changed) {
+      set({
+        rate,
+      });
+    }
   },
 
   stopAndKeepSource: async () => {
     const player = globalPlayer;
 
-    try {
-      player.pause();
-    } catch {}
+    const paused = runPlayerCommand(
+      () => player.pause(),
+      (message) =>
+        set({
+          status: "error",
+          error: message,
+        }),
+    );
 
-    try {
-      player.currentTime = 0;
-    } catch {}
+    if (!paused) {
+      return;
+    }
+
+    await runPlayerAsyncCommand(
+      () => player.seekTo(0),
+      (message) =>
+        set({
+          status: "error",
+          error: message,
+        }),
+    );
+
+    clearLockScreenControls(player);
 
     set({
       isPlaying: false,
       position: 0,
-      status: "ready",
+      status: get().currentKey ? "ready" : "idle",
       stoppedByUser: true,
     });
   },
@@ -690,38 +1171,46 @@ export const useGlobalPlayer = create<PlayerState>((set, get) => ({
   stopAndUnload: async () => {
     const player = globalPlayer;
 
-    try {
-      player.pause();
-    } catch {}
+    runPlayerCommand(
+      () => player.pause(),
+      (message) =>
+        set({
+          status: "error",
+          error: message,
+        }),
+    );
 
-    try {
-      if (typeof (player as any).replaceAsync === "function") {
-        await (player as any).replaceAsync(null);
-      } else {
-        (player as any).replace?.(null);
-      }
-    } catch {}
+    await runPlayerAsyncCommand(
+      () => player.seekTo(0),
+      (message) =>
+        set({
+          status: "error",
+          error: message,
+        }),
+    );
 
-    try {
-      player.currentTime = 0;
-    } catch {}
+    clearLockScreenControls(player);
 
+    /*
+      Important:
+      Do not call player.replace(null).
+      On some expo-audio/native versions this can crash with:
+      "Cannot convert Optional(nil) to AudioSource".
+      Instead, reset the store and block play() when no currentKey exists.
+    */
     set({
       isPlaying: false,
       position: 0,
       duration: 0,
-
       currentKey: undefined,
       currentUri: undefined,
-
       title: undefined,
       artwork: undefined,
       podcastId: undefined,
       filename: undefined,
-
-      stoppedByUser: true,
       status: "idle",
       error: null,
+      stoppedByUser: true,
     });
   },
 
@@ -733,12 +1222,15 @@ export const useGlobalPlayer = create<PlayerState>((set, get) => ({
   },
 
   _setTime: (position, duration) => {
+    const safePosition =
+      Number.isFinite(position) && position > 0 ? position : 0;
+
     const nextState: Partial<PlayerState> = {
-      position: typeof position === "number" ? position : 0,
+      position: safePosition,
     };
 
-    if (typeof duration === "number" && duration > 0) {
-      nextState.duration = duration;
+    if (typeof duration === "number" && Number.isFinite(duration)) {
+      nextState.duration = Math.max(0, duration);
     }
 
     set(nextState);

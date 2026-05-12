@@ -263,7 +263,6 @@
 //   );
 // }
 
-
 import "react-native-reanimated";
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
@@ -301,14 +300,14 @@ import useNotificationStore from "../../stores/notificationStore";
 
 import "../../utils/i18n";
 
-import GlobalVideoHost from "../../player/GlobalVideoHost";
+import GlobalAudioHost from "../../player/GlobalAudioHost";
 import IntroVideo, { useIntroVideo } from "@/components/Intro";
 import { cleanupPodcastCache } from "../../utils/podcastCache";
 
 if (typeof (BackHandler as any).removeEventListener !== "function") {
   (BackHandler as any).removeEventListener = (
     eventName: any,
-    handler: () => boolean
+    handler: () => boolean,
   ) => {
     const subscription = BackHandler.addEventListener(eventName, handler);
     subscription.remove();
@@ -516,10 +515,10 @@ export default function RootLayout() {
   }
 
   return (
-    <GlobalVideoHost>
+    <GlobalAudioHost>
       <LanguageProvider>
         <AppContent />
       </LanguageProvider>
-    </GlobalVideoHost>
+    </GlobalAudioHost>
   );
 }

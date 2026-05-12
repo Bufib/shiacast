@@ -11,13 +11,7 @@ const _layout = () => {
           animation: "default",
         }}
       />
-      <Stack.Screen
-        name="recommendations"
-        options={{
-          presentation: "formSheet",
-          animation: "default",
-        }}
-      />
+
       <Stack.Screen
         name="impressum"
         options={{
