@@ -10,7 +10,7 @@ export type PodcastFilterPair = {
 };
 
 type UsePodcastFiltersArgs = {
-  language: string;
+  language: string | null;
   selectedTopic: string | null;
   selectedAuthor: string | null;
 };
@@ -23,10 +23,15 @@ export function usePodcastFilters({
   const query = useQuery<PodcastFilterPair[]>({
     queryKey: ["podcast_filter_pairs", language],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let request = supabase
         .from("podcasts")
-        .select("podcast_topic, podcast_author")
-        .eq("language_code", language);
+        .select("podcast_topic, podcast_author");
+
+      if (language !== null) {
+        request = request.eq("language_code", language);
+      }
+
+      const { data, error } = await request;
 
       if (error) throw error;
 
@@ -44,13 +49,13 @@ export function usePodcastFilters({
         }));
       });
     },
-    enabled: Boolean(language),
+    enabled: true,
     staleTime: 60 * 60 * 1000,
   });
 
- const filterPairs = useMemo(() => {
-  return query.data ?? [];
-}, [query.data]);
+  const filterPairs = useMemo(() => {
+    return query.data ?? [];
+  }, [query.data]);
 
   const allTopics = useMemo(() => {
     return [

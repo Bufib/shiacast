@@ -467,7 +467,6 @@ import { ThemedText } from "@/components/ThemedText";
 import { Colors } from "@/constants/Colors";
 import { useLanguage } from "../../../../contexts/LanguageContext";
 import { useConnectionStatus } from "../../../../hooks/useConnectionStatus";
-import { useAuthStore } from "../../../../stores/authStore";
 import useNotificationStore from "../../../../stores/notificationStore";
 import handleOpenExternalUrl from "../../../../utils/handleOpenExternalUrl";
 import Constants from "expo-constants";
@@ -498,9 +497,6 @@ import { useScreenFadeIn } from "@/hooks/useScreenFadeIn";
 const Settings = () => {
   const colorScheme = useColorScheme() || "light";
   const [isDarkMode, setIsDarkMode] = useState(colorScheme === "dark");
-  const clearSession = useAuthStore.getState().clearSession;
-  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
-  const isAdmin = useAuthStore((state) => state.isAdmin);
   const [payPalLink, setPayPalLink] = useState<string | null>("");
   const [version, setVersion] = useState<string | null>("");
   const [questionCount, setQuestionCount] = useState<number>(0);
@@ -518,16 +514,6 @@ const Settings = () => {
   const { fadeAnim, onLayout } = useScreenFadeIn(800);
   const countRef = useRef(0);
 
-  const handleDeleteSuccess = () => {
-    clearSession();
-    router.replace("./(tabs)/home/");
-    Toast.show({
-      type: "success",
-      text1: t("successDeletion"),
-      text1Style: { fontWeight: "500" },
-      topOffset: 60,
-    });
-  };
 
   useEffect(() => {
     (async () => {
@@ -660,13 +646,13 @@ const Settings = () => {
           </Pressable>
 
           <View style={styles.infoSection}>
-            {isAdmin && isLoggedIn && (
+           
               <ThemedText
                 style={[styles.versionText, rtl && { textAlign: "right" }]}
               >
                 {t("appVersion", { version: Constants.expoConfig?.version })}
               </ThemedText>
-            )}
+            
           </View>
 
           <View

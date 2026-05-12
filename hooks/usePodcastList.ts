@@ -16,7 +16,7 @@ export type PodcastPage = {
 };
 
 type UsePodcastListArgs = {
-  language: string;
+  language: string | null;
   selectedTopic?: string | null;
   selectedAuthor?: string | null;
   searchQuery?: string;
@@ -53,9 +53,12 @@ export function usePodcastList({
       let request = supabase
         .from("podcasts")
         .select("*")
-        .eq("language_code", language)
         .order("created_at", { ascending: false })
         .range(pageParam, pageParam + pageSize - 1);
+
+      if (language !== null) {
+        request = request.eq("language_code", language);
+      }
 
       if (selectedAuthor) {
         request = request.eq("podcast_author", selectedAuthor);
@@ -89,7 +92,7 @@ export function usePodcastList({
     getNextPageParam: (lastPage) => lastPage.nextOffset,
 
     initialPageParam: 0,
-    enabled: Boolean(language),
+    enabled: true,
     retry: 3,
     staleTime: 12 * 60 * 60 * 1000,
     gcTime: 7 * 24 * 60 * 60 * 1000,

@@ -21,10 +21,27 @@ type FilterModalProps = {
   onClose: () => void;
   topics: string[];
   authors: string[];
+  languages: string[];
   selectedTopic: string | null;
   selectedAuthor: string | null;
+  selectedLanguage: string | null;
+  defaultLanguage: string;
   onSelectTopic: (topic: string | null) => void;
   onSelectAuthor: (author: string | null) => void;
+  onSelectLanguage: (language: string | null) => void;
+};
+
+const getLanguageLabel = (language: string) => {
+  switch (language) {
+    case "de":
+      return "Deutsch";
+    case "en":
+      return "English";
+    case "ar":
+      return "العربية";
+    default:
+      return language.toUpperCase();
+  }
 };
 
 export default function FilterModal({
@@ -32,10 +49,14 @@ export default function FilterModal({
   onClose,
   topics,
   authors,
+  languages,
   selectedTopic,
   selectedAuthor,
+  selectedLanguage,
+  defaultLanguage,
   onSelectTopic,
   onSelectAuthor,
+  onSelectLanguage,
 }: FilterModalProps) {
   const { t } = useTranslation();
   const colorScheme = useColorScheme() ?? "light";
@@ -65,7 +86,14 @@ export default function FilterModal({
     [],
   );
 
-  const hasActiveFilters = selectedTopic !== null || selectedAuthor !== null;
+  const languageOptions = useMemo(() => {
+    return [...new Set([defaultLanguage, ...languages])].sort();
+  }, [defaultLanguage, languages]);
+
+  const hasActiveFilters =
+    selectedTopic !== null ||
+    selectedAuthor !== null ||
+    selectedLanguage !== defaultLanguage;
 
   const panelBg = isDark ? "#1e2a3a" : "#ffffff";
   const sectionLabelColor = isDark ? "#8899aa" : "#888";
@@ -245,7 +273,59 @@ export default function FilterModal({
         )}
 
         {/* Language selector */}
-        
+        <View style={styles.section}>
+          <Text style={[styles.sectionLabel, { color: sectionLabelColor }]}>
+            {t("language").toUpperCase()}
+          </Text>
+          <View style={styles.chipsWrap}>
+            <TouchableOpacity
+              style={[
+                styles.chip,
+                { backgroundColor: chipBg, borderColor: chipBorder },
+                selectedLanguage === null && {
+                  backgroundColor: activeBg,
+                  borderColor: activeBg,
+                },
+              ]}
+              onPress={() => onSelectLanguage(null)}
+            >
+              <Text
+                style={[
+                  styles.chipText,
+                  { color: isDark ? "#ccd6e0" : "#444" },
+                  selectedLanguage === null && styles.chipTextActive,
+                ]}
+              >
+                All languages
+              </Text>
+            </TouchableOpacity>
+            {languageOptions.map((language) => (
+              <TouchableOpacity
+                key={language}
+                style={[
+                  styles.chip,
+                  { backgroundColor: chipBg, borderColor: chipBorder },
+                  selectedLanguage === language && {
+                    backgroundColor: activeBg,
+                    borderColor: activeBg,
+                  },
+                ]}
+                onPress={() => onSelectLanguage(language)}
+              >
+                <Text
+                  style={[
+                    styles.chipText,
+                    { color: isDark ? "#ccd6e0" : "#444" },
+                    selectedLanguage === language && styles.chipTextActive,
+                  ]}
+                >
+                  {getLanguageLabel(language)}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
         {/* Clear button */}
         {hasActiveFilters && (
           <TouchableOpacity
@@ -253,6 +333,7 @@ export default function FilterModal({
             onPress={() => {
               onSelectTopic(null);
               onSelectAuthor(null);
+              onSelectLanguage(defaultLanguage);
             }}
           >
             <Ionicons

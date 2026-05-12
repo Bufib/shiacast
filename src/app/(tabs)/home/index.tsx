@@ -1012,6 +1012,7 @@ import { useGradient } from "@/hooks/useGradient";
 import { useScreenFadeIn } from "@/hooks/useScreenFadeIn";
 import { useDebouncedValue } from "../../../../hooks/useDebouncedValue";
 import { usePodcastFilters } from "../../../../hooks/usePodcastFilters";
+import { usePodcastLanguages } from "../../../../hooks/usePodcastLanguages";
 import { usePodcastList } from "../../../../hooks/usePodcastList";
 import Feather from "@expo/vector-icons/Feather";
 import { Ionicons } from "@expo/vector-icons";
@@ -1041,6 +1042,21 @@ const PAGE_SIZE = 20;
 const GRID_GAP = 12;
 const HORIZONTAL_PADDING = 16;
 const CARD_HEIGHT = 230;
+
+const getLanguageLabel = (language: string | null) => {
+  if (language === null) return "All languages";
+
+  switch (language) {
+    case "de":
+      return "Deutsch";
+    case "en":
+      return "English";
+    case "ar":
+      return "العربية";
+    default:
+      return language.toUpperCase();
+  }
+};
 
 type PodcastGridCardProps = {
   podcast: PodcastType;
@@ -1179,12 +1195,14 @@ export default function HomeScreen() {
   const { width } = useWindowDimensions();
 
   const searchInputRef = useRef<TextInput>(null);
+  const previousPodcastDefaultLanguageRef = useRef(lang);
 
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
   const [selectedAuthor, setSelectedAuthor] = useState<string | null>(null);
+  const [selectedPodcastLanguage, setSelectedPodcastLanguage] = useState<
+    string | null
+  >(lang);
   const [filterVisible, setFilterVisible] = useState(false);
-const [selectedLanguage, setSelectedLanguage] = useState<string>("de");
-
 
   const [searchVisible, setSearchVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -1195,11 +1213,15 @@ const [selectedLanguage, setSelectedLanguage] = useState<string>("de");
     return (width - HORIZONTAL_PADDING * 2 - GRID_GAP) / 2;
   }, [width]);
 
-  const activeFilterCount = (selectedTopic ? 1 : 0) + (selectedAuthor ? 1 : 0);
+  const activeFilterCount =
+    (selectedTopic ? 1 : 0) +
+    (selectedAuthor ? 1 : 0) +
+    (selectedPodcastLanguage !== lang ? 1 : 0);
   const hasActiveSearch = debouncedSearchQuery.length > 0;
 
+  const { languages } = usePodcastLanguages();
   const { availableTopics, availableAuthors } = usePodcastFilters({
-    language: lang,
+    language: selectedPodcastLanguage,
     selectedTopic,
     selectedAuthor,
   });
@@ -1213,12 +1235,21 @@ const [selectedLanguage, setSelectedLanguage] = useState<string>("de");
     isFetchingNextPage: podcastsIsFetchingNextPage,
     refetch: podcastsRefetch,
   } = usePodcastList({
-    language: lang,
+    language: selectedPodcastLanguage,
     selectedTopic,
     selectedAuthor,
     searchQuery: debouncedSearchQuery,
     pageSize: PAGE_SIZE,
   });
+
+  useEffect(() => {
+    const previousDefaultLanguage = previousPodcastDefaultLanguageRef.current;
+    previousPodcastDefaultLanguageRef.current = lang;
+
+    if (selectedPodcastLanguage === previousDefaultLanguage) {
+      setSelectedPodcastLanguage(lang);
+    }
+  }, [lang, selectedPodcastLanguage]);
 
   useEffect(() => {
     if (!searchVisible) return;
@@ -1233,6 +1264,7 @@ const [selectedLanguage, setSelectedLanguage] = useState<string>("de");
   const clearFilters = () => {
     setSelectedTopic(null);
     setSelectedAuthor(null);
+    setSelectedPodcastLanguage(lang);
   };
 
   const clearSearch = () => {
@@ -1446,6 +1478,30 @@ const [selectedLanguage, setSelectedLanguage] = useState<string>("de");
             </View>
           )}
 
+          {selectedPodcastLanguage !== lang && (
+            <View
+              style={[
+                styles.filterChip,
+                {
+                  backgroundColor: colors.backgroundElement,
+                },
+              ]}
+            >
+              <Text
+                numberOfLines={1}
+                style={[
+                  styles.filterChipText,
+                  {
+                    color: colors.text,
+                    textAlign: rtl ? "right" : "left",
+                  },
+                ]}
+              >
+                {getLanguageLabel(selectedPodcastLanguage)}
+              </Text>
+            </View>
+          )}
+
           <TouchableOpacity onPress={clearFilters} activeOpacity={0.75}>
             <Text
               style={[
@@ -1518,10 +1574,18 @@ const [selectedLanguage, setSelectedLanguage] = useState<string>("de");
         onClose={() => setFilterVisible(false)}
         topics={availableTopics}
         authors={availableAuthors}
+        languages={languages}
         selectedTopic={selectedTopic}
         selectedAuthor={selectedAuthor}
+        selectedLanguage={selectedPodcastLanguage}
+        defaultLanguage={lang}
         onSelectTopic={setSelectedTopic}
         onSelectAuthor={setSelectedAuthor}
+        onSelectLanguage={(language) => {
+          setSelectedPodcastLanguage(language);
+          setSelectedTopic(null);
+          setSelectedAuthor(null);
+        }}
       />
 
       <FlatList
