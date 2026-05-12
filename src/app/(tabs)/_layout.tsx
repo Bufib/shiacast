@@ -81,12 +81,15 @@ import React from "react";
 import { useColorScheme } from "react-native";
 
 import AppTabs from "@/components/app-tabs";
+import { SupabaseRealtimeProvider } from "@/components/SupabaseRealtimeProvider";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <AppTabs />
+      <SupabaseRealtimeProvider>
+        <AppTabs />
+      </SupabaseRealtimeProvider>
     </ThemeProvider>
   );
 }

@@ -5,9 +5,6 @@ const _layout = () => {
           <Stack screenOptions={{headerBackButtonMenuEnabled: false,}}>
 
       <Stack.Screen name="index" options={{ headerShown: false }} />
-      <Stack.Screen name="allPodcasts" options={{ headerShown: false }} />
-      <Stack.Screen name="allPdfs" options={{ headerShown: false }} />
-      <Stack.Screen name="allArticles" options={{ headerShown: false }} />
     </Stack>
   );
 };
