@@ -13,7 +13,7 @@ import { useScreenFadeIn } from "@/hooks/useScreenFadeIn";
 import { LanguageProvider, useLanguage } from "../../contexts/LanguageContext";
 import { useColorScheme } from "../../hooks/useColorScheme";
 import { useConnectionStatus } from "../../hooks/useConnectionStatus";
-import { cleanupCache } from "../../hooks/usePodcasts";
+
 import { usePushNotifications } from "../../hooks/usePushNotifications";
 import { useAuthStore } from "../../stores/authStore";
 import { useFontSizeStore } from "../../stores/fontSizeStore";
@@ -45,6 +45,7 @@ import { setAudioModeAsync } from "expo-audio";
 
 import GlobalVideoHost from "../../player/GlobalVideoHost";
 import IntroVideo, { useIntroVideo } from "@/components/Intro";
+import { cleanupPodcastCache } from "../../utils/podcastCache";
 
 if (typeof (BackHandler as any).removeEventListener !== "function") {
   (BackHandler as any).removeEventListener = (
@@ -140,7 +141,7 @@ function AppContent() {
   }, [storesHydrated]);
 
   useEffect(() => {
-    cleanupCache().catch(console.warn);
+    cleanupPodcastCache().catch(console.warn);
   }, []);
 
   useEffect(() => {

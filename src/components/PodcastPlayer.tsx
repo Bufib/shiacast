@@ -70,7 +70,6 @@
 //     podcast?.language_code ?? "de"
 //   );
 
-
 //   // UI state
 //   const [isFavorite, setIsFavorite] = useState(false);
 //   const [playerError, setPlayerError] = useState<string | null>(null);
@@ -1133,7 +1132,6 @@
 //   },
 // });
 
-
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Animated,
@@ -1159,13 +1157,8 @@ import type { PodcastPlayerPropsType, SavedProgress } from "@/constants/Types";
 import HeaderLeftBackButton from "@/components/HeaderLeftBackButton";
 import { LoadingIndicator } from "@/components/LoadingIndicator";
 import { useGlobalPlayer } from "../../player/useGlobalPlayer";
-import {
-  remoteUrlFor,
-  usePodcasts,
-  cancelCurrentDownload,
-  deleteFromCache,
-} from "../../hooks/usePodcasts";
-import { supabase } from "../../utils/supabase";
+import { getSignedImageUrl } from "../../utils/podcastStorage";
+import { usePodcastDownloads } from "../../hooks/usePodcastsDownloads";
 import {
   isPodcastFavorited,
   togglePodcastFavorite,
@@ -1175,26 +1168,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { usePodcastDownloadStore } from "../../stores/usePodcastDownloadStore";
 import { useDataVersionStore } from "../../stores/dataVersionStore";
-
-// --- COVER IMAGE HELPER ---
-
-const COVER_IMAGE_BUCKET = "images";
-const COVER_SIGNED_URL_EXPIRES_IN_SECONDS = 60 * 60 * 24;
-
-async function fetchCoverUrl(filename: string): Promise<string | null> {
-  const cleanPath = filename.trim().replace(/\\/g, "/").replace(/^\/+/, "");
-
-  const { data, error } = await supabase.storage
-    .from(COVER_IMAGE_BUCKET)
-    .createSignedUrl(cleanPath, COVER_SIGNED_URL_EXPIRES_IN_SECONDS);
-
-  if (error || !data?.signedUrl) {
-    console.warn("[fetchCoverUrl] error:", error);
-    return null;
-  }
-
-  return data.signedUrl;
-}
 
 export default function PodcastPlayer({ podcast }: PodcastPlayerPropsType) {
   const { t } = useTranslation();
@@ -1208,9 +1181,9 @@ export default function PodcastPlayer({ podcast }: PodcastPlayerPropsType) {
   // Remote cover image (signed URL from private 'images' bucket)
   const { data: coverUrl } = useQuery({
     queryKey: ["podcast_cover", podcast?.image_filename],
-    queryFn: () => fetchCoverUrl(podcast.image_filename!),
+    queryFn: () => getSignedImageUrl(podcast?.image_filename),
     enabled: Boolean(podcast?.image_filename),
-    staleTime: 12 * 60 * 60 * 1000, // refresh well before 24h expiry
+    staleTime: 12 * 60 * 60 * 1000,
     gcTime: 24 * 60 * 60 * 1000,
   });
 
@@ -1245,10 +1218,13 @@ export default function PodcastPlayer({ podcast }: PodcastPlayerPropsType) {
     stopAndUnload,
   } = useGlobalPlayer();
 
-  // Cache/download helpers
-  const { download, getCachedUri } = usePodcasts(
-    podcast?.language_code ?? "de",
-  );
+  const {
+    download,
+    getCachedUri,
+    getRemoteUrl,
+    deleteFromCache,
+    cancelDownload: cancelActiveDownload,
+  } = usePodcastDownloads(podcast.language_code);
 
   // UI state
   const [isFavorite, setIsFavorite] = useState(false);
@@ -1452,7 +1428,7 @@ export default function PodcastPlayer({ podcast }: PodcastPlayerPropsType) {
       setIsStreamLoading(true);
       setIsStream(true);
 
-      const remote = await remoteUrlFor(podcast.filename);
+      const remote = await getRemoteUrl(podcast.filename);
 
       if (!remote) {
         setPlayerError("Cannot create stream URL.");
@@ -1652,7 +1628,7 @@ export default function PodcastPlayer({ podcast }: PodcastPlayerPropsType) {
 
   const cancelDownload = async () => {
     // 1) stop the actual download
-    await cancelCurrentDownload();
+    await cancelActiveDownload();
 
     // 2) fully reset state so next actions don't "inherit" old state
     resetDownloadUI();
@@ -1661,10 +1637,7 @@ export default function PodcastPlayer({ podcast }: PodcastPlayerPropsType) {
   const handleDeleteFromCache = async () => {
     if (!podcast?.filename) return;
 
-    const deleted = await deleteFromCache(
-      podcast.filename,
-      podcast.language_code,
-    );
+    const deleted = await deleteFromCache(podcast.filename);
     if (deleted) {
       setCachedUri(null);
       stopAndUnload();

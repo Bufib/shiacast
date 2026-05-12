@@ -470,7 +470,6 @@ import { useConnectionStatus } from "../../../../hooks/useConnectionStatus";
 import { useAuthStore } from "../../../../stores/authStore";
 import useNotificationStore from "../../../../stores/notificationStore";
 import handleOpenExternalUrl from "../../../../utils/handleOpenExternalUrl";
-import { useLogout } from "../../../../utils/useLogout";
 import Constants from "expo-constants";
 import { Image } from "expo-image";
 import { router } from "expo-router";
@@ -511,7 +510,6 @@ const Settings = () => {
     useNotificationStore();
   const { rtl } = useLanguage();
   const hasInternet = useConnectionStatus();
-  const logout = useLogout();
   const effectiveEnabled = getNotifications && permissionStatus === "granted";
 
   const { t } = useTranslation();
@@ -575,20 +573,7 @@ const Settings = () => {
             {t("settings")}
           </ThemedText>
 
-          <Pressable
-            onPress={isLoggedIn ? logout : () => router.push("/(auth)/login")}
-            style={({ pressed }) => [
-              styles.buttonContainer,
-              {
-                opacity: pressed ? 0.8 : 1,
-                transform: [{ scale: pressed ? 0.98 : 1 }],
-              },
-            ]}
-          >
-            <ThemedText style={styles.loginButtonText}>
-              {isLoggedIn ? t("logout") : t("login")}
-            </ThemedText>
-          </Pressable>
+         
         </View>
 
         <ScrollView
@@ -663,36 +648,7 @@ const Settings = () => {
             </View>
           </View>
 
-          {isLoggedIn && (
-            <View style={styles.section}>
-              <ThemedText
-                style={[styles.sectionTitle, rtl && { textAlign: "right" }]}
-              >
-                {t("account")}
-              </ThemedText>
-
-              <Pressable
-                style={styles.settingButton}
-                onPress={() => router.push("/(auth)/forgotPassword")}
-              >
-                <Text style={styles.settingButtonText}>
-                  {t("changePassword")}
-                </Text>
-              </Pressable>
-
-              <Pressable
-                style={[styles.settingButton, styles.deleteButton]}
-                onPress={() => setOpenDeleteModal(true)}
-              >
-                <ThemedText
-                  style={[styles.settingButtonText, styles.deleteButtonText]}
-                >
-                  {t("deleteAccount")}
-                </ThemedText>
-              </Pressable>
-            </View>
-          )}
-
+        
           <Pressable
             style={styles.paypalButton}
             onPress={() => payPalLink && handleOpenExternalUrl(payPalLink)}
@@ -752,12 +708,7 @@ const Settings = () => {
           </View>
         </ScrollView>
 
-        <DeleteUserModal
-          isVisible={openDeleteModal}
-          onClose={() => setOpenDeleteModal(false)}
-          onDeleteSuccess={handleDeleteSuccess}
-          serverUrl="https://ygtlsiifupyoepxfamcn.supabase.co/functions/v1/delete-account"
-        />
+     
       </SafeAreaView>
     </Animated.View>
   );

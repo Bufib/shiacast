@@ -15,7 +15,6 @@ import {
   BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import LanguageSelection from "./LanguageSelectionScreen";
 
 type FilterModalProps = {
   visible: boolean;

@@ -1,5 +1,3 @@
-
-
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../utils/supabase";
 import { PodcastType } from "@/constants/Types";
@@ -10,7 +8,7 @@ export function useSearchPodcasts(searchTerm: string) {
   const term = searchTerm.trim();
 
   return useQuery<PodcastType[], Error>({
-    queryKey: ["search", "podcasts", lang, term], // ← include lang
+    queryKey: ["search", "podcasts", lang, term],
     enabled: !!term && Boolean(lang),
 
     queryFn: async () => {
@@ -27,9 +25,9 @@ export function useSearchPodcasts(searchTerm: string) {
     },
 
     // Search-friendly cache settings
-    staleTime: 2 * 60 * 1000,        // 2 minutes
-    gcTime: 30 * 60 * 1000,          // 30 minutes
-    refetchOnMount: true,           // rely on staleTime; set to "always" if you want a hard refresh
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    gcTime: 30 * 60 * 1000, // 30 minutes
+    refetchOnMount: true, // rely on staleTime; set to "always" if you want a hard refresh
     refetchOnWindowFocus: false,
     refetchOnReconnect: true,
     retry: 3,

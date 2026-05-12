@@ -1002,7 +1002,6 @@
 //     textAlign: "center",
 //   },
 // });
-
 import { LoadingIndicator } from "@/components/LoadingIndicator";
 import RetryButton from "@/components/RetryButton";
 import { ThemedText } from "@/components/ThemedText";
@@ -1011,15 +1010,12 @@ import { Colors } from "@/constants/Colors";
 import { PodcastType } from "@/constants/Types";
 import { useGradient } from "@/hooks/useGradient";
 import { useScreenFadeIn } from "@/hooks/useScreenFadeIn";
+import { useDebouncedValue } from "../../../../hooks/useDebouncedValue";
+import { usePodcastFilters } from "../../../../hooks/usePodcastFilters";
+import { usePodcastList } from "../../../../hooks/usePodcastList";
 import Feather from "@expo/vector-icons/Feather";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import {
-  InfiniteData,
-  QueryKey,
-  useInfiniteQuery,
-  useQuery,
-} from "@tanstack/react-query";
 import { router } from "expo-router";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -1039,21 +1035,12 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useLanguage } from "../../../../contexts/LanguageContext";
-import { supabase } from "../../../../utils/supabase";
 import { formatDate } from "../../../../utils/formatDate";
 
 const PAGE_SIZE = 20;
 const GRID_GAP = 12;
 const HORIZONTAL_PADDING = 16;
 const CARD_HEIGHT = 230;
-
-const IMAGES_BUCKET = "images";
-const IMAGE_SIGNED_URL_EXPIRES_IN_SECONDS = 60 * 60 * 24;
-
-type PodcastPage = {
-  items: PodcastType[];
-  nextOffset?: number;
-};
 
 type PodcastGridCardProps = {
   podcast: PodcastType;
@@ -1064,83 +1051,7 @@ type PodcastGridCardProps = {
   gradientColors: readonly [string, string, ...string[]] | string[];
 };
 
-// --- IMAGE URL HELPER ---
-async function signedUrlsForImages(
-  filenames: string[],
-): Promise<Record<string, string>> {
-  if (filenames.length === 0) return {};
 
-  const cleanPaths = filenames.map((f) =>
-    f.trim().replace(/\\/g, "/").replace(/^\/+/, ""),
-  );
-
-  const { data, error } = await supabase.storage
-    .from(IMAGES_BUCKET)
-    .createSignedUrls(cleanPaths, IMAGE_SIGNED_URL_EXPIRES_IN_SECONDS);
-
-  if (error || !data) {
-    console.warn("[signedUrlsForImages] error:", error);
-    return {};
-  }
-
-  const map: Record<string, string> = {};
-
-  data.forEach((item, i) => {
-    if (item.signedUrl) {
-      map[filenames[i]] = item.signedUrl;
-    } else if (item.error) {
-      console.warn(
-        `[signedUrlsForImages] failed for ${filenames[i]}:`,
-        item.error,
-      );
-    }
-  });
-
-  return map;
-}
-
-function useDebouncedValue<T>(value: T, delay = 350) {
-  const [debouncedValue, setDebouncedValue] = useState(value);
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-
-    return () => clearTimeout(timeout);
-  }, [value, delay]);
-
-  return debouncedValue;
-}
-
-function parseTopics(raw: any): string[] {
-  if (!raw) return [];
-
-  if (Array.isArray(raw)) {
-    return raw.map((topic) => String(topic).trim()).filter(Boolean);
-  }
-
-  if (typeof raw === "string") {
-    const trimmed = raw.trim();
-
-    if (trimmed.startsWith("[")) {
-      try {
-        const parsed = JSON.parse(trimmed);
-
-        if (Array.isArray(parsed)) {
-          return parsed.map((topic) => String(topic).trim()).filter(Boolean);
-        }
-      } catch {}
-    }
-
-    return trimmed ? [trimmed] : [];
-  }
-
-  return [];
-}
-
-function matchesTopic(rawTopic: any, topic: string): boolean {
-  return parseTopics(rawTopic).includes(topic);
-}
 
 function PodcastGridCard({
   podcast,
@@ -1163,7 +1074,7 @@ function PodcastGridCard({
               style={StyleSheet.absoluteFill}
               resizeMode="cover"
             />
-            {/* Dark gradient overlay so the title stays readable */}
+
             <LinearGradient
               colors={[
                 "rgba(0,0,0,0.15)",
@@ -1184,6 +1095,7 @@ function PodcastGridCard({
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
             />
+
             <View style={styles.cardOverlay} />
           </>
         )}
@@ -1194,7 +1106,7 @@ function PodcastGridCard({
             rtl ? styles.vinylRecordRtl : styles.vinylRecordLtr,
           ]}
         >
-          <Feather name="mic" size={18} color={"#fff"} />
+          <Feather name="mic" size={18} color="#fff" />
         </View>
 
         <View style={styles.cardContent}>
@@ -1255,11 +1167,6 @@ function PodcastGridCard({
   );
 }
 
-type FilterPair = {
-  topic: string | null;
-  author: string | null;
-};
-
 export default function HomeScreen() {
   const colorScheme = useColorScheme() ?? "light";
   const colors = Colors[colorScheme];
@@ -1276,6 +1183,8 @@ export default function HomeScreen() {
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
   const [selectedAuthor, setSelectedAuthor] = useState<string | null>(null);
   const [filterVisible, setFilterVisible] = useState(false);
+const [selectedLanguage, setSelectedLanguage] = useState<string>("de");
+
 
   const [searchVisible, setSearchVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -1287,8 +1196,29 @@ export default function HomeScreen() {
   }, [width]);
 
   const activeFilterCount = (selectedTopic ? 1 : 0) + (selectedAuthor ? 1 : 0);
-
   const hasActiveSearch = debouncedSearchQuery.length > 0;
+
+  const { availableTopics, availableAuthors } = usePodcastFilters({
+    language: lang,
+    selectedTopic,
+    selectedAuthor,
+  });
+  const {
+    podcasts,
+    isLoading: podcastsLoading,
+    isError: podcastsError,
+    error: podcastsErrorObj,
+    fetchNextPage: podcastsFetchNextPage,
+    hasNextPage: podcastsHasNextPage,
+    isFetchingNextPage: podcastsIsFetchingNextPage,
+    refetch: podcastsRefetch,
+  } = usePodcastList({
+    language: lang,
+    selectedTopic,
+    selectedAuthor,
+    searchQuery: debouncedSearchQuery,
+    pageSize: PAGE_SIZE,
+  });
 
   useEffect(() => {
     if (!searchVisible) return;
@@ -1299,159 +1229,6 @@ export default function HomeScreen() {
 
     return () => clearTimeout(timeout);
   }, [searchVisible]);
-
-  const { data: filterPairs = [] } = useQuery<FilterPair[]>({
-    queryKey: ["home_podcast_filter_pairs", lang],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("podcasts")
-        .select("podcast_topic, podcast_author")
-        .eq("language_code", lang);
-
-      if (error) throw error;
-
-      return (data ?? []).flatMap((row: any): FilterPair[] => {
-        const topics = parseTopics(row.podcast_topic);
-        const author = row.podcast_author ?? null;
-
-        if (topics.length === 0) {
-          return [{ topic: null, author }];
-        }
-
-        return topics.map((topic) => ({
-          topic,
-          author,
-        }));
-      });
-    },
-    enabled: Boolean(lang),
-    staleTime: 60 * 60 * 1000,
-  });
-
-  const allTopics = useMemo(() => {
-    return [
-      ...new Set(
-        filterPairs
-          .map((pair) => pair.topic)
-          .filter((topic): topic is string => Boolean(topic)),
-      ),
-    ].sort();
-  }, [filterPairs]);
-
-  const allAuthors = useMemo(() => {
-    return [
-      ...new Set(
-        filterPairs
-          .map((pair) => pair.author)
-          .filter((author): author is string => Boolean(author)),
-      ),
-    ].sort();
-  }, [filterPairs]);
-
-  const availableTopics = useMemo(() => {
-    if (!selectedAuthor) return allTopics;
-
-    return [
-      ...new Set(
-        filterPairs
-          .filter((pair) => pair.author === selectedAuthor)
-          .map((pair) => pair.topic)
-          .filter((topic): topic is string => Boolean(topic)),
-      ),
-    ].sort();
-  }, [filterPairs, selectedAuthor, allTopics]);
-
-  const availableAuthors = useMemo(() => {
-    if (!selectedTopic) return allAuthors;
-
-    return [
-      ...new Set(
-        filterPairs
-          .filter((pair) => pair.topic === selectedTopic)
-          .map((pair) => pair.author)
-          .filter((author): author is string => Boolean(author)),
-      ),
-    ].sort();
-  }, [filterPairs, selectedTopic, allAuthors]);
-
-  const {
-    data: podcastPages,
-    isLoading: podcastsLoading,
-    isError: podcastsError,
-    error: podcastsErrorObj,
-    fetchNextPage: podcastsFetchNextPage,
-    hasNextPage: podcastsHasNextPage,
-    isFetchingNextPage: podcastsIsFetchingNextPage,
-    refetch: podcastsRefetch,
-  } = useInfiniteQuery<
-    PodcastPage,
-    Error,
-    InfiniteData<PodcastPage>,
-    QueryKey,
-    number
-  >({
-    queryKey: [
-      "home_podcasts_grid",
-      lang,
-      selectedTopic,
-      selectedAuthor,
-      debouncedSearchQuery,
-    ],
-    queryFn: async ({ pageParam = 0 }) => {
-      let query = supabase
-        .from("podcasts")
-        .select("*")
-        .eq("language_code", lang)
-        .order("created_at", { ascending: false })
-        .range(pageParam, pageParam + PAGE_SIZE - 1);
-
-      if (selectedAuthor) {
-        query = query.eq("podcast_author", selectedAuthor);
-      }
-
-      if (debouncedSearchQuery.length > 0) {
-        query = query.ilike("title", `%${debouncedSearchQuery}%`);
-      }
-
-      const { data, error } = await query;
-
-      if (error) throw error;
-
-      const rawRows = (data ?? []) as PodcastType[];
-
-      const filteredRows = selectedTopic
-        ? rawRows.filter((podcast) =>
-            matchesTopic(podcast.podcast_topic, selectedTopic),
-          )
-        : rawRows;
-
-      const imageFilenames = filteredRows
-        .map((podcast) => podcast.image_filename)
-        .filter((filename): filename is string => Boolean(filename));
-
-      const imageUrlMap = await signedUrlsForImages(imageFilenames);
-
-      const itemsWithImages = filteredRows.map((podcast) => ({
-        ...podcast,
-        image_url: podcast.image_filename
-          ? (imageUrlMap[podcast.image_filename] ?? null)
-          : null,
-      })) as PodcastType[];
-
-      return {
-        items: itemsWithImages,
-        nextOffset:
-          rawRows.length === PAGE_SIZE ? pageParam + PAGE_SIZE : undefined,
-      };
-    },
-    getNextPageParam: (lastPage) => lastPage.nextOffset,
-    initialPageParam: 0,
-    enabled: Boolean(lang),
-  });
-
-  const podcasts = useMemo(() => {
-    return podcastPages?.pages.flatMap((page) => page.items) ?? [];
-  }, [podcastPages]);
 
   const clearFilters = () => {
     setSelectedTopic(null);
@@ -1729,6 +1506,7 @@ export default function HomeScreen() {
       style={[
         styles.animatedContainer,
         {
+          opacity: fadeAnim,
           backgroundColor: colors.background,
           paddingTop: insets.top,
           paddingBottom: insets.bottom,
@@ -1836,14 +1614,6 @@ const styles = StyleSheet.create({
     height: 50,
   },
 
-  headerIconContainer: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
   sectionLabel: {
     paddingHorizontal: 6,
   },
@@ -1906,6 +1676,8 @@ const styles = StyleSheet.create({
   activeFiltersRow: {
     alignItems: "center",
     flexWrap: "wrap",
+    gap: 8,
+    marginTop: 10,
   },
 
   filterChip: {
@@ -1952,7 +1724,7 @@ const styles = StyleSheet.create({
     borderRadius: 26,
     position: "relative",
     overflow: "hidden",
-    backgroundColor: "#1a1a1a", // shown briefly while the image loads
+    backgroundColor: "#1a1a1a",
   },
 
   cardOverlay: {
