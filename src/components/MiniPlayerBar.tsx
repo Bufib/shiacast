@@ -230,7 +230,7 @@ export default function MiniPlayerBar({ bottomOffset = 50 }: Props) {
             <View style={styles.collapsedContent}>
               <View style={styles.artworkWrap}>
                 <Image
-                  source={require("@/assets/images/logo.png")}
+                  source={require("@/assets/images/icon.png")}
                   style={styles.collapsedArtwork}
                   contentFit="cover"
                 />
@@ -308,7 +308,7 @@ export default function MiniPlayerBar({ bottomOffset = 50 }: Props) {
               {/* Artwork */}
               <View style={styles.artworkContainer}>
                 <Image
-                  source={require("@/assets/images/logo.png")}
+                  source={require("@/assets/images/icon.png")}
                   style={styles.artwork}
                   contentFit="cover"
                 />

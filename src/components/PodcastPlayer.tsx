@@ -41,7 +41,7 @@ export default function PodcastPlayer({ podcast }: PodcastPlayerPropsType) {
   const isDark = colorScheme === "dark";
   const lastTimeKey = (id: string | number) => `podcast:lastTime:${id}`;
   // Artwork (local app logo)
-  const logoAsset = Asset.fromModule(require("@/assets/images/logo.png"));
+  const logoAsset = Asset.fromModule(require("@/assets/images/icon.png"));
   const artworkUri: string | undefined = logoAsset?.uri || undefined;
 
   // Global player state & actions
@@ -540,7 +540,7 @@ export default function PodcastPlayer({ podcast }: PodcastPlayerPropsType) {
           {/* Header / Artwork / Info */}
           <View style={styles.headerContainer}>
             <Image
-              source={require("@/assets/images/logo.png")}
+              source={require("@/assets/images/icon.png")}
               style={styles.coverArt}
               contentFit="cover"
             />

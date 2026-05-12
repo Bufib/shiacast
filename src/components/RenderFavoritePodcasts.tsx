@@ -21,23 +21,18 @@ import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { formatDate } from "../../utils/formatDate";
 import { useDataVersionStore } from "../../stores/dataVersionStore";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function RenderFavoritePodcasts() {
   const { lang, rtl } = useLanguage();
   const { t } = useTranslation();
   const colorScheme = useColorScheme() || "light";
-  const podcastFavoritesVersion = useDataVersionStore((s) => s.podcastFavoritesVersion);
+  const podcastFavoritesVersion = useDataVersionStore(
+    (s) => s.podcastFavoritesVersion,
+  );
 
   const [favoriteIds, setFavoriteIds] = useState<number[]>([]);
   const favKey = useMemo(() => favoriteIds.join(","), [favoriteIds]);
-
-  // // Load favorite IDs from storage (scoped per language)
-  // useEffect(() => {
-  //   (async () => {
-  //     const ids = await getFavoritePodcasts(lang);
-  //     setFavoriteIds(ids);
-  //   })();
-  // }, [lang, favoritesRefreshed, podcastFavoritesVersion]);
 
   useEffect(() => {
     let cancelled = false;
@@ -133,7 +128,7 @@ export default function RenderFavoritePodcasts() {
   }
 
   return (
-    <ThemedView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={["top"]}>
       <FlatList
         data={favoriteEpisodes}
         // extraData={listExtraData}
@@ -172,7 +167,7 @@ export default function RenderFavoritePodcasts() {
           </TouchableOpacity>
         )}
       />
-    </ThemedView>
+    </SafeAreaView>
   );
 }
 
@@ -183,7 +178,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 20,
-    textAlign: "center"
+    textAlign: "center",
   },
   flatListContent: {
     paddingTop: 15,
