@@ -7,7 +7,7 @@ import {
   useMutation,
   useQueryClient,
 } from "@tanstack/react-query";
-import * as FileSystem from "../node_modules/expo-file-system/build/legacy";
+import * as FileSystem from 'expo-file-system/legacy';
 import { useCallback, useEffect } from "react";
 
 // --- CONFIGURATION ---

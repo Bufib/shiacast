@@ -24,11 +24,11 @@ import {
   DarkTheme,
   DefaultTheme,
   ThemeProvider,
-} from "../../node_modules/@react-navigation/native/lib/typescript/src";
+} from "@react-navigation/native";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { StatusBar } from "../../node_modules/expo-status-bar/build/StatusBar";
+import { StatusBar } from "expo-status-bar";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {

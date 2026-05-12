@@ -14,7 +14,7 @@ import {
 import { supabase } from "../../utils/supabase";
 import { router } from "expo-router";
 import { z } from "zod";
-import { useForm, Controller } from "../../node_modules/react-hook-form/dist";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Colors } from "@/constants/Colors";
 import { ThemedText } from "./ThemedText";

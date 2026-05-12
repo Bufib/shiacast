@@ -12,7 +12,7 @@ import {
   Pressable,
   useColorScheme,
 } from "react-native";
-import { useForm, Controller } from "../../../node_modules/react-hook-form/dist";
+import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Feather from "@expo/vector-icons/Feather";
@@ -106,7 +106,6 @@ export default function LoginScreen() {
         topOffset: 60,
       });
 
-      router.replace("/(askQuestion)");
     } catch (error) {
       if (error instanceof Error) {
         Alert.alert(t("loginFailed"), error.message);
