@@ -65,7 +65,8 @@ export function usePodcastList({
       }
 
       if (trimmedSearchQuery.length > 0) {
-        request = request.ilike("title", `%${trimmedSearchQuery}%`);
+        const safe = trimmedSearchQuery.replace(/[%,]/g, "");
+        request = request.ilike("title", `%${safe}%`);
       }
 
       const { data, error } = await request;

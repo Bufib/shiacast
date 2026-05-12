@@ -883,3 +883,13 @@ export type SectionItem =
       long: string;
       longLatin: string;
     };
+
+    export type PodcastGridCardType = {
+      podcast: PodcastType;
+      width: number;
+      rtl: boolean;
+      lang: string;
+      listenText: string;
+      gradientColors: readonly [string, string, ...string[]] | string[];
+    };
+    

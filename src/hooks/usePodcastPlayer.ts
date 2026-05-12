@@ -425,13 +425,13 @@ export function usePodcastPlayer(podcast: PodcastPlayerPropsType["podcast"]) {
   const goBack = () => {
     if (!isThisEpisodeLoaded) return;
 
-    seekBy(-15);
+    seekBy(-10);
   };
 
   const goForward = () => {
     if (!isThisEpisodeLoaded) return;
 
-    seekBy(15);
+    seekBy(10);
   };
 
   const stopPlayback = async () => {

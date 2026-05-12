@@ -1,106 +1,279 @@
-import React, { useEffect, useMemo, useState } from "react";
-import {
-  FlatList,
-  Platform,
-  StyleSheet,
-  TouchableOpacity,
-  useColorScheme,
-  View,
-} from "react-native";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "../../utils/supabase";
-import { PodcastType } from "@/constants/Types";
-import { getFavoritePodcasts } from "../../utils/favorites";
-import { useLanguage } from "../../contexts/LanguageContext";
-import { ThemedView } from "@/components/ThemedView";
-import { ThemedText } from "@/components/ThemedText";
+// import PodcastGridList from "@/components/PodcastGridList";
+// import { LoadingIndicator } from "@/components/LoadingIndicator";
+// import { ThemedText } from "@/components/ThemedText";
+// import { ThemedView } from "@/components/ThemedView";
+// import { Colors } from "@/constants/Colors";
+// import { useLanguage } from "../../contexts/LanguageContext";
+// import { useDataVersionStore } from "../../stores/dataVersionStore";
+// import { getFavoritePodcasts } from "../../utils/favorites";
+// import React, { useEffect, useMemo, useState } from "react";
+// import { useTranslation } from "react-i18next";
+// import { Animated, StyleSheet, useColorScheme } from "react-native";
+// import {
+//   SafeAreaView,
+//   useSafeAreaInsets,
+// } from "react-native-safe-area-context";
+// import { usePodcastsByIdsForFavorites } from "../../hooks/usePodcastsByIdsForFavorites";
+// import { useScreenFadeIn } from "@/hooks/useScreenFadeIn";
+
+// export default function RenderFavoritePodcasts() {
+//   const { lang } = useLanguage();
+//   const { t } = useTranslation();
+//   const colorScheme = useColorScheme() ?? "light";
+
+//   const podcastFavoritesVersion = useDataVersionStore(
+//     (state) => state.podcastFavoritesVersion,
+//   );
+
+//   const [favoriteIds, setFavoriteIds] = useState<number[]>([]);
+//   const [refreshing, setRefreshing] = useState(false);
+//   const { fadeAnim, onLayout } = useScreenFadeIn(800);
+//   const insets = useSafeAreaInsets();
+
+//   useEffect(() => {
+//     let cancelled = false;
+
+//     async function loadFavoriteIds() {
+//       try {
+//         const ids = await getFavoritePodcasts(lang);
+
+//         if (!cancelled) {
+//           setFavoriteIds(ids);
+//         }
+//       } catch (error) {
+//         if (!cancelled) {
+//           console.warn("Failed to load favorite podcasts:", error);
+//           setFavoriteIds([]);
+//         }
+//       }
+//     }
+
+//     loadFavoriteIds();
+
+//     return () => {
+//       cancelled = true;
+//     };
+//   }, [lang, podcastFavoritesVersion]);
+
+//   const {
+//     data: favoriteEpisodes = [],
+//     isLoading,
+//     isError,
+//     refetch,
+//     isFetching,
+//   } = usePodcastsByIdsForFavorites({
+//     ids: favoriteIds,
+//     language: lang,
+//   });
+//   const { rtl } = useLanguage();
+
+//   const handleRefresh = async () => {
+//     try {
+//       setRefreshing(true);
+
+//       const ids = await getFavoritePodcasts(lang);
+//       setFavoriteIds(ids);
+
+//       if (ids.length > 0) {
+//         await refetch();
+//       }
+//     } catch (error) {
+//       console.warn("Failed to refresh favorite podcasts:", error);
+//     } finally {
+//       setRefreshing(false);
+//     }
+//   };
+
+//   if (isLoading && favoriteIds.length > 0) {
+//     return (
+//       <ThemedView style={styles.centeredContainer}>
+//         <LoadingIndicator size="large" />
+//       </ThemedView>
+//     );
+//   }
+
+//   if (isError) {
+//     return (
+//       <ThemedView style={styles.centeredContainer}>
+//         <ThemedText style={styles.errorText}>{t("error")}</ThemedText>
+//       </ThemedView>
+//     );
+//   }
+
+//   if (favoriteIds.length === 0 || favoriteEpisodes.length === 0) {
+//     return (
+//       <ThemedView style={styles.centeredContainer}>
+//         <ThemedText style={styles.emptyText}>{t("noFavorites")}</ThemedText>
+//       </ThemedView>
+//     );
+//   }
+
+//   return (
+//     <Animated.View
+//       onLayout={onLayout}
+//       style={[
+//         styles.container,
+//         {
+//           opacity: fadeAnim,
+//           backgroundColor: Colors[colorScheme].background,
+//           paddingTop: insets.top + 10,
+//           paddingBottom: insets.bottom,
+//         },
+//       ]}
+//     >
+//       <ThemedText
+//         type="title"
+//         style={[
+//           styles.sectionLabel,
+//           {
+//             textAlign: rtl ? "right" : "left",
+//             paddingHorizontal: 24,
+//             marginBottom: 22
+
+//           },
+//         ]}
+//       >
+//         {t("favorites")}
+//       </ThemedText>
+//       <PodcastGridList
+//         podcasts={favoriteEpisodes}
+//         refreshing={refreshing || isFetching}
+//         onRefresh={handleRefresh}
+//       />
+//     </Animated.View>
+//   );
+// }
+
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//   },
+//   sectionLabel: {
+//     paddingHorizontal: 6,
+//   },
+//   centeredContainer: {
+//     flex: 1,
+//     justifyContent: "center",
+//     alignItems: "center",
+//     paddingHorizontal: 20,
+//   },
+
+//   emptyText: {
+//     textAlign: "center",
+//     fontWeight: "500",
+//     fontSize: 16,
+//     lineHeight: 22,
+//   },
+
+//   errorText: {
+//     fontSize: 16,
+//     color: "red",
+//     textAlign: "center",
+//   },
+// });
+
+import PodcastGridList from "@/components/PodcastGridList";
 import { LoadingIndicator } from "@/components/LoadingIndicator";
+import { ThemedText } from "@/components/ThemedText";
+import { ThemedView } from "@/components/ThemedView";
 import { Colors } from "@/constants/Colors";
-import { Entypo } from "@expo/vector-icons";
-import { router } from "expo-router";
-import { useTranslation } from "react-i18next";
-import { formatDate } from "../../utils/formatDate";
+import { useLanguage } from "../../contexts/LanguageContext";
 import { useDataVersionStore } from "../../stores/dataVersionStore";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { getFavoritePodcasts } from "../../utils/favorites";
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { Animated, StyleSheet, useColorScheme, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { usePodcastsByIdsForFavorites } from "../../hooks/usePodcastsByIdsForFavorites";
+import { useScreenFadeIn } from "@/hooks/useScreenFadeIn";
 
 export default function RenderFavoritePodcasts() {
   const { lang, rtl } = useLanguage();
   const { t } = useTranslation();
-  const colorScheme = useColorScheme() || "light";
+
   const podcastFavoritesVersion = useDataVersionStore(
-    (s) => s.podcastFavoritesVersion,
+    (state) => state.podcastFavoritesVersion,
   );
 
   const [favoriteIds, setFavoriteIds] = useState<number[]>([]);
-  const favKey = useMemo(() => favoriteIds.join(","), [favoriteIds]);
+  const [refreshing, setRefreshing] = useState(false);
+  const { fadeAnim, onLayout } = useScreenFadeIn(800);
+  const insets = useSafeAreaInsets();
 
+  const colorScheme = useColorScheme() || "light";
   useEffect(() => {
     let cancelled = false;
 
-    (async () => {
+    async function loadFavoriteIds() {
       try {
         const ids = await getFavoritePodcasts(lang);
+
         if (!cancelled) {
           setFavoriteIds(ids);
         }
-      } catch (e) {
+      } catch (error) {
         if (!cancelled) {
-          console.warn("Failed to load favorite podcasts:", e);
+          console.warn("Failed to load favorite podcasts:", error);
           setFavoriteIds([]);
         }
       }
-    })();
+    }
+
+    loadFavoriteIds();
 
     return () => {
       cancelled = true;
     };
   }, [lang, podcastFavoritesVersion]);
 
-  // Fetch favorite episodes by ID directly (no pagination dance)
   const {
     data: favoriteEpisodes = [],
     isLoading,
     isError,
     refetch,
     isFetching,
-  } = useQuery({
-    queryKey: ["favorite-episodes", lang, favKey],
-    enabled: favoriteIds.length > 0,
-    queryFn: async (): Promise<PodcastType[]> => {
-      const ids = favoriteIds.map(Number);
-      const { data, error } = await supabase
-        .from("podcasts")
-        .select("*")
-        .in("id", ids)
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return data ?? [];
-    },
-    retry: 3,
-    staleTime: 12 * 60 * 60 * 1000, // 12 hours
-    gcTime: 7 * 24 * 60 * 60 * 1000, // 7 days
-    refetchOnMount: "always",
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: true,
+  } = usePodcastsByIdsForFavorites({
+    ids: favoriteIds,
+    language: lang,
   });
 
-  // Pull-to-refresh (optional but handy)
-  const [refreshing, setRefreshing] = useState(false);
-  const onRefresh = async () => {
-    setRefreshing(true);
-    // Reload IDs in case user changed favorites while this screen was open
-    const ids = await getFavoritePodcasts(lang);
-    setFavoriteIds(ids);
-    await refetch();
-    setRefreshing(false);
+  const handleRefresh = async () => {
+    try {
+      setRefreshing(true);
+
+      const ids = await getFavoritePodcasts(lang);
+      setFavoriteIds(ids);
+
+      if (ids.length > 0) {
+        await refetch();
+      }
+    } catch (error) {
+      console.warn("Failed to refresh favorite podcasts:", error);
+    } finally {
+      setRefreshing(false);
+    }
   };
 
-  // const listExtraData = React.useMemo(
-  //   () => `${podcastFavoritesVersion}`,
-  //   [podcastFavoritesVersion]
-  // );
+  const renderEmpty = () => (
+    <View style={styles.emptyContainer}>
+      <ThemedText style={styles.emptyText} type="subtitle">
+        {t("noData")}
+      </ThemedText>
+    </View>
+  );
 
-  // Loading first data
+  const renderHeader = () => (
+    <View
+      style={[
+        styles.sectionHeaderRow,
+        {
+          flexDirection: rtl ? "row-reverse" : "row",
+        },
+      ]}
+    >
+      <ThemedText type="title">{t("favorites")}</ThemedText>
+    </View>
+  );
   if (isLoading && favoriteIds.length > 0) {
     return (
       <ThemedView style={styles.centeredContainer}>
@@ -109,7 +282,6 @@ export default function RenderFavoritePodcasts() {
     );
   }
 
-  // Error state
   if (isError) {
     return (
       <ThemedView style={styles.centeredContainer}>
@@ -118,7 +290,6 @@ export default function RenderFavoritePodcasts() {
     );
   }
 
-  // No favorites stored (or none returned)
   if (favoriteIds.length === 0 || favoriteEpisodes.length === 0) {
     return (
       <ThemedView style={styles.centeredContainer}>
@@ -128,97 +299,282 @@ export default function RenderFavoritePodcasts() {
   }
 
   return (
-    <SafeAreaView
+    <Animated.View
+      onLayout={onLayout}
       style={[
-        styles.container,
+        styles.animatedContainer,
         {
+          opacity: fadeAnim,
           backgroundColor: Colors[colorScheme].background,
+          paddingTop: insets.top,
+          paddingBottom: insets.bottom,
         },
       ]}
-      edges={["top"]}
     >
-      <FlatList
-        data={favoriteEpisodes}
-        // extraData={listExtraData}
-        keyExtractor={(item) => String(item.id)}
+      <PodcastGridList
+        podcasts={favoriteEpisodes}
         refreshing={refreshing || isFetching}
-        onRefresh={onRefresh}
-        contentContainerStyle={styles.flatListContent}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={[
-              styles.itemContainer,
-              {
-                backgroundColor: Colors[colorScheme].contrast,
-                flexDirection: rtl ? "row-reverse" : "row",
-              },
-            ]}
-            onPress={() =>
-              router.push({
-                pathname: "/(podcast)/indexPodcast",
-                params: { podcast: JSON.stringify(item) },
-              })
-            }
-          >
-            <View style={{ flex: 1, gap: 40 }}>
-              <ThemedText style={styles.itemTitle}>{item.title}</ThemedText>
-              <ThemedText style={styles.itemDate}>
-                {formatDate(item.created_at)}
-              </ThemedText>
-            </View>
-            <Entypo
-              name="chevron-thin-right"
-              size={24}
-              color={colorScheme === "dark" ? "#fff" : "#000"}
-              style={{ marginTop: -15 }}
-            />
-          </TouchableOpacity>
-        )}
+        onRefresh={handleRefresh}
+        ListHeaderComponent={renderHeader}
+        ListEmptyComponent={renderEmpty}
       />
-    </SafeAreaView>
+    </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  animatedContainer: {
+    flex: 1,
+  },
+
+  headerWrapper: {
+    marginBottom: 16,
+  },
+
+  sectionHeaderRow: {
+    padding: 10,
+    marginBottom: 12,
+  },
+
+  titleGroup: {
+    flex: 1,
+    alignItems: "center",
+    gap: 10,
+    paddingRight: 12,
+    height: 50,
+  },
+
+  sectionLabel: {
+    paddingHorizontal: 6,
+  },
+
+  headerActions: {
+    alignItems: "center",
+    gap: 8,
+  },
+
+  iconButton: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  searchContainer: {
+    minHeight: 44,
+    borderRadius: 22,
+    alignItems: "center",
+    paddingHorizontal: 14,
+    gap: 8,
+  },
+
+  searchInput: {
+    flex: 1,
+    fontSize: 15,
+    fontWeight: "500",
+    paddingVertical: 10,
+  },
+
+  clearSearchButton: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  filterBadge: {
+    position: "absolute",
+    top: -2,
+    right: -2,
+    minWidth: 16,
+    height: 16,
+    borderRadius: 8,
+    paddingHorizontal: 4,
+    backgroundColor: Colors.universal.primary,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  filterBadgeText: {
+    color: "#fff",
+    fontSize: 10,
+    fontWeight: "700",
+  },
+
+  activeFiltersRow: {
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: 8,
+    marginTop: 10,
+  },
+
+  filterChip: {
+    maxWidth: 170,
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+  },
+
+  filterChipText: {
+    fontSize: 12,
+    fontWeight: "600",
+  },
+
+  clearFiltersText: {
+    fontSize: 12,
+    fontWeight: "700",
+  },
+
   centeredContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 20,
-    textAlign: "center",
   },
-  flatListContent: {
-    paddingTop: 15,
-    gap: 20,
-    paddingBottom: 24,
-    paddingHorizontal: 15,
+
+  podcastItem: {
+    marginBottom: 0,
   },
-  itemContainer: {
-    justifyContent: "space-between",
+
+  cardShadow: {
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.18,
+    shadowRadius: 4,
+    elevation: 3,
+    overflow: "visible",
+  },
+
+  cardOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0, 0, 0, 0.2)",
+    zIndex: 1,
+  },
+
+  vinylRecord: {
+    position: "absolute",
+    top: 12,
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: "rgba(0, 0, 0, 0.22)",
+    justifyContent: "center",
     alignItems: "center",
-    padding: 15,
-    borderRadius: 8,
-    ...Platform.select({
-      ios: {
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 2,
-      },
-      android: { elevation: 5 },
-    }),
+    zIndex: 3,
   },
-  itemTitle: { fontSize: 16, fontWeight: "500" },
-  itemDate: {
-    fontSize: 14,
-    alignSelf: "flex-end",
-    color: Colors.universal.grayedOut,
+
+  vinylRecordLtr: {
+    right: 12,
   },
+
+  vinylRecordRtl: {
+    left: 12,
+  },
+
+  cardContent: {
+    flex: 1,
+    padding: 16,
+    justifyContent: "space-between",
+    zIndex: 2,
+  },
+
+  titleContainer: {
+    flex: 1,
+    justifyContent: "center",
+    paddingTop: 44,
+    marginBottom: 12,
+  },
+
+  cardTitle: {
+    fontSize: 17,
+    fontWeight: "900",
+    color: "#FFFFFF",
+    lineHeight: 22,
+    letterSpacing: -0.3,
+    textShadowColor: "rgba(0, 0, 0, 0.45)",
+    textShadowOffset: {
+      width: 0,
+      height: 0,
+    },
+    textShadowRadius: 4,
+  },
+
+  cardFooter: {
+    gap: 8,
+  },
+
+  playSection: {
+    alignItems: "center",
+  },
+
+  playButton: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: "rgba(255, 255, 255, 0.28)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  playText: {
+    flex: 1,
+    fontSize: 11,
+    fontWeight: "800",
+    color: "rgba(255, 255, 255, 0.9)",
+    letterSpacing: 0.8,
+    textTransform: "uppercase",
+  },
+
+  playTextLtr: {
+    marginLeft: 8,
+  },
+
+  playTextRtl: {
+    marginRight: 8,
+  },
+
+  createdAt: {
+    fontSize: 11,
+    fontWeight: "600",
+    color: "rgba(255, 255, 255, 0.78)",
+    letterSpacing: 0.4,
+    textTransform: "uppercase",
+  },
+
+  sectionLoader: {
+    marginVertical: 24,
+  },
+
+  footerLoader: {
+    paddingVertical: 16,
+    alignItems: "center",
+  },
+
+  emptyContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 32,
+    backgroundColor: "transparent",
+  },
+
   emptyText: {
     textAlign: "center",
-    fontWeight: "500",
-    fontSize: 16,
-    lineHeight: 22,
   },
-  errorText: { fontSize: 16, color: "red", textAlign: "center" },
+
+  errorContainer: {
+    alignItems: "center",
+    gap: 10,
+    paddingVertical: 20,
+    paddingHorizontal: 16,
+  },
+
+  errorText: {
+    fontSize: 16,
+    textAlign: "center",
+  },
 });
