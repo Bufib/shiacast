@@ -533,6 +533,8 @@ export type PodcastType = {
   created_at: string;
   podcast_topic?: string;
   podcast_author?: string;
+  image_filename: string;
+  image_url: any
 };
 
 export type SavedProgress = {

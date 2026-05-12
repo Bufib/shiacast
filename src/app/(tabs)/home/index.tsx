@@ -1,4 +1,3 @@
-//! Orginal
 // import { LoadingIndicator } from "@/components/LoadingIndicator";
 // import RetryButton from "@/components/RetryButton";
 // import { ThemedText } from "@/components/ThemedText";
@@ -16,14 +15,16 @@
 //   useInfiniteQuery,
 //   useQuery,
 // } from "@tanstack/react-query";
-
-// import React, { useMemo, useState } from "react";
+// import { router } from "expo-router";
+// import React, { useEffect, useMemo, useRef, useState } from "react";
 // import { useTranslation } from "react-i18next";
 // import {
 //   Animated,
 //   FlatList,
+//   Keyboard,
 //   StyleSheet,
 //   Text,
+//   TextInput,
 //   TouchableOpacity,
 //   useColorScheme,
 //   useWindowDimensions,
@@ -34,7 +35,6 @@
 // import { useLanguage } from "../../../../contexts/LanguageContext";
 // import { supabase } from "../../../../utils/supabase";
 // import { formatDate } from "../../../../utils/formatDate";
-// import { router } from "expo-router";
 
 // const PAGE_SIZE = 20;
 // const GRID_GAP = 12;
@@ -54,6 +54,19 @@
 //   listenText: string;
 //   gradientColors: readonly [string, string, ...string[]] | string[];
 // };
+
+// function useDebouncedValue<T>(value: T, delay = 350) {
+//   const [debouncedValue, setDebouncedValue] = useState(value);
+//   useEffect(() => {
+//     const timeout = setTimeout(() => {
+//       setDebouncedValue(value);
+//     }, delay);
+
+//     return () => clearTimeout(timeout);
+//   }, [value, delay]);
+
+//   return debouncedValue;
+// }
 
 // function parseTopics(raw: any): string[] {
 //   if (!raw) return [];
@@ -94,9 +107,9 @@
 //   gradientColors,
 // }: PodcastGridCardProps) {
 //   const formattedDate = formatDate(podcast.created_at);
+//   const colorScheme = useColorScheme() || "light";
 
 //   return (
-
 //     <View style={[styles.cardShadow, { width }]}>
 //       <LinearGradient
 //         style={styles.card}
@@ -112,7 +125,7 @@
 //             rtl ? styles.vinylRecordRtl : styles.vinylRecordLtr,
 //           ]}
 //         >
-//           <Feather name="mic" size={18} color="rgba(255,255,255,0.85)" />
+//           <Feather name="mic" size={18} color={"#fff"} />
 //         </View>
 
 //         <View style={styles.cardContent}>
@@ -175,6 +188,8 @@
 
 // export default function HomeScreen() {
 //   const colorScheme = useColorScheme() ?? "light";
+//   const colors = Colors[colorScheme];
+
 //   const { t } = useTranslation();
 //   const { lang, rtl } = useLanguage();
 //   const { gradientColors } = useGradient();
@@ -182,15 +197,33 @@
 //   const insets = useSafeAreaInsets();
 //   const { width } = useWindowDimensions();
 
-//   const podcastCardWidth = useMemo(() => {
-//     return (width - HORIZONTAL_PADDING * 2 - GRID_GAP) / 2;
-//   }, [width]);
+//   const searchInputRef = useRef<TextInput>(null);
 
 //   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
 //   const [selectedAuthor, setSelectedAuthor] = useState<string | null>(null);
 //   const [filterVisible, setFilterVisible] = useState(false);
 
+//   const [searchVisible, setSearchVisible] = useState(false);
+//   const [searchQuery, setSearchQuery] = useState("");
+
+//   const debouncedSearchQuery = useDebouncedValue(searchQuery.trim(), 350);
+
+//   const podcastCardWidth = useMemo(() => {
+//     return (width - HORIZONTAL_PADDING * 2 - GRID_GAP) / 2;
+//   }, [width]);
+
 //   const activeFilterCount = (selectedTopic ? 1 : 0) + (selectedAuthor ? 1 : 0);
+//   const hasActiveSearch = debouncedSearchQuery.length > 0;
+
+//   useEffect(() => {
+//     if (searchVisible) {
+//       const timeout = setTimeout(() => {
+//         searchInputRef.current?.focus();
+//       }, 120);
+
+//       return () => clearTimeout(timeout);
+//     }
+//   }, [searchVisible]);
 
 //   const { data: filterPairs = [] } = useQuery<
 //     { topic: string | null; author: string | null }[]
@@ -290,7 +323,13 @@
 //     QueryKey,
 //     number
 //   >({
-//     queryKey: ["home_podcasts_grid", lang, selectedTopic, selectedAuthor],
+//     queryKey: [
+//       "home_podcasts_grid",
+//       lang,
+//       selectedTopic,
+//       selectedAuthor,
+//       debouncedSearchQuery,
+//     ],
 //     queryFn: async ({ pageParam = 0 }) => {
 //       let query = supabase
 //         .from("podcasts")
@@ -301,6 +340,10 @@
 
 //       if (selectedAuthor) {
 //         query = query.eq("podcast_author", selectedAuthor);
+//       }
+
+//       if (debouncedSearchQuery.length > 0) {
+//         query = query.ilike("title", `%${debouncedSearchQuery}%`);
 //       }
 
 //       const { data, error } = await query;
@@ -334,49 +377,176 @@
 //     setSelectedAuthor(null);
 //   };
 
+//   const clearSearch = () => {
+//     setSearchQuery("");
+//     Keyboard.dismiss();
+//   };
+
+//   const closeSearch = () => {
+//     setSearchQuery("");
+//     setSearchVisible(false);
+//     Keyboard.dismiss();
+//   };
+
 //   const renderHeader = () => (
 //     <View style={styles.headerWrapper}>
-//       <View style={styles.sectionHeaderRow}>
-//         <ThemedText style={styles.sectionLabel}>
-//           {t("podcastsTitle").toUpperCase()}
-//         </ThemedText>
-
-//         <TouchableOpacity
-//           activeOpacity={0.75}
-//           onPress={() => setFilterVisible(true)}
+//       <View
+//         style={[
+//           styles.sectionHeaderRow,
+//           {
+//             flexDirection: rtl ? "row-reverse" : "row",
+//           },
+//         ]}
+//       >
+//         <View
 //           style={[
-//             styles.filterButton,
+//             styles.titleGroup,
 //             {
-//               backgroundColor: Colors[colorScheme].backgroundElement,
+//               flexDirection: rtl ? "row-reverse" : "row",
 //             },
 //           ]}
 //         >
-//           <Ionicons
-//             name="options-outline"
-//             size={19}
-//             color={
-//               activeFilterCount > 0
-//                 ? Colors.universal.primary
-//                 : Colors[colorScheme].text
-//             }
-//           />
+//           {searchVisible ? (
+//             <View
+//               style={[
+//                 styles.searchContainer,
+//                 {
+//                   backgroundColor: Colors[colorScheme].contrast,
+//                   flexDirection: rtl ? "row-reverse" : "row",
+//                 },
+//               ]}
+//             >
+//               <Ionicons
+//                 name="search-outline"
+//                 size={18}
+//                 color={colors.tabIconDefault}
+//               />
 
-//           {activeFilterCount > 0 && (
-//             <View style={styles.filterBadge}>
-//               <Text style={styles.filterBadgeText}>{activeFilterCount}</Text>
+//               <TextInput
+//                 ref={searchInputRef}
+//                 value={searchQuery}
+//                 onChangeText={setSearchQuery}
+//                 placeholder={t("search") || "Suchen"}
+//                 placeholderTextColor={colors.tabIconDefault}
+//                 returnKeyType="search"
+//                 autoCorrect={false}
+//                 autoCapitalize="none"
+//                 clearButtonMode="never"
+//                 style={[
+//                   styles.searchInput,
+//                   {
+//                     color: colors.text,
+//                     textAlign: rtl ? "right" : "left",
+//                     writingDirection: rtl ? "rtl" : "ltr",
+//                   },
+//                 ]}
+//               />
+
+//               {searchQuery.length > 0 && (
+//                 <TouchableOpacity
+//                   activeOpacity={0.75}
+//                   onPress={clearSearch}
+//                   style={styles.clearSearchButton}
+//                 >
+//                   <Ionicons
+//                     name="close-circle"
+//                     size={18}
+//                     color={colors.tabIconDefault}
+//                   />
+//                 </TouchableOpacity>
+//               )}
 //             </View>
+//           ) : (
+//             <ThemedText
+//               type="title"
+
+//               style={[
+//                 styles.sectionLabel,
+//                 {
+//                   textAlign: rtl ? "right" : "left",
+//                 },
+//               ]}
+//             >
+//               {t("podcastsTitle")}
+//             </ThemedText>
 //           )}
-//         </TouchableOpacity>
+//         </View>
+
+//         <View
+//           style={[
+//             styles.headerActions,
+//             {
+//               flexDirection: rtl ? "row-reverse" : "row",
+//             },
+//           ]}
+//         >
+//           <TouchableOpacity
+//             activeOpacity={0.75}
+//             onPress={() => {
+//               if (searchVisible) {
+//                 closeSearch();
+//               } else {
+//                 setSearchVisible(true);
+//               }
+//             }}
+//             style={[
+//               styles.iconButton,
+//               {
+//                 backgroundColor: searchVisible
+//                   ? Colors.universal.primary
+//                   : colors.backgroundElement,
+//               },
+//             ]}
+//           >
+//             <Ionicons
+//               name={searchVisible ? "close-outline" : "search-outline"}
+//               size={20}
+//               color={searchVisible ? "#FFFFFF" : colors.text}
+//             />
+//           </TouchableOpacity>
+
+//           <TouchableOpacity
+//             activeOpacity={0.75}
+//             onPress={() => setFilterVisible(true)}
+//             style={[
+//               styles.iconButton,
+//               {
+//                 backgroundColor: colors.backgroundElement,
+//               },
+//             ]}
+//           >
+//             <Ionicons
+//               name="options-outline"
+//               size={19}
+//               color={
+//                 activeFilterCount > 0 ? Colors.universal.primary : colors.text
+//               }
+//             />
+
+//             {activeFilterCount > 0 && (
+//               <View style={styles.filterBadge}>
+//                 <Text style={styles.filterBadgeText}>{activeFilterCount}</Text>
+//               </View>
+//             )}
+//           </TouchableOpacity>
+//         </View>
 //       </View>
 
 //       {activeFilterCount > 0 && (
-//         <View style={styles.activeFiltersRow}>
+//         <View
+//           style={[
+//             styles.activeFiltersRow,
+//             {
+//               flexDirection: rtl ? "row-reverse" : "row",
+//             },
+//           ]}
+//         >
 //           {selectedTopic && (
 //             <View
 //               style={[
 //                 styles.filterChip,
 //                 {
-//                   backgroundColor: Colors[colorScheme].backgroundElement,
+//                   backgroundColor: colors.backgroundElement,
 //                 },
 //               ]}
 //             >
@@ -384,7 +554,10 @@
 //                 numberOfLines={1}
 //                 style={[
 //                   styles.filterChipText,
-//                   { color: Colors[colorScheme].text },
+//                   {
+//                     color: colors.text,
+//                     textAlign: rtl ? "right" : "left",
+//                   },
 //                 ]}
 //               >
 //                 {selectedTopic}
@@ -397,7 +570,7 @@
 //               style={[
 //                 styles.filterChip,
 //                 {
-//                   backgroundColor: Colors[colorScheme].backgroundElement,
+//                   backgroundColor: colors.backgroundElement,
 //                 },
 //               ]}
 //             >
@@ -405,7 +578,10 @@
 //                 numberOfLines={1}
 //                 style={[
 //                   styles.filterChipText,
-//                   { color: Colors[colorScheme].text },
+//                   {
+//                     color: colors.text,
+//                     textAlign: rtl ? "right" : "left",
+//                   },
 //                 ]}
 //               >
 //                 {selectedAuthor}
@@ -416,12 +592,13 @@
 //           <TouchableOpacity onPress={clearFilters} activeOpacity={0.75}>
 //             <Text
 //               style={[
-
 //                 styles.clearFiltersText,
-//                 { color: Colors.universal.link },
+//                 {
+//                   color: Colors.universal.link,
+//                 },
 //               ]}
 //             >
-//               {t("reset") || "Zurücksetzen"}
+//               {t("reset")}
 //             </Text>
 //           </TouchableOpacity>
 //         </View>
@@ -441,7 +618,7 @@
 //             style={[
 //               styles.errorText,
 //               {
-//                 color: Colors[colorScheme].error,
+//                 color: colors.error,
 //               },
 //             ]}
 //           >
@@ -456,7 +633,7 @@
 //     return (
 //       <View style={styles.emptyContainer}>
 //         <ThemedText style={styles.emptyText} type="subtitle">
-//           {activeFilterCount > 0
+//           {hasActiveSearch || activeFilterCount > 0
 //             ? t("noSearchResult") || "Keine passenden Podcasts gefunden"
 //             : t("podcastsEmpty") ||
 //               t("noPodcasts") ||
@@ -467,11 +644,12 @@
 //   };
 
 //   return (
-//     <View
+//     <Animated.View
+//       onLayout={onLayout}
 //       style={[
-//         styles.container,
+//         styles.animatedContainer,
 //         {
-//           backgroundColor: Colors[colorScheme].background,
+//           backgroundColor: colors.background,
 //           paddingTop: insets.top,
 //           paddingBottom: insets.bottom,
 //         },
@@ -488,84 +666,71 @@
 //         onSelectAuthor={setSelectedAuthor}
 //       />
 
-//       <Animated.View
-//         onLayout={onLayout}
-//         style={[
-//           styles.animatedContainer,
-//           {
-//             opacity: fadeAnim,
-//             backgroundColor: Colors[colorScheme].background,
-//           },
-//         ]}
-//       >
-//         <FlatList
-//           data={podcasts}
-//           numColumns={2}
-//           key="podcast-grid-2"
-//           keyExtractor={(item) => item.id.toString()}
-//           renderItem={({ item }) => (
-//             <TouchableOpacity
-//               activeOpacity={0.85}
-//               style={[
-//                 styles.podcastItem,
-//                 {
-//                   width: podcastCardWidth,
+//       <FlatList
+//         data={podcasts}
+//         numColumns={2}
+//         key="podcast-grid-2"
+//         keyExtractor={(item) => item.id.toString()}
+//         renderItem={({ item }) => (
+//           <TouchableOpacity
+//             activeOpacity={0.85}
+//             style={[
+//               styles.podcastItem,
+//               {
+//                 width: podcastCardWidth,
+//               },
+//             ]}
+//             onPress={() =>
+//               router.push({
+//                 pathname: "/indexPodcast",
+//                 params: {
+//                   podcast: JSON.stringify(item),
 //                 },
-//               ]}
-//               onPress={() =>
-//                 router.push({
-//                   pathname: "/indexPodcast",
-//                   params: {
-//                     podcast: JSON.stringify(item),
-//                   },
-//                 })
-//               }
-//             >
-//               <PodcastGridCard
-//                 podcast={item}
-//                 width={podcastCardWidth}
-//                 rtl={rtl}
-//                 lang={lang}
-//                 listenText={t("listen")}
-//                 gradientColors={gradientColors}
-//               />
-//             </TouchableOpacity>
-//           )}
-//           columnWrapperStyle={styles.columnWrapper}
-//           ListHeaderComponent={renderHeader}
-//           ListEmptyComponent={renderEmpty}
-//           ListFooterComponent={
-//             podcastsIsFetchingNextPage ? (
-//               <View style={styles.footerLoader}>
-//                 <LoadingIndicator size="small" />
-//               </View>
-//             ) : null
-//           }
-//           onEndReached={() => {
-//             if (
-//               podcastsHasNextPage &&
-//               !podcastsIsFetchingNextPage &&
-//               !podcastsLoading
-//             ) {
-//               podcastsFetchNextPage();
+//               })
 //             }
-//           }}
-//           onEndReachedThreshold={0.4}
-//           showsVerticalScrollIndicator={false}
-//           contentContainerStyle={styles.listContent}
-//         />
-//       </Animated.View>
-//     </View>
+//           >
+//             <PodcastGridCard
+//               podcast={item}
+//               width={podcastCardWidth}
+//               rtl={rtl}
+//               lang={lang}
+//               listenText={t("listen")}
+//               gradientColors={gradientColors}
+//             />
+//           </TouchableOpacity>
+//         )}
+//         columnWrapperStyle={styles.columnWrapper}
+//         ListHeaderComponent={renderHeader}
+//         ListEmptyComponent={renderEmpty}
+//         ListFooterComponent={
+//           podcastsIsFetchingNextPage ? (
+//             <View style={styles.footerLoader}>
+//               <LoadingIndicator size="small" />
+//             </View>
+//           ) : null
+//         }
+//         onEndReached={() => {
+//           if (
+//             podcastsHasNextPage &&
+//             !podcastsIsFetchingNextPage &&
+//             !podcastsLoading
+//           ) {
+//             podcastsFetchNextPage();
+//           }
+//         }}
+//         onEndReachedThreshold={0.4}
+//         keyboardShouldPersistTaps="handled"
+//         showsVerticalScrollIndicator={false}
+//         contentContainerStyle={styles.listContent}
+//       />
+//     </Animated.View>
 //   );
 // }
-
 // const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//   },
 //   animatedContainer: {
 //     flex: 1,
 //   },
+
 //   listContent: {
 //     paddingTop: 18,
 //     paddingBottom: 30,
@@ -573,27 +738,72 @@
 //   },
 
 //   headerWrapper: {
-//     gap: 10,
-//     marginBottom: 14,
+//     marginBottom: 16,
 //   },
+
 //   sectionHeaderRow: {
-//     flexDirection: "row",
+//     minHeight: 40,
 //     justifyContent: "space-between",
 //     alignItems: "center",
 //   },
-//   sectionLabel: {
-//     fontSize: 16,
-//     fontWeight: "700",
-//     letterSpacing: 1.2,
+
+//   titleGroup: {
+//     flex: 1,
+//     alignItems: "center",
+//     gap: 10,
+//     paddingRight: 12,
+//     height: 50
 //   },
 
-//   filterButton: {
-//     width: 36,
-//     height: 36,
-//     borderRadius: 18,
+//   headerIconContainer: {
+//     width: 38,
+//     height: 38,
+//     borderRadius: 19,
 //     justifyContent: "center",
 //     alignItems: "center",
 //   },
+
+//   sectionLabel: {
+//     paddingHorizontal: 6
+//   },
+
+//   headerActions: {
+//     alignItems: "center",
+//     gap: 8,
+//   },
+
+//   iconButton: {
+//     width: 38,
+//     height: 38,
+//     borderRadius: 19,
+//     justifyContent: "center",
+//     alignItems: "center",
+//   },
+
+//   searchContainer: {
+//     minHeight: 44,
+//     borderRadius: 22,
+//     alignItems: "center",
+//     paddingHorizontal: 14,
+//     gap: 8,
+
+//   },
+
+//   searchInput: {
+//     flex: 1,
+//     fontSize: 15,
+//     fontWeight: "500",
+//     paddingVertical: 10,
+//   },
+
+//   clearSearchButton: {
+//     width: 26,
+//     height: 26,
+//     borderRadius: 13,
+//     justifyContent: "center",
+//     alignItems: "center",
+//   },
+
 //   filterBadge: {
 //     position: "absolute",
 //     top: -2,
@@ -606,27 +816,30 @@
 //     justifyContent: "center",
 //     alignItems: "center",
 //   },
+
 //   filterBadgeText: {
 //     color: "#fff",
 //     fontSize: 10,
 //     fontWeight: "700",
 //   },
+
 //   activeFiltersRow: {
-//     flexDirection: "row",
 //     alignItems: "center",
 //     flexWrap: "wrap",
-//     gap: 8,
 //   },
+
 //   filterChip: {
 //     maxWidth: 170,
 //     borderRadius: 999,
 //     paddingHorizontal: 10,
 //     paddingVertical: 5,
 //   },
+
 //   filterChipText: {
 //     fontSize: 12,
 //     fontWeight: "600",
 //   },
+
 //   clearFiltersText: {
 //     fontSize: 12,
 //     fontWeight: "700",
@@ -636,6 +849,7 @@
 //     justifyContent: "space-between",
 //     marginBottom: GRID_GAP,
 //   },
+
 //   podcastItem: {
 //     marginBottom: 0,
 //   },
@@ -651,6 +865,7 @@
 //     elevation: 3,
 //     overflow: "visible",
 //   },
+
 //   card: {
 //     width: "100%",
 //     height: CARD_HEIGHT,
@@ -658,11 +873,13 @@
 //     position: "relative",
 //     overflow: "hidden",
 //   },
+
 //   cardOverlay: {
 //     ...StyleSheet.absoluteFillObject,
 //     backgroundColor: "rgba(0, 0, 0, 0.2)",
 //     zIndex: 1,
 //   },
+
 //   vinylRecord: {
 //     position: "absolute",
 //     top: 12,
@@ -674,24 +891,29 @@
 //     alignItems: "center",
 //     zIndex: 3,
 //   },
+
 //   vinylRecordLtr: {
 //     right: 12,
 //   },
+
 //   vinylRecordRtl: {
 //     left: 12,
 //   },
+
 //   cardContent: {
 //     flex: 1,
 //     padding: 16,
 //     justifyContent: "space-between",
 //     zIndex: 2,
 //   },
+
 //   titleContainer: {
 //     flex: 1,
 //     justifyContent: "center",
 //     paddingTop: 44,
 //     marginBottom: 12,
 //   },
+
 //   cardTitle: {
 //     fontSize: 17,
 //     fontWeight: "900",
@@ -699,15 +921,21 @@
 //     lineHeight: 22,
 //     letterSpacing: -0.3,
 //     textShadowColor: "rgba(0, 0, 0, 0.45)",
-//     textShadowOffset: { width: 0, height: 0 },
+//     textShadowOffset: {
+//       width: 0,
+//       height: 0,
+//     },
 //     textShadowRadius: 4,
 //   },
+
 //   cardFooter: {
 //     gap: 8,
 //   },
+
 //   playSection: {
 //     alignItems: "center",
 //   },
+
 //   playButton: {
 //     width: 34,
 //     height: 34,
@@ -716,6 +944,7 @@
 //     justifyContent: "center",
 //     alignItems: "center",
 //   },
+
 //   playText: {
 //     flex: 1,
 //     fontSize: 11,
@@ -724,12 +953,15 @@
 //     letterSpacing: 0.8,
 //     textTransform: "uppercase",
 //   },
+
 //   playTextLtr: {
 //     marginLeft: 8,
 //   },
+
 //   playTextRtl: {
 //     marginRight: 8,
 //   },
+
 //   createdAt: {
 //     fontSize: 11,
 //     fontWeight: "600",
@@ -741,25 +973,30 @@
 //   sectionLoader: {
 //     marginVertical: 24,
 //   },
+
 //   footerLoader: {
 //     paddingVertical: 16,
 //     alignItems: "center",
 //   },
+
 //   emptyContainer: {
 //     alignItems: "center",
 //     justifyContent: "center",
 //     paddingVertical: 32,
 //     backgroundColor: "transparent",
 //   },
+
 //   emptyText: {
 //     textAlign: "center",
 //   },
+
 //   errorContainer: {
 //     alignItems: "center",
 //     gap: 10,
 //     paddingVertical: 20,
 //     paddingHorizontal: 16,
 //   },
+
 //   errorText: {
 //     fontSize: 16,
 //     textAlign: "center",
@@ -789,6 +1026,7 @@ import { useTranslation } from "react-i18next";
 import {
   Animated,
   FlatList,
+  Image,
   Keyboard,
   StyleSheet,
   Text,
@@ -809,6 +1047,9 @@ const GRID_GAP = 12;
 const HORIZONTAL_PADDING = 16;
 const CARD_HEIGHT = 230;
 
+const IMAGES_BUCKET = "images";
+const IMAGE_SIGNED_URL_EXPIRES_IN_SECONDS = 60 * 60 * 24;
+
 type PodcastPage = {
   items: PodcastType[];
   nextOffset?: number;
@@ -822,6 +1063,41 @@ type PodcastGridCardProps = {
   listenText: string;
   gradientColors: readonly [string, string, ...string[]] | string[];
 };
+
+// --- IMAGE URL HELPER ---
+async function signedUrlsForImages(
+  filenames: string[],
+): Promise<Record<string, string>> {
+  if (filenames.length === 0) return {};
+
+  const cleanPaths = filenames.map((f) =>
+    f.trim().replace(/\\/g, "/").replace(/^\/+/, ""),
+  );
+
+  const { data, error } = await supabase.storage
+    .from(IMAGES_BUCKET)
+    .createSignedUrls(cleanPaths, IMAGE_SIGNED_URL_EXPIRES_IN_SECONDS);
+
+  if (error || !data) {
+    console.warn("[signedUrlsForImages] error:", error);
+    return {};
+  }
+
+  const map: Record<string, string> = {};
+
+  data.forEach((item, i) => {
+    if (item.signedUrl) {
+      map[filenames[i]] = item.signedUrl;
+    } else if (item.error) {
+      console.warn(
+        `[signedUrlsForImages] failed for ${filenames[i]}:`,
+        item.error,
+      );
+    }
+  });
+
+  return map;
+}
 
 function useDebouncedValue<T>(value: T, delay = 350) {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -875,17 +1151,42 @@ function PodcastGridCard({
   gradientColors,
 }: PodcastGridCardProps) {
   const formattedDate = formatDate(podcast.created_at);
-  const colorScheme = useColorScheme() || "light";
+  const hasCover = Boolean(podcast.image_url);
 
   return (
     <View style={[styles.cardShadow, { width }]}>
-      <LinearGradient
-        style={styles.card}
-        colors={gradientColors as any}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-      >
-        <View style={styles.cardOverlay} />
+      <View style={styles.card}>
+        {hasCover ? (
+          <>
+            <Image
+              source={{ uri: podcast.image_url! }}
+              style={StyleSheet.absoluteFill}
+              resizeMode="cover"
+            />
+            {/* Dark gradient overlay so the title stays readable */}
+            <LinearGradient
+              colors={[
+                "rgba(0,0,0,0.15)",
+                "rgba(0,0,0,0.4)",
+                "rgba(0,0,0,0.8)",
+              ]}
+              locations={[0, 0.5, 1]}
+              style={StyleSheet.absoluteFill}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 0, y: 1 }}
+            />
+          </>
+        ) : (
+          <>
+            <LinearGradient
+              style={StyleSheet.absoluteFill}
+              colors={gradientColors as any}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+            />
+            <View style={styles.cardOverlay} />
+          </>
+        )}
 
         <View
           style={[
@@ -949,10 +1250,15 @@ function PodcastGridCard({
             </Text>
           </View>
         </View>
-      </LinearGradient>
+      </View>
     </View>
   );
 }
+
+type FilterPair = {
+  topic: string | null;
+  author: string | null;
+};
 
 export default function HomeScreen() {
   const colorScheme = useColorScheme() ?? "light";
@@ -981,21 +1287,20 @@ export default function HomeScreen() {
   }, [width]);
 
   const activeFilterCount = (selectedTopic ? 1 : 0) + (selectedAuthor ? 1 : 0);
+
   const hasActiveSearch = debouncedSearchQuery.length > 0;
 
   useEffect(() => {
-    if (searchVisible) {
-      const timeout = setTimeout(() => {
-        searchInputRef.current?.focus();
-      }, 120);
+    if (!searchVisible) return;
 
-      return () => clearTimeout(timeout);
-    }
+    const timeout = setTimeout(() => {
+      searchInputRef.current?.focus();
+    }, 120);
+
+    return () => clearTimeout(timeout);
   }, [searchVisible]);
 
-  const { data: filterPairs = [] } = useQuery<
-    { topic: string | null; author: string | null }[]
-  >({
+  const { data: filterPairs = [] } = useQuery<FilterPair[]>({
     queryKey: ["home_podcast_filter_pairs", lang],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -1005,49 +1310,43 @@ export default function HomeScreen() {
 
       if (error) throw error;
 
-      return (data ?? []).flatMap(
-        (row: any): { topic: string | null; author: string | null }[] => {
-          const topics = parseTopics(row.podcast_topic);
-          const author = row.podcast_author ?? null;
+      return (data ?? []).flatMap((row: any): FilterPair[] => {
+        const topics = parseTopics(row.podcast_topic);
+        const author = row.podcast_author ?? null;
 
-          if (topics.length === 0) {
-            return [{ topic: null, author }];
-          }
+        if (topics.length === 0) {
+          return [{ topic: null, author }];
+        }
 
-          return topics.map((topic) => ({
-            topic,
-            author,
-          }));
-        },
-      );
+        return topics.map((topic) => ({
+          topic,
+          author,
+        }));
+      });
     },
     enabled: Boolean(lang),
     staleTime: 60 * 60 * 1000,
   });
 
-  const allTopics = useMemo(
-    () =>
-      [
-        ...new Set(
-          filterPairs
-            .map((pair) => pair.topic)
-            .filter((topic): topic is string => Boolean(topic)),
-        ),
-      ].sort(),
-    [filterPairs],
-  );
+  const allTopics = useMemo(() => {
+    return [
+      ...new Set(
+        filterPairs
+          .map((pair) => pair.topic)
+          .filter((topic): topic is string => Boolean(topic)),
+      ),
+    ].sort();
+  }, [filterPairs]);
 
-  const allAuthors = useMemo(
-    () =>
-      [
-        ...new Set(
-          filterPairs
-            .map((pair) => pair.author)
-            .filter((author): author is string => Boolean(author)),
-        ),
-      ].sort(),
-    [filterPairs],
-  );
+  const allAuthors = useMemo(() => {
+    return [
+      ...new Set(
+        filterPairs
+          .map((pair) => pair.author)
+          .filter((author): author is string => Boolean(author)),
+      ),
+    ].sort();
+  }, [filterPairs]);
 
   const availableTopics = useMemo(() => {
     if (!selectedAuthor) return allTopics;
@@ -1121,13 +1420,26 @@ export default function HomeScreen() {
       const rawRows = (data ?? []) as PodcastType[];
 
       const filteredRows = selectedTopic
-        ? rawRows.filter((podcast: any) =>
+        ? rawRows.filter((podcast) =>
             matchesTopic(podcast.podcast_topic, selectedTopic),
           )
         : rawRows;
 
+      const imageFilenames = filteredRows
+        .map((podcast) => podcast.image_filename)
+        .filter((filename): filename is string => Boolean(filename));
+
+      const imageUrlMap = await signedUrlsForImages(imageFilenames);
+
+      const itemsWithImages = filteredRows.map((podcast) => ({
+        ...podcast,
+        image_url: podcast.image_filename
+          ? (imageUrlMap[podcast.image_filename] ?? null)
+          : null,
+      })) as PodcastType[];
+
       return {
-        items: filteredRows,
+        items: itemsWithImages,
         nextOffset:
           rawRows.length === PAGE_SIZE ? pageParam + PAGE_SIZE : undefined,
       };
@@ -1137,8 +1449,9 @@ export default function HomeScreen() {
     enabled: Boolean(lang),
   });
 
-  const podcasts: PodcastType[] =
-    podcastPages?.pages.flatMap((page) => page.items) ?? [];
+  const podcasts = useMemo(() => {
+    return podcastPages?.pages.flatMap((page) => page.items) ?? [];
+  }, [podcastPages]);
 
   const clearFilters = () => {
     setSelectedTopic(null);
@@ -1227,7 +1540,6 @@ export default function HomeScreen() {
           ) : (
             <ThemedText
               type="title"
-            
               style={[
                 styles.sectionLabel,
                 {
@@ -1494,6 +1806,7 @@ export default function HomeScreen() {
     </Animated.View>
   );
 }
+
 const styles = StyleSheet.create({
   animatedContainer: {
     flex: 1,
@@ -1520,7 +1833,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 10,
     paddingRight: 12,
-    height: 50
+    height: 50,
   },
 
   headerIconContainer: {
@@ -1532,7 +1845,7 @@ const styles = StyleSheet.create({
   },
 
   sectionLabel: {
-    paddingHorizontal: 6
+    paddingHorizontal: 6,
   },
 
   headerActions: {
@@ -1554,7 +1867,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 14,
     gap: 8,
-
   },
 
   searchInput: {
@@ -1640,6 +1952,7 @@ const styles = StyleSheet.create({
     borderRadius: 26,
     position: "relative",
     overflow: "hidden",
+    backgroundColor: "#1a1a1a", // shown briefly while the image loads
   },
 
   cardOverlay: {

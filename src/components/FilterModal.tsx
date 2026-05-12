@@ -2,13 +2,20 @@ import { Colors } from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { StyleSheet, Text, TouchableOpacity, View, useColorScheme } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  useColorScheme,
+} from "react-native";
 import {
   BottomSheetBackdrop,
   BottomSheetModal,
   BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import LanguageSelection from "./LanguageSelectionScreen";
 
 type FilterModalProps = {
   visible: boolean;
@@ -56,7 +63,7 @@ export default function FilterModal({
         opacity={0.5}
       />
     ),
-    []
+    [],
   );
 
   const hasActiveFilters = selectedTopic !== null || selectedAuthor !== null;
@@ -87,17 +94,26 @@ export default function FilterModal({
             color={Colors.universal.primary}
             style={{ marginRight: 8 }}
           />
-          <Text style={[styles.panelTitle, { color: isDark ? "#fff" : "#111" }]}>
+          <Text
+            style={[styles.panelTitle, { color: isDark ? "#fff" : "#111" }]}
+          >
             Filter
           </Text>
         </View>
         <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
-          <Ionicons name="close" size={22} color={isDark ? "#8899aa" : "#666"} />
+          <Ionicons
+            name="close"
+            size={22}
+            color={isDark ? "#8899aa" : "#666"}
+          />
         </TouchableOpacity>
       </View>
 
       <View
-        style={[styles.divider, { backgroundColor: isDark ? "#2d3d50" : "#f0f2f5" }]}
+        style={[
+          styles.divider,
+          { backgroundColor: isDark ? "#2d3d50" : "#f0f2f5" },
+        ]}
       />
 
       <BottomSheetScrollView
@@ -111,14 +127,20 @@ export default function FilterModal({
         {topics.length > 0 && (
           <View style={styles.section}>
             <Text style={[styles.sectionLabel, { color: sectionLabelColor }]}>
-              {t("allTopics").replace("Alle ", "").replace("All ", "").toUpperCase()}
+              {t("allTopics")
+                .replace("Alle ", "")
+                .replace("All ", "")
+                .toUpperCase()}
             </Text>
             <View style={styles.chipsWrap}>
               <TouchableOpacity
                 style={[
                   styles.chip,
                   { backgroundColor: chipBg, borderColor: chipBorder },
-                  !selectedTopic && { backgroundColor: activeBg, borderColor: activeBg },
+                  !selectedTopic && {
+                    backgroundColor: activeBg,
+                    borderColor: activeBg,
+                  },
                 ]}
                 onPress={() => onSelectTopic(null)}
               >
@@ -138,9 +160,14 @@ export default function FilterModal({
                   style={[
                     styles.chip,
                     { backgroundColor: chipBg, borderColor: chipBorder },
-                    selectedTopic === topic && { backgroundColor: activeBg, borderColor: activeBg },
+                    selectedTopic === topic && {
+                      backgroundColor: activeBg,
+                      borderColor: activeBg,
+                    },
                   ]}
-                  onPress={() => onSelectTopic(selectedTopic === topic ? null : topic)}
+                  onPress={() =>
+                    onSelectTopic(selectedTopic === topic ? null : topic)
+                  }
                 >
                   <Text
                     style={[
@@ -161,14 +188,20 @@ export default function FilterModal({
         {authors.length > 0 && (
           <View style={styles.section}>
             <Text style={[styles.sectionLabel, { color: sectionLabelColor }]}>
-              {t("allAuthors").replace("Alle ", "").replace("All ", "").toUpperCase()}
+              {t("allAuthors")
+                .replace("Alle ", "")
+                .replace("All ", "")
+                .toUpperCase()}
             </Text>
             <View style={styles.chipsWrap}>
               <TouchableOpacity
                 style={[
                   styles.chip,
                   { backgroundColor: chipBg, borderColor: chipBorder },
-                  !selectedAuthor && { backgroundColor: activeBg, borderColor: activeBg },
+                  !selectedAuthor && {
+                    backgroundColor: activeBg,
+                    borderColor: activeBg,
+                  },
                 ]}
                 onPress={() => onSelectAuthor(null)}
               >
@@ -188,9 +221,14 @@ export default function FilterModal({
                   style={[
                     styles.chip,
                     { backgroundColor: chipBg, borderColor: chipBorder },
-                    selectedAuthor === author && { backgroundColor: activeBg, borderColor: activeBg },
+                    selectedAuthor === author && {
+                      backgroundColor: activeBg,
+                      borderColor: activeBg,
+                    },
                   ]}
-                  onPress={() => onSelectAuthor(selectedAuthor === author ? null : author)}
+                  onPress={() =>
+                    onSelectAuthor(selectedAuthor === author ? null : author)
+                  }
                 >
                   <Text
                     style={[
@@ -207,6 +245,8 @@ export default function FilterModal({
           </View>
         )}
 
+        {/* Language selector */}
+        
         {/* Clear button */}
         {hasActiveFilters && (
           <TouchableOpacity
