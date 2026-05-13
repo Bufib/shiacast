@@ -20,6 +20,7 @@ import { BlurView } from "expo-blur";
 import { Colors } from "@/constants/Colors";
 import { useGlobalPlayer } from "../../player/useGlobalPlayer";
 import { CircularProgressRing } from "./CircularProgressRing";
+import { useLastPlayedPodcastStore } from "../../stores/useLastPlayedPodcastStore";
 
 type Props = {
   bottomOffset?: number; // initial placement above bottom
@@ -32,7 +33,7 @@ const RIGHT_MARGIN = 16;
 const PADDING = 10;
 
 const readVal = (v: any) =>
-  typeof v?.__getValue === "function" ? v.__getValue() : v?._value ?? 0;
+  typeof v?.__getValue === "function" ? v.__getValue() : (v?._value ?? 0);
 
 const clamp = (n: number, min: number, max: number) =>
   Math.max(min, Math.min(max, n));
@@ -62,12 +63,12 @@ export default function MiniPlayerBar({ bottomOffset = 50 }: Props) {
   // ---- Hooks must be declared before any early return
   const [isCollapsed, setIsCollapsed] = React.useState(false);
   const [measured, setMeasured] = React.useState({ w: SCREEN_W - 32, h: 100 });
-
+  const undismissLastPlayed = useLastPlayedPodcastStore((s) => s.undismiss);
   const pan = React.useRef(
     new Animated.ValueXY({
       x: 0,
       y: SCREEN_H - bottomOffset - 100, // initial guess; parked/clamped after we know size/insets
-    })
+    }),
   ).current;
 
   const onMeasure = (e: LayoutChangeEvent) => {
@@ -102,7 +103,7 @@ export default function MiniPlayerBar({ bottomOffset = 50 }: Props) {
     const targetY = clamp(
       SCREEN_H - insets.bottom - measured.h - bottomOffset,
       bounds.minY,
-      bounds.maxY
+      bounds.maxY,
     );
     pan.setValue({ x: 0, y: targetY });
     parkedRef.current = true;
@@ -145,7 +146,7 @@ export default function MiniPlayerBar({ bottomOffset = 50 }: Props) {
           tension: 80,
         }).start();
       },
-    })
+    }),
   ).current;
 
   // Re-clamp when state/metrics change
@@ -185,8 +186,8 @@ export default function MiniPlayerBar({ bottomOffset = 50 }: Props) {
   };
 
   const artworkSource = artwork
-  ? { uri: artwork }
-  : require("@/assets/images/icon.png");
+    ? { uri: artwork }
+    : require("@/assets/images/icon.png");
 
   const openFull = () => {
     router.push({
@@ -197,7 +198,7 @@ export default function MiniPlayerBar({ bottomOffset = 50 }: Props) {
           title: title,
           filename,
           currentUri,
-          artwork
+          artwork,
         }),
       },
     });
@@ -235,11 +236,11 @@ export default function MiniPlayerBar({ bottomOffset = 50 }: Props) {
             />
             <View style={styles.collapsedContent}>
               <View style={styles.artworkWrap}>
-               <Image
-  source={artworkSource}          
-  style={styles.collapsedArtwork}
-  contentFit="cover"
-/>
+                <Image
+                  source={artworkSource}
+                  style={styles.collapsedArtwork}
+                  contentFit="cover"
+                />
                 {isPlaying && (
                   <View style={styles.ringOverlay}>
                     <CircularProgressRing
@@ -313,11 +314,11 @@ export default function MiniPlayerBar({ bottomOffset = 50 }: Props) {
             >
               {/* Artwork */}
               <View style={styles.artworkContainer}>
-               <Image
-  source={artworkSource}         
-  style={styles.artwork}
-  contentFit="cover"
-/>
+                <Image
+                  source={artworkSource}
+                  style={styles.artwork}
+                  contentFit="cover"
+                />
                 {isPlaying && (
                   <View style={styles.playingIndicator}>
                     <View style={styles.bar} />
@@ -367,7 +368,13 @@ export default function MiniPlayerBar({ bottomOffset = 50 }: Props) {
               </TouchableOpacity>
 
               <TouchableOpacity
-                onPress={toggle}
+                onPress={() => {
+                  // Beim Wechsel von Pause → Play: Continue-Listening-Card wieder zeigen
+                  if (!isPlaying) {
+                    undismissLastPlayed();
+                  }
+                  toggle();
+                }}
                 style={styles.playBtn}
                 activeOpacity={0.85}
               >
