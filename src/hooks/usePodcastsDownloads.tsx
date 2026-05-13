@@ -8,8 +8,8 @@ import {
   downloadPodcastToCache,
   ensurePodcastCacheDir,
   getPodcastLocalUri,
-} from "../utils/podcastCache";
-import { getPodcastAudioUrl, getSignedImageUrl } from "../utils/podcastStorage";
+} from "../../utils/podcastCache";
+import { getPodcastAudioUrl, getSignedImageUrl } from "../../utils/podcastStorage";
 
 type DownloadVariables = {
   filename: string;

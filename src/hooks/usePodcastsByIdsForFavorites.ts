@@ -2,8 +2,8 @@ import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 import type { PodcastType } from "@/constants/Types";
-import { supabase } from "../utils/supabase";
-import { attachPodcastImageUrls } from "../utils/podcastStorage";
+import { supabase } from "../../utils/supabase";
+import { attachPodcastImageUrls } from "../../utils/podcastStorage";
 
 type UsePodcastsByIdsArgs = {
   ids: number[];

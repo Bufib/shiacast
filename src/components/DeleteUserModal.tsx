@@ -16,7 +16,7 @@ import { supabase } from "../../utils/supabase";
 import { useAuthStore } from "../../stores/authStore";
 import { Colors } from "@/constants/Colors";
 import { ThemedText } from "@/components/ThemedText";
-import { useConnectionStatus } from "../../hooks/useConnectionStatus";
+import { useConnectionStatus } from "../hooks/useConnectionStatus";
 import { DeleteUserModalPropsType } from "@/constants/Types";
 import { useTranslation } from "react-i18next";
 

@@ -6,9 +6,9 @@ import {
 } from "@tanstack/react-query";
 
 import { PodcastType } from "@/constants/Types";
-import { supabase } from "../utils/supabase";
-import { attachPodcastImageUrls } from "../utils/podcastStorage";
-import { matchesTopic } from "../utils/podcastTopics";
+import { supabase } from "../../utils/supabase";
+import { attachPodcastImageUrls } from "../../utils/podcastStorage";
+import { matchesTopic } from "../../utils/podcastTopics";
 
 export type PodcastPage = {
   items: PodcastType[];

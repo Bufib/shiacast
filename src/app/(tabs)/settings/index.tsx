@@ -466,7 +466,7 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { ThemedText } from "@/components/ThemedText";
 import { Colors } from "@/constants/Colors";
 import { useLanguage } from "../../../../contexts/LanguageContext";
-import { useConnectionStatus } from "../../../../hooks/useConnectionStatus";
+import { useConnectionStatus } from "../../../hooks/useConnectionStatus";
 import useNotificationStore from "../../../../stores/notificationStore";
 import handleOpenExternalUrl from "../../../../utils/handleOpenExternalUrl";
 import Constants from "expo-constants";

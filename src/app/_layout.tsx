@@ -291,9 +291,9 @@ import { NoInternet } from "@/components/NoInternet";
 import { SupabaseRealtimeProvider } from "@/components/SupabaseRealtimeProvider";
 
 import { LanguageProvider, useLanguage } from "../../contexts/LanguageContext";
-import { useColorScheme } from "../../hooks/useColorScheme";
-import { useConnectionStatus } from "../../hooks/useConnectionStatus";
-import { usePushNotifications } from "../../hooks/usePushNotifications";
+import { useColorScheme } from "../hooks/useColorScheme";
+import { useConnectionStatus } from "../hooks/useConnectionStatus";
+import { usePushNotifications } from "../hooks/usePushNotifications";
 
 import { useFontSizeStore } from "../../stores/fontSizeStore";
 import useNotificationStore from "../../stores/notificationStore";
@@ -427,6 +427,7 @@ function AppContent() {
 
   if (!essentialsReady) return null;
 
+  
   return (
     <View style={{ flex: 1 }} onLayout={hideSplashOnFirstVisibleLayout}>
       <GestureHandlerRootView style={{ flex: 1 }}>

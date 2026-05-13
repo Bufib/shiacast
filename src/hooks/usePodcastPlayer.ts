@@ -11,7 +11,7 @@ import type { PodcastPlayerPropsType, SavedProgress } from "@/constants/Types";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { useGlobalPlayer } from "../../player/useGlobalPlayer";
 import { getSignedImageUrl } from "../../utils/podcastStorage";
-import { usePodcastDownloads } from "../../hooks/usePodcastsDownloads";
+import { usePodcastDownloads } from "./usePodcastsDownloads";
 import { usePodcastDownloadStore } from "../../stores/usePodcastDownloadStore";
 import { useDataVersionStore } from "../../stores/dataVersionStore";
 import {

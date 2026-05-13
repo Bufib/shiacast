@@ -184,7 +184,7 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Animated, StyleSheet, useColorScheme, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { usePodcastsByIdsForFavorites } from "../../hooks/usePodcastsByIdsForFavorites";
+import { usePodcastsByIdsForFavorites } from "../hooks/usePodcastsByIdsForFavorites";
 import { useScreenFadeIn } from "@/hooks/useScreenFadeIn";
 
 export default function RenderFavoritePodcasts() {

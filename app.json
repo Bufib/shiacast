@@ -5,16 +5,11 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "splash": {
-      "image": "./assets/images/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#039931"
-    },
     "scheme": "shiacast",
     "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/images/icon.png",
-      "bundleIdentifier": "com.hadi-ea.ShiaWissen",
+      "bundleIdentifier": "com.hadi-ea.shiacast",
       "supportsTablet": true,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
@@ -31,7 +26,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.hadi_ea.ShiaWissen",
+      "package": "com.hadi_ea.shiacast",
       "googleServicesFile": "./android/app/google-services.json",
       "permissions": [
         "android.permission.RECORD_AUDIO",
@@ -47,11 +42,10 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#039931",
-          "android": {
-            "image": "./assets/images/splash.png",
-            "imageWidth": 76
-          }
+          "backgroundColor": "#000000",
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 200
+          
         }
       ],
       [

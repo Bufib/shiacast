@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 
-import { supabase } from "../utils/supabase";
+import { supabase } from "../../utils/supabase";
 
 type PodcastLanguageRow = {
   language_code: string | null;

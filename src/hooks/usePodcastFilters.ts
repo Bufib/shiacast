@@ -1,8 +1,8 @@
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 
-import { supabase } from "../utils/supabase";
-import { parseTopics } from "../utils/podcastTopics";
+import { supabase } from "../../utils/supabase";
+import { parseTopics } from "../../utils/podcastTopics";
 
 export type PodcastFilterPair = {
   topic: string | null;
