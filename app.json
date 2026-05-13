@@ -15,7 +15,11 @@
         "ITSAppUsesNonExemptEncryption": false,
         "NSPhotoLibraryUsageDescription": "This app needs access to your photo library to select images.",
         "CFBundleAllowMixedLocalizations": true,
-        "CFBundleLocalizations": ["de", "en", "ar"],
+        "CFBundleLocalizations": [
+          "de",
+          "en",
+          "ar"
+        ],
         "CFBundleDevelopmentRegion": "de",
         "NSUserNotificationsUsageDescription": "Wir senden Push-Benachrichtigungen"
       }
@@ -30,7 +34,9 @@
       "googleServicesFile": "./android/app/google-services.json",
       "permissions": [
         "android.permission.RECORD_AUDIO",
-        "android.permission.MODIFY_AUDIO_SETTINGS"
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
       ]
     },
     "web": {
@@ -45,7 +51,6 @@
           "backgroundColor": "#000000",
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200
-          
         }
       ],
       [
@@ -76,8 +81,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "f7894541-7316-4c28-a215-1c14c4f02f04"
+        "projectId": "17addcb3-1e38-464c-a41d-acadb2a72696"
       }
-    }
+    },
+    "owner": "hadi_ea"
   }
 }

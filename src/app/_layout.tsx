@@ -1,44 +1,46 @@
+
+// import "react-native-reanimated";
+// import React, { useCallback, useEffect, useRef, useState } from "react";
+// import { Appearance, BackHandler, Platform, View } from "react-native";
 // import { GestureHandlerRootView } from "react-native-gesture-handler";
 // import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
-// import "react-native-reanimated";
-
-// import AppReviewPrompt from "@/components/AppReviewPrompt";
-// import { LoadingIndicator } from "@/components/LoadingIndicator";
-// import MiniPlayerBar from "@/components/MiniPlayerBar";
-// import { NoInternet } from "@/components/NoInternet";
-// import { SupabaseRealtimeProvider } from "@/components/SupabaseRealtimeProvider";
-// import { Colors } from "@/constants/Colors";
-// import { useScreenFadeIn } from "@/hooks/useScreenFadeIn";
-
-// import { LanguageProvider, useLanguage } from "../../contexts/LanguageContext";
-// import { useColorScheme } from "../../hooks/useColorScheme";
-// import { useConnectionStatus } from "../../hooks/useConnectionStatus";
-
-// import { usePushNotifications } from "../../hooks/usePushNotifications";
-// import { useFontSizeStore } from "../../stores/fontSizeStore";
-// import useNotificationStore from "../../stores/notificationStore";
-// import "../../utils/i18n";
+// import { MenuProvider } from "react-native-popup-menu";
+// import Toast from "react-native-toast-message";
+// import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // import {
 //   DarkTheme,
 //   DefaultTheme,
 //   ThemeProvider,
 // } from "@react-navigation/native";
+
 // import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 // import { Stack } from "expo-router";
 // import * as SplashScreen from "expo-splash-screen";
 // import { StatusBar } from "expo-status-bar";
-// import React, { useCallback, useEffect, useRef, useState } from "react";
-// import { useTranslation } from "react-i18next";
-// import { Appearance, BackHandler, Platform, Text, View } from "react-native";
-// import { MenuProvider } from "react-native-popup-menu";
-// import Toast from "react-native-toast-message";
-// import AsyncStorage from "@react-native-async-storage/async-storage";
 // import { setAudioModeAsync } from "expo-audio";
 
-// import GlobalVideoHost from "../../player/GlobalVideoHost";
+// import AppReviewPrompt from "@/components/AppReviewPrompt";
+// import MiniPlayerBar from "@/components/MiniPlayerBar";
+// import { NoInternet } from "@/components/NoInternet";
+// import { SupabaseRealtimeProvider } from "@/components/SupabaseRealtimeProvider";
+
+// import { LanguageProvider, useLanguage } from "../../contexts/LanguageContext";
+// import { useColorScheme } from "../hooks/useColorScheme";
+// import { useConnectionStatus } from "../hooks/useConnectionStatus";
+// import { usePushNotifications } from "../hooks/usePushNotifications";
+
+// import { useFontSizeStore } from "../../stores/fontSizeStore";
+// import useNotificationStore from "../../stores/notificationStore";
+
+// import "../../utils/i18n";
+
+// import GlobalAudioHost from "../../player/GlobalAudioHost";
 // import IntroVideo, { useIntroVideo } from "@/components/Intro";
 // import { cleanupPodcastCache } from "../../utils/podcastCache";
+// import ForceUpdateGate from "@/components/ForceUpdateGate";
+// import { usePodcastListenedStore } from "@/hooks/usePodcastListenedStore";
+// import { useLastPlayedPodcastStore } from "../../stores/useLastPlayedPodcastStore";
 
 // if (typeof (BackHandler as any).removeEventListener !== "function") {
 //   (BackHandler as any).removeEventListener = (
@@ -57,12 +59,11 @@
 // function AppContent() {
 //   const colorScheme = useColorScheme() || "light";
 //   const { ready: languageContextReady } = useLanguage();
-//   const [isSessionRestored, setIsSessionRestored] = useState(false);
+
 //   const [storesHydrated, setStoresHydrated] = useState(false);
 
 //   const hasInternet = useConnectionStatus();
 //   const { expoPushToken } = usePushNotifications();
-//   const { t } = useTranslation();
 
 //   const hasHiddenSplashRef = useRef(false);
 //   const hasShownOfflineToastRef = useRef(false);
@@ -88,9 +89,10 @@
 //   useEffect(() => {
 //     const checkHydration = () => {
 //       const allHydrated =
-//         useFontSizeStore.persist.hasHydrated() &&
-//         useNotificationStore.persist.hasHydrated();
-
+//       useFontSizeStore.persist.hasHydrated() &&
+//       useNotificationStore.persist.hasHydrated() &&
+//       usePodcastListenedStore.persist.hasHydrated();
+//       useLastPlayedPodcastStore.persist.hasHydrated();
 //       if (allHydrated) {
 //         setStoresHydrated(true);
 //         useNotificationStore.getState().checkPermissions();
@@ -133,8 +135,7 @@
 //   }, [expoPushToken]);
 
 //   useEffect(() => {
-//     const essentialsReady =
-//       languageContextReady && storesHydrated && isSessionRestored;
+//     const essentialsReady = languageContextReady && storesHydrated;
 
 //     if (!essentialsReady) return;
 
@@ -143,8 +144,8 @@
 
 //       Toast.show({
 //         type: "error",
-//         text1: t("noInternetTitle"),
-//         text2: t("noInternetMessage"),
+//         text1: "Keine Internetverbindung",
+//         text2: "Bitte überprüfe deine Verbindung.",
 //         visibilityTime: 5000,
 //       });
 //     }
@@ -152,10 +153,9 @@
 //     if (hasInternet) {
 //       hasShownOfflineToastRef.current = false;
 //     }
-//   }, [languageContextReady, storesHydrated, isSessionRestored, hasInternet, t]);
+//   }, [languageContextReady, storesHydrated, hasInternet]);
 
-//   const essentialsReady =
-//     languageContextReady && storesHydrated && isSessionRestored;
+//   const essentialsReady = languageContextReady && storesHydrated;
 
 //   const hideSplashOnFirstVisibleLayout = useCallback(() => {
 //     if (hasHiddenSplashRef.current) return;
@@ -164,7 +164,7 @@
 //     void SplashScreen.hideAsync().catch(() => {});
 //   }, []);
 
-//   if (essentialsReady) return null;
+//   if (!essentialsReady) return null;
 
 //   return (
 //     <View style={{ flex: 1 }} onLayout={hideSplashOnFirstVisibleLayout}>
@@ -179,23 +179,22 @@
 //               <SupabaseRealtimeProvider>
 //                 <BottomSheetModalProvider>
 //                   <NoInternet showUI={!hasInternet} showToast={false} />
-
-//                   <Stack
-//                     screenOptions={{
-//                       headerShown: false,
-//                       headerBackButtonMenuEnabled: false,
-//                     }}
-//                   >
-//                     <Stack.Screen name="index" />
-//                     <Stack.Screen name="(tabs)" />
-//                     <Stack.Screen name="(auth)" />
-//                     <Stack.Screen name="(podcast)" />
-//                     <Stack.Screen
-//                       name="+not-found"
-//                       options={{ headerShown: true }}
-//                     />
-//                   </Stack>
-
+//                   <ForceUpdateGate>
+//                     <Stack
+//                       screenOptions={{
+//                         headerShown: false,
+//                         headerBackButtonMenuEnabled: false,
+//                       }}
+//                     >
+//                       <Stack.Screen name="index" />
+//                       <Stack.Screen name="(tabs)" />
+//                       <Stack.Screen name="(podcast)" />
+//                       <Stack.Screen
+//                         name="+not-found"
+//                         options={{ headerShown: true }}
+//                       />
+//                     </Stack>
+//                   </ForceUpdateGate>
 //                   <MiniPlayerBar />
 //                   <AppReviewPrompt />
 //                 </BottomSheetModalProvider>
@@ -255,16 +254,16 @@
 //   }
 
 //   return (
-//     <GlobalVideoHost>
+//     <GlobalAudioHost>
 //       <LanguageProvider>
 //         <AppContent />
 //       </LanguageProvider>
-//     </GlobalVideoHost>
+//     </GlobalAudioHost>
 //   );
 // }
 
-import "react-native-reanimated";
 
+import "react-native-reanimated";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Appearance, BackHandler, Platform, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -289,6 +288,9 @@ import AppReviewPrompt from "@/components/AppReviewPrompt";
 import MiniPlayerBar from "@/components/MiniPlayerBar";
 import { NoInternet } from "@/components/NoInternet";
 import { SupabaseRealtimeProvider } from "@/components/SupabaseRealtimeProvider";
+import ForceUpdateGate from "@/components/ForceUpdateGate";
+import IntroVideo, { useIntroVideo } from "@/components/Intro";
+import LanguageSelection from "@/components/LanguageSelectionScreen";
 
 import { LanguageProvider, useLanguage } from "../../contexts/LanguageContext";
 import { useColorScheme } from "../hooks/useColorScheme";
@@ -297,17 +299,19 @@ import { usePushNotifications } from "../hooks/usePushNotifications";
 
 import { useFontSizeStore } from "../../stores/fontSizeStore";
 import useNotificationStore from "../../stores/notificationStore";
+import { useLastPlayedPodcastStore } from "../../stores/useLastPlayedPodcastStore";
 
-import "../../utils/i18n";
+import { usePodcastListenedStore } from "@/hooks/usePodcastListenedStore";
+import { cleanupPodcastCache } from "../../utils/podcastCache";
 
 import GlobalAudioHost from "../../player/GlobalAudioHost";
-import IntroVideo, { useIntroVideo } from "@/components/Intro";
-import { cleanupPodcastCache } from "../../utils/podcastCache";
+
+import "../../utils/i18n";
 
 if (typeof (BackHandler as any).removeEventListener !== "function") {
   (BackHandler as any).removeEventListener = (
     eventName: any,
-    handler: () => boolean,
+    handler: () => boolean
   ) => {
     const subscription = BackHandler.addEventListener(eventName, handler);
     subscription.remove();
@@ -352,7 +356,9 @@ function AppContent() {
     const checkHydration = () => {
       const allHydrated =
         useFontSizeStore.persist.hasHydrated() &&
-        useNotificationStore.persist.hasHydrated();
+        useNotificationStore.persist.hasHydrated() &&
+        usePodcastListenedStore.persist.hasHydrated() &&
+        useLastPlayedPodcastStore.persist.hasHydrated();
 
       if (allHydrated) {
         setStoresHydrated(true);
@@ -427,7 +433,6 @@ function AppContent() {
 
   if (!essentialsReady) return null;
 
-  
   return (
     <View style={{ flex: 1 }} onLayout={hideSplashOnFirstVisibleLayout}>
       <GestureHandlerRootView style={{ flex: 1 }}>
@@ -442,20 +447,22 @@ function AppContent() {
                 <BottomSheetModalProvider>
                   <NoInternet showUI={!hasInternet} showToast={false} />
 
-                  <Stack
-                    screenOptions={{
-                      headerShown: false,
-                      headerBackButtonMenuEnabled: false,
-                    }}
-                  >
-                    <Stack.Screen name="index" />
-                    <Stack.Screen name="(tabs)" />
-                    <Stack.Screen name="(podcast)" />
-                    <Stack.Screen
-                      name="+not-found"
-                      options={{ headerShown: true }}
-                    />
-                  </Stack>
+                  <ForceUpdateGate>
+                    <Stack
+                      screenOptions={{
+                        headerShown: false,
+                        headerBackButtonMenuEnabled: false,
+                      }}
+                    >
+                      <Stack.Screen name="index" />
+                      <Stack.Screen name="(tabs)" />
+                      <Stack.Screen name="(podcast)" />
+                      <Stack.Screen
+                        name="+not-found"
+                        options={{ headerShown: true }}
+                      />
+                    </Stack>
+                  </ForceUpdateGate>
 
                   <MiniPlayerBar />
                   <AppReviewPrompt />
@@ -471,8 +478,10 @@ function AppContent() {
   );
 }
 
-export default function RootLayout() {
+function RootLayoutContent() {
   const [audioReady, setAudioReady] = useState(Platform.OS !== "ios");
+
+  const { ready: languageReady, hasStoredLanguage } = useLanguage();
 
   const { hasPlayed: hasPlayedIntro, markAsPlayed: markIntroAsPlayed } =
     useIntroVideo();
@@ -499,12 +508,35 @@ export default function RootLayout() {
   }, []);
 
   useEffect(() => {
-    if (audioReady && hasPlayedIntro === false) {
+    if (!audioReady || !languageReady) return;
+
+    if (!hasStoredLanguage) {
+      hideRootSplashOnce();
+      return;
+    }
+
+    if (hasPlayedIntro === false) {
       hideRootSplashOnce();
     }
-  }, [audioReady, hasPlayedIntro, hideRootSplashOnce]);
+  }, [
+    audioReady,
+    languageReady,
+    hasStoredLanguage,
+    hasPlayedIntro,
+    hideRootSplashOnce,
+  ]);
 
-  if (!audioReady || hasPlayedIntro === null) return null;
+  if (!audioReady || !languageReady) {
+    return null;
+  }
+
+  if (!hasStoredLanguage) {
+    return <LanguageSelection />;
+  }
+
+  if (hasPlayedIntro === null) {
+    return null;
+  }
 
   if (hasPlayedIntro === false) {
     return (
@@ -517,9 +549,15 @@ export default function RootLayout() {
 
   return (
     <GlobalAudioHost>
-      <LanguageProvider>
-        <AppContent />
-      </LanguageProvider>
+      <AppContent />
     </GlobalAudioHost>
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <LanguageProvider>
+      <RootLayoutContent />
+    </LanguageProvider>
   );
 }

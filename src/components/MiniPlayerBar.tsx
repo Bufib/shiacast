@@ -54,6 +54,7 @@ export default function MiniPlayerBar({ bottomOffset = 50 }: Props) {
     filename,
     stoppedByUser,
     toggle,
+    artwork,
     seekBy,
     stopAndKeepSource,
   } = useGlobalPlayer();
@@ -183,6 +184,10 @@ export default function MiniPlayerBar({ bottomOffset = 50 }: Props) {
     return `${m}:${ss.toString().padStart(2, "0")}`;
   };
 
+  const artworkSource = artwork
+  ? { uri: artwork }
+  : require("@/assets/images/icon.png");
+
   const openFull = () => {
     router.push({
       pathname: "/(podcast)/indexPodcast",
@@ -192,6 +197,7 @@ export default function MiniPlayerBar({ bottomOffset = 50 }: Props) {
           title: title,
           filename,
           currentUri,
+          artwork
         }),
       },
     });
@@ -229,11 +235,11 @@ export default function MiniPlayerBar({ bottomOffset = 50 }: Props) {
             />
             <View style={styles.collapsedContent}>
               <View style={styles.artworkWrap}>
-                <Image
-                  source={require("@/assets/images/icon.png")}
-                  style={styles.collapsedArtwork}
-                  contentFit="cover"
-                />
+               <Image
+  source={artworkSource}          
+  style={styles.collapsedArtwork}
+  contentFit="cover"
+/>
                 {isPlaying && (
                   <View style={styles.ringOverlay}>
                     <CircularProgressRing
@@ -307,11 +313,11 @@ export default function MiniPlayerBar({ bottomOffset = 50 }: Props) {
             >
               {/* Artwork */}
               <View style={styles.artworkContainer}>
-                <Image
-                  source={require("@/assets/images/icon.png")}
-                  style={styles.artwork}
-                  contentFit="cover"
-                />
+               <Image
+  source={artworkSource}         
+  style={styles.artwork}
+  contentFit="cover"
+/>
                 {isPlaying && (
                   <View style={styles.playingIndicator}>
                     <View style={styles.bar} />

@@ -21,6 +21,10 @@ const ar = {
   stream: "تدفق",
   loading_stream: "جارٍ تحميل الدفق",
   delete_from_cache: "حذف من ذاكرة التخزين المؤقت",
+  marked_as_listened: "تم وضع علامة كمسموع",
+  unmarked_as_listened: "تم إزالة العلامة",
+  continue_listening: "متابعة الاستماع",
+  resume: "استئناف",
   // General
   today: "اليوم",
   yes: "نعم",
@@ -74,7 +78,7 @@ const ar = {
     "حدث خطأ ما أثناء إعداد التطبيق. حاول إغلاق التطبيق وفتحه مرة أخرى.",
   pdfsTitle: "لقراءة",
   feedback: "ملاحظات",
-  allDays:"جميع الأيام",
+  allDays: "جميع الأيام",
 
   // Books and PDF
   readingSettings: "التنسيق",

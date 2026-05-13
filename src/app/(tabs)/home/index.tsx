@@ -29,6 +29,7 @@ import { useLanguage } from "../../../../contexts/LanguageContext";
 import PodcastGridList from "@/components/PodcastGridList";
 import { ThemedView } from "@/components/ThemedView";
 import PodcastGridCardSkeleton from "@/components/PodcastGridCardSkeleton";
+import ContinueListeningCard from "@/components/ContinueListeningCard";
 
 const PAGE_SIZE = 20;
 const GRID_GAP = 12;
@@ -85,7 +86,7 @@ export default function HomeScreen() {
   });
   const {
     podcasts,
-    isLoading: podcastsLoading ,
+    isLoading: podcastsLoading,
     isError: podcastsError,
     error: podcastsErrorObj,
     fetchNextPage: podcastsFetchNextPage,
@@ -139,6 +140,7 @@ export default function HomeScreen() {
 
   const renderHeader = () => (
     <View style={styles.headerWrapper}>
+      <ContinueListeningCard />
       <View
         style={[
           styles.sectionHeaderRow,

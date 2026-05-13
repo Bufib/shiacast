@@ -21,6 +21,10 @@ const de = {
   stream: "Streamen",
   loading_stream: "Stream lädt",
   delete_from_cache: "Aus Cache löschen",
+  marked_as_listened: "Als gehört markiert",
+  unmarked_as_listened: "Markierung entfernt",
+  continue_listening: "Weiterhören",
+  resume: "Fortsetzen",
   // General
   today: "Heute",
   yes: "Ja",
@@ -79,7 +83,7 @@ const de = {
   reminderDeleted: "Erinnerung gelöscht",
   repeatsWeekly: "Wiederholt sich wöchentlich",
   feedback: "Feedback",
-  allDays:"Täglich",
+  allDays: "Täglich",
   // Navigation
   knowledge: "Wissen",
   settings: "Einstellungen",

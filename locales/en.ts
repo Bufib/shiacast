@@ -21,7 +21,10 @@ const en = {
   stream: "Stream",
   loading_stream: "Stream is loading",
   delete_from_cache: "Delete from cache",
-
+  marked_as_listened: "Marked as listened",
+  unmarked_as_listened: "Mark removed",
+  continue_listening: "Continue listening",
+  resume: "Resume",
   // Books and PDF
   readingSettings: "Format",
   pageLayout: "Page Layout",
@@ -94,7 +97,7 @@ const en = {
   calendarScreenTitle: "Calendar",
   quranScreen: "Quran",
   historyScreen: "History",
-  allDays:"Daily",
+  allDays: "Daily",
 
   // Push-notification
 
@@ -450,8 +453,8 @@ const en = {
     "Do you really want to delete all cached files of the app?",
   clearAppCacheSuccessMessage: "The app cache was cleared successfully.",
   clearAppCacheErrorMessage: "An error occurred while clearing the app cache.",
-arabicDateAdjustment: "Adjust Arabic date",
-arabicDateAdjustmentDescription:"Add or subtract days",
+  arabicDateAdjustment: "Adjust Arabic date",
+  arabicDateAdjustmentDescription: "Add or subtract days",
 
   // Language selector
   language: "Language",
