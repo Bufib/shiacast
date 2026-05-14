@@ -596,7 +596,7 @@ import Toast from "react-native-toast-message";
 import type { PodcastPlayerPropsType, SavedProgress } from "@/constants/Types";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { useGlobalPlayer } from "../../player/useGlobalPlayer";
-import { getSignedImageUrl } from "../../utils/podcastStorage";
+import { getImageUrl } from "../../utils/podcastStorage";
 import { usePodcastDownloads } from "./usePodcastsDownloads";
 import { usePodcastDownloadStore } from "../../stores/usePodcastDownloadStore";
 import { useDataVersionStore } from "../../stores/dataVersionStore";
@@ -645,7 +645,7 @@ export function usePodcastPlayer(podcast: PodcastPlayerPropsType["podcast"]) {
 
   const { data: coverUrl } = useQuery({
     queryKey: ["podcast_cover", podcast?.image_filename],
-    queryFn: () => getSignedImageUrl(podcast.image_filename as string),
+    queryFn: () => getImageUrl(podcast.image_filename as string),
     enabled: Boolean(podcast?.image_filename),
     staleTime: 12 * 60 * 60 * 1000,
     gcTime: 24 * 60 * 60 * 1000,

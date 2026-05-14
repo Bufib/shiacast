@@ -9,7 +9,10 @@ import {
   ensurePodcastCacheDir,
   getPodcastLocalUri,
 } from "../../utils/podcastCache";
-import { getPodcastAudioUrl, getSignedImageUrl } from "../../utils/podcastStorage";
+import {
+  getImageUrl,
+  getPublicAudioUrl,
+} from "../../utils/podcastStorage";
 
 type DownloadVariables = {
   filename: string;
@@ -102,19 +105,9 @@ export function usePodcastDownloads(language: string) {
     [language],
   );
 
-  const getRemoteUrl = useCallback(
-    async (filename: string): Promise<string> => {
-      return getPodcastAudioUrl(filename);
-    },
-    [],
-  );
+  const getRemoteUrl = getPublicAudioUrl;
 
-  const getRemoteImageUrl = useCallback(
-    async (filename: string): Promise<string | null> => {
-      return getSignedImageUrl(filename);
-    },
-    [],
-  );
+  const getRemoteImageUrl = getImageUrl;
 
   const deleteFromCache = useCallback(
     async (filename: string): Promise<boolean> => {

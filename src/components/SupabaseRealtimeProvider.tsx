@@ -384,7 +384,6 @@ export const SupabaseRealtimeProvider = ({
           status === "TIMED_OUT" ||
           status === "CLOSED"
         ) {
-          console.warn(`PayPal realtime channel status: ${status}`, err);
         }
       });
 

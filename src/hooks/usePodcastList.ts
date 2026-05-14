@@ -81,7 +81,7 @@ export function usePodcastList({
           )
         : rawRows;
 
-      const itemsWithImages = await attachPodcastImageUrls(filteredRows);
+      const itemsWithImages = attachPodcastImageUrls(filteredRows);
 
       return {
         items: itemsWithImages as PodcastType[],

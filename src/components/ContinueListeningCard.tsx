@@ -14,7 +14,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { useLastPlayedPodcast, useLastPlayedPodcastStore } from "../../stores/useLastPlayedPodcastStore";
 import { useIsPodcastListened } from "@/hooks/usePodcastListenedStore";
-import { getSignedImageUrl } from "../../utils/podcastStorage";
+import { getImageUrl } from "../../utils/podcastStorage";
 
 
 const LOCAL_PODCAST_ARTWORK = require("@/assets/images/icon.png");
@@ -33,7 +33,7 @@ export default function ContinueListeningCard() {
   const { data: coverUrl } = useQuery({
     queryKey: ["podcast_cover", entry?.podcast?.image_filename],
     queryFn: () =>
-      getSignedImageUrl(entry!.podcast.image_filename as string),
+      getImageUrl(entry!.podcast.image_filename as string),
     enabled: Boolean(entry?.podcast?.image_filename),
     staleTime: 12 * 60 * 60 * 1000,
     gcTime: 24 * 60 * 60 * 1000,

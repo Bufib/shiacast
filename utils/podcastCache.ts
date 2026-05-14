@@ -1,5 +1,5 @@
 import * as FileSystem from "expo-file-system/legacy";
-import { cleanAudioPath, getPodcastAudioUrl } from "./podcastStorage";
+import { cleanAudioPath, getPublicAudioUrl } from "./podcastStorage";
 
 const CACHE_MAX_AGE_DAYS = 7;
 const CACHE_MAX_FILES = 20;
@@ -190,7 +190,7 @@ export async function downloadPodcastToCache(
     }
 
     try {
-      const downloadUrl = await getPodcastAudioUrl(filename);
+      const downloadUrl =  getPublicAudioUrl(filename);
 
       const task = FileSystem.createDownloadResumable(
         downloadUrl,
