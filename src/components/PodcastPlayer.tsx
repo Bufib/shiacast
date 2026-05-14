@@ -956,7 +956,7 @@ export default function PodcastPlayer({ podcast }: PodcastPlayerPropsType) {
         transition={200}
       >
         <View style={[styles.coverHeader, { paddingTop: insets.top + 4 }]}>
-          <HeaderLeftBackButton color={Colors.universal.link} size={40} />
+          <HeaderLeftBackButton color={"white"} size={40} />
 
           {!cachedUri && !showInitialButtons && !isDownloading && (
             <TouchableOpacity

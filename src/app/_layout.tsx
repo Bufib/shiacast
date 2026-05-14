@@ -478,6 +478,8 @@ function AppContent() {
 
   if (!essentialsReady) return null;
 
+  
+
   return (
     <View style={{ flex: 1 }} onLayout={hideSplashOnFirstVisibleLayout}>
       <GestureHandlerRootView style={{ flex: 1 }}>
@@ -568,6 +570,8 @@ function RootLayoutContent() {
     hasPlayedIntro,
     hideRootSplashOnce,
   ]);
+
+  console.log("[Intro debug]", { hasStoredLanguage, hasPlayedIntro, audioReady, languageReady });
 
   if (!audioReady || !languageReady) {
     return null;
