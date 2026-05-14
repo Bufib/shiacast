@@ -41,7 +41,6 @@ const Settings = () => {
 
   const { t } = useTranslation();
 
-  const paypallinkVersion = useDataVersionStore((s) => s.paypalVersion);
   const { fadeAnim, onLayout } = useScreenFadeIn(800);
 
   useEffect(() => {
@@ -53,7 +52,7 @@ const Settings = () => {
         Alert.alert("Fehler", error.message);
       }
     })();
-  }, [paypallinkVersion]);
+  }, []);
 
   const toggleDarkMode = async () => {
     const newDarkMode = !isDarkMode;

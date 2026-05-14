@@ -20,6 +20,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { usePodcastPlayer } from "@/hooks/usePodcastPlayer";
 import { StatusBar } from "expo-status-bar";
+import { useConnectionStatus } from "@/hooks/useConnectionStatus";
 
 const ACCENT = "#ff7648";
 const PLAY_BG = "#101b35";
@@ -40,6 +41,7 @@ export default function PodcastPlayer({ podcast }: PodcastPlayerPropsType) {
   const colors = Colors[colorScheme];
   const isDark = colorScheme === "dark";
   const insets = useSafeAreaInsets();
+  const hasInternet = useConnectionStatus();
 
   const {
     coverSource,
@@ -186,7 +188,7 @@ export default function PodcastPlayer({ podcast }: PodcastPlayerPropsType) {
                 isListened ? "checkmark-circle" : "checkmark-circle-outline"
               }
               size={30}
-              color={isListened ? ACCENT : colors.defaultIcon}
+              color={isListened ? Colors.universal.primary : colors.defaultIcon}
             />
           </TouchableOpacity>
 
@@ -273,10 +275,14 @@ export default function PodcastPlayer({ podcast }: PodcastPlayerPropsType) {
                   backgroundColor: colors.contrast,
                   borderColor: colors.border,
                 },
+                !hasInternet && {
+                  backgroundColor: "#ccc",
+                  opacity: 0.75
+
+                },
               ]}
               onPress={handleStream}
-              disabled={isLoading}
-              activeOpacity={0.75}
+              disabled={isLoading || !hasInternet}
             >
               <Ionicons name="play" size={20} color={colors.defaultIcon} />
               <ThemedText style={styles.actionButtonText}>
@@ -291,10 +297,14 @@ export default function PodcastPlayer({ podcast }: PodcastPlayerPropsType) {
                   backgroundColor: colors.contrast,
                   borderColor: colors.border,
                 },
+                !hasInternet && {
+                  backgroundColor: "#ccc",
+                  opacity: 0.75
+                },
               ]}
               onPress={handleDownload}
-              disabled={isLoading}
-              activeOpacity={0.75}
+              disabled={isLoading || !hasInternet}
+              
             >
               <Ionicons name="download" size={20} color={colors.defaultIcon} />
               <ThemedText style={styles.actionButtonText}>

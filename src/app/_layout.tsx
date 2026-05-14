@@ -24,6 +24,9 @@
 // import MiniPlayerBar from "@/components/MiniPlayerBar";
 // import { NoInternet } from "@/components/NoInternet";
 // import { SupabaseRealtimeProvider } from "@/components/SupabaseRealtimeProvider";
+// import ForceUpdateGate from "@/components/ForceUpdateGate";
+// import IntroVideo, { useIntroVideo } from "@/components/Intro";
+// import LanguageSelection from "@/components/LanguageSelectionScreen";
 
 // import { LanguageProvider, useLanguage } from "../../contexts/LanguageContext";
 // import { useColorScheme } from "../hooks/useColorScheme";
@@ -32,20 +35,19 @@
 
 // import { useFontSizeStore } from "../../stores/fontSizeStore";
 // import useNotificationStore from "../../stores/notificationStore";
+// import { useLastPlayedPodcastStore } from "../../stores/useLastPlayedPodcastStore";
 
-// import "../../utils/i18n";
+// import { usePodcastListenedStore } from "@/hooks/usePodcastListenedStore";
+// import { cleanupPodcastCache } from "../../utils/podcastCache";
 
 // import GlobalAudioHost from "../../player/GlobalAudioHost";
-// import IntroVideo, { useIntroVideo } from "@/components/Intro";
-// import { cleanupPodcastCache } from "../../utils/podcastCache";
-// import ForceUpdateGate from "@/components/ForceUpdateGate";
-// import { usePodcastListenedStore } from "@/hooks/usePodcastListenedStore";
-// import { useLastPlayedPodcastStore } from "../../stores/useLastPlayedPodcastStore";
+
+// import "../../utils/i18n";
 
 // if (typeof (BackHandler as any).removeEventListener !== "function") {
 //   (BackHandler as any).removeEventListener = (
 //     eventName: any,
-//     handler: () => boolean,
+//     handler: () => boolean
 //   ) => {
 //     const subscription = BackHandler.addEventListener(eventName, handler);
 //     subscription.remove();
@@ -89,10 +91,11 @@
 //   useEffect(() => {
 //     const checkHydration = () => {
 //       const allHydrated =
-//       useFontSizeStore.persist.hasHydrated() &&
-//       useNotificationStore.persist.hasHydrated() &&
-//       usePodcastListenedStore.persist.hasHydrated();
-//       useLastPlayedPodcastStore.persist.hasHydrated();
+//         useFontSizeStore.persist.hasHydrated() &&
+//         useNotificationStore.persist.hasHydrated() &&
+//         usePodcastListenedStore.persist.hasHydrated() &&
+//         useLastPlayedPodcastStore.persist.hasHydrated();
+
 //       if (allHydrated) {
 //         setStoresHydrated(true);
 //         useNotificationStore.getState().checkPermissions();
@@ -179,6 +182,7 @@
 //               <SupabaseRealtimeProvider>
 //                 <BottomSheetModalProvider>
 //                   <NoInternet showUI={!hasInternet} showToast={false} />
+
 //                   <ForceUpdateGate>
 //                     <Stack
 //                       screenOptions={{
@@ -195,6 +199,7 @@
 //                       />
 //                     </Stack>
 //                   </ForceUpdateGate>
+
 //                   <MiniPlayerBar />
 //                   <AppReviewPrompt />
 //                 </BottomSheetModalProvider>
@@ -209,8 +214,10 @@
 //   );
 // }
 
-// export default function RootLayout() {
+// function RootLayoutContent() {
 //   const [audioReady, setAudioReady] = useState(Platform.OS !== "ios");
+
+//   const { ready: languageReady, hasStoredLanguage } = useLanguage();
 
 //   const { hasPlayed: hasPlayedIntro, markAsPlayed: markIntroAsPlayed } =
 //     useIntroVideo();
@@ -237,12 +244,35 @@
 //   }, []);
 
 //   useEffect(() => {
-//     if (audioReady && hasPlayedIntro === false) {
+//     if (!audioReady || !languageReady) return;
+
+//     if (!hasStoredLanguage) {
+//       hideRootSplashOnce();
+//       return;
+//     }
+
+//     if (hasPlayedIntro === false) {
 //       hideRootSplashOnce();
 //     }
-//   }, [audioReady, hasPlayedIntro, hideRootSplashOnce]);
+//   }, [
+//     audioReady,
+//     languageReady,
+//     hasStoredLanguage,
+//     hasPlayedIntro,
+//     hideRootSplashOnce,
+//   ]);
 
-//   if (!audioReady || hasPlayedIntro === null) return null;
+//   if (!audioReady || !languageReady) {
+//     return null;
+//   }
+
+//   if (!hasStoredLanguage) {
+//     return <LanguageSelection />;
+//   }
+
+//   if (hasPlayedIntro === null) {
+//     return null;
+//   }
 
 //   if (hasPlayedIntro === false) {
 //     return (
@@ -255,13 +285,18 @@
 
 //   return (
 //     <GlobalAudioHost>
-//       <LanguageProvider>
-//         <AppContent />
-//       </LanguageProvider>
+//       <AppContent />
 //     </GlobalAudioHost>
 //   );
 // }
 
+// export default function RootLayout() {
+//   return (
+//     <LanguageProvider>
+//       <RootLayoutContent />
+//     </LanguageProvider>
+//   );
+// }
 
 import "react-native-reanimated";
 import React, { useCallback, useEffect, useRef, useState } from "react";
@@ -304,9 +339,11 @@ import { useLastPlayedPodcastStore } from "../../stores/useLastPlayedPodcastStor
 import { usePodcastListenedStore } from "@/hooks/usePodcastListenedStore";
 import { cleanupPodcastCache } from "../../utils/podcastCache";
 
+
 import GlobalAudioHost from "../../player/GlobalAudioHost";
 
 import "../../utils/i18n";
+import { supabase } from "../../utils/supabase";
 
 if (typeof (BackHandler as any).removeEventListener !== "function") {
   (BackHandler as any).removeEventListener = (
@@ -333,6 +370,7 @@ function AppContent() {
 
   const hasHiddenSplashRef = useRef(false);
   const hasShownOfflineToastRef = useRef(false);
+  const hasFetchedPaypalRef = useRef(false);
 
   useEffect(() => {
     const setColorTheme = async () => {
@@ -394,6 +432,33 @@ function AppContent() {
   useEffect(() => {
     cleanupPodcastCache().catch(console.warn);
   }, []);
+
+  useEffect(() => {
+    if (!hasInternet || hasFetchedPaypalRef.current) return;
+
+    const fetchAndStorePaypalLink = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("paypal")
+          .select("paypal_link")
+          .maybeSingle();
+
+        if (error) {
+          console.warn("Failed to fetch PayPal link:", error.message);
+          return;
+        }
+
+        if (data?.paypal_link) {
+          await AsyncStorage.setItem("paypal", data.paypal_link);
+          hasFetchedPaypalRef.current = true;
+        }
+      } catch (err) {
+        console.warn("Failed to fetch/store PayPal link:", err);
+      }
+    };
+
+    fetchAndStorePaypalLink();
+  }, [hasInternet]);
 
   useEffect(() => {
     if (expoPushToken) {
