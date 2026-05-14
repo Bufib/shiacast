@@ -355,7 +355,7 @@ function AppContent() {
   const hasInternet = useConnectionStatus();
   const hasHiddenSplashRef = useRef(false);
   const hasShownOfflineToastRef = useRef(false);
-  const hasFetchedPaypalRef = useRef(false);
+  // const hasFetchedPaypalRef = useRef(false);
 
   const { t } = useTranslation();
   useEffect(() => {
@@ -419,32 +419,32 @@ function AppContent() {
     cleanupPodcastCache().catch(console.warn);
   }, []);
 
-  useEffect(() => {
-    if (!hasInternet || hasFetchedPaypalRef.current) return;
+  // useEffect(() => {
+  //   if (!hasInternet || hasFetchedPaypalRef.current) return;
 
-    const fetchAndStorePaypalLink = async () => {
-      try {
-        const { data, error } = await supabase
-          .from("paypal")
-          .select("paypal_link")
-          .maybeSingle();
+  //   const fetchAndStorePaypalLink = async () => {
+  //     try {
+  //       const { data, error } = await supabase
+  //         .from("paypal")
+  //         .select("paypal_link")
+  //         .maybeSingle();
 
-        if (error) {
-          console.warn("Failed to fetch PayPal link:", error.message);
-          return;
-        }
+  //       if (error) {
+  //         console.warn("Failed to fetch PayPal link:", error.message);
+  //         return;
+  //       }
 
-        if (data?.paypal_link) {
-          await AsyncStorage.setItem("paypal", data.paypal_link);
-          hasFetchedPaypalRef.current = true;
-        }
-      } catch (err) {
-        console.warn("Failed to fetch/store PayPal link:", err);
-      }
-    };
+  //       if (data?.paypal_link) {
+  //         await AsyncStorage.setItem("paypal", data.paypal_link);
+  //         hasFetchedPaypalRef.current = true;
+  //       }
+  //     } catch (err) {
+  //       console.warn("Failed to fetch/store PayPal link:", err);
+  //     }
+  //   };
 
-    fetchAndStorePaypalLink();
-  }, [hasInternet]);
+  //   fetchAndStorePaypalLink();
+  // }, [hasInternet]);
 
   useEffect(() => {
     const essentialsReady = languageContextReady && storesHydrated;

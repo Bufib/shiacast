@@ -230,29 +230,29 @@ export default function RenderFavoritePodcasts() {
     data: favoriteEpisodes = [],
     isLoading,
     isError,
-    refetch,
+    // refetch,
     isFetching,
   } = usePodcastsByIdsForFavorites({
     ids: favoriteIds,
     language: lang,
   });
 
-  const handleRefresh = async () => {
-    try {
-      setRefreshing(true);
+  // const handleRefresh = async () => {
+  //   try {
+  //     setRefreshing(true);
 
-      const ids = await getFavoritePodcasts(lang);
-      setFavoriteIds(ids);
+  //     const ids = await getFavoritePodcasts(lang);
+  //     setFavoriteIds(ids);
 
-      if (ids.length > 0) {
-        await refetch();
-      }
-    } catch (error) {
-      console.warn("Failed to refresh favorite podcasts:", error);
-    } finally {
-      setRefreshing(false);
-    }
-  };
+  //     if (ids.length > 0) {
+  //       await refetch();
+  //     }
+  //   } catch (error) {
+  //     console.warn("Failed to refresh favorite podcasts:", error);
+  //   } finally {
+  //     setRefreshing(false);
+  //   }
+  // };
 
   const renderEmpty = () => (
     <View style={styles.emptyContainer}>
@@ -313,8 +313,8 @@ export default function RenderFavoritePodcasts() {
     >
       <PodcastGridList
         podcasts={favoriteEpisodes}
-        refreshing={refreshing || isFetching}
-        onRefresh={handleRefresh}
+        // refreshing={refreshing || isFetching}
+        // onRefresh={handleRefresh}
         ListHeaderComponent={renderHeader}
         ListEmptyComponent={renderEmpty}
       />
