@@ -1,4 +1,3 @@
-
 // import "react-native-reanimated";
 // import React, { useCallback, useEffect, useRef, useState } from "react";
 // import { Appearance, BackHandler, Platform, View } from "react-native";
@@ -299,6 +298,7 @@
 // }
 
 import "react-native-reanimated";
+import "../../utils/i18n";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Appearance, BackHandler, Platform, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -306,49 +306,38 @@ import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { MenuProvider } from "react-native-popup-menu";
 import Toast from "react-native-toast-message";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
 import {
   DarkTheme,
   DefaultTheme,
   ThemeProvider,
 } from "@react-navigation/native";
-
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { setAudioModeAsync } from "expo-audio";
-
 import AppReviewPrompt from "@/components/AppReviewPrompt";
 import MiniPlayerBar from "@/components/MiniPlayerBar";
-import { NoInternet } from "@/components/NoInternet";
 import { SupabaseRealtimeProvider } from "@/components/SupabaseRealtimeProvider";
 import ForceUpdateGate from "@/components/ForceUpdateGate";
 import IntroVideo, { useIntroVideo } from "@/components/Intro";
 import LanguageSelection from "@/components/LanguageSelectionScreen";
-
 import { LanguageProvider, useLanguage } from "../../contexts/LanguageContext";
 import { useColorScheme } from "../hooks/useColorScheme";
 import { useConnectionStatus } from "../hooks/useConnectionStatus";
-import { usePushNotifications } from "../hooks/usePushNotifications";
-
 import { useFontSizeStore } from "../../stores/fontSizeStore";
 import useNotificationStore from "../../stores/notificationStore";
 import { useLastPlayedPodcastStore } from "../../stores/useLastPlayedPodcastStore";
-
 import { usePodcastListenedStore } from "@/hooks/usePodcastListenedStore";
 import { cleanupPodcastCache } from "../../utils/podcastCache";
-
-
 import GlobalAudioHost from "../../player/GlobalAudioHost";
-
-import "../../utils/i18n";
 import { supabase } from "../../utils/supabase";
+import { useTranslation } from "react-i18next";
 
 if (typeof (BackHandler as any).removeEventListener !== "function") {
   (BackHandler as any).removeEventListener = (
     eventName: any,
-    handler: () => boolean
+    handler: () => boolean,
   ) => {
     const subscription = BackHandler.addEventListener(eventName, handler);
     subscription.remove();
@@ -362,16 +351,13 @@ const queryClient = new QueryClient();
 function AppContent() {
   const colorScheme = useColorScheme() || "light";
   const { ready: languageContextReady } = useLanguage();
-
   const [storesHydrated, setStoresHydrated] = useState(false);
-
   const hasInternet = useConnectionStatus();
-  const { expoPushToken } = usePushNotifications();
-
   const hasHiddenSplashRef = useRef(false);
   const hasShownOfflineToastRef = useRef(false);
   const hasFetchedPaypalRef = useRef(false);
 
+  const { t } = useTranslation();
   useEffect(() => {
     const setColorTheme = async () => {
       try {
@@ -461,12 +447,6 @@ function AppContent() {
   }, [hasInternet]);
 
   useEffect(() => {
-    if (expoPushToken) {
-      console.log("Push Token:", expoPushToken);
-    }
-  }, [expoPushToken]);
-
-  useEffect(() => {
     const essentialsReady = languageContextReady && storesHydrated;
 
     if (!essentialsReady) return;
@@ -476,8 +456,8 @@ function AppContent() {
 
       Toast.show({
         type: "error",
-        text1: "Keine Internetverbindung",
-        text2: "Bitte überprüfe deine Verbindung.",
+        text1: t("noInternetConnectionTitle"),
+        text2: t("noInternetConnectionMessage"),
         visibilityTime: 5000,
       });
     }
@@ -485,7 +465,7 @@ function AppContent() {
     if (hasInternet) {
       hasShownOfflineToastRef.current = false;
     }
-  }, [languageContextReady, storesHydrated, hasInternet]);
+  }, [languageContextReady, storesHydrated, hasInternet, t]);
 
   const essentialsReady = languageContextReady && storesHydrated;
 
@@ -510,8 +490,6 @@ function AppContent() {
             <QueryClientProvider client={queryClient}>
               <SupabaseRealtimeProvider>
                 <BottomSheetModalProvider>
-                  <NoInternet showUI={!hasInternet} showToast={false} />
-
                   <ForceUpdateGate>
                     <Stack
                       screenOptions={{

@@ -2,15 +2,6 @@ const de = {
   //LanguageSelectionScreen
   chooseLanguage: "Wähle deine Sprache aus",
 
-  // NewsArticles
-  newsArticlesTitle: "Artikel",
-  isExternalLink: "Externer Link",
-  errorLoadingArticle: "Es ist ein Fehler beim Laden des Artikels aufgetreten!",
-  // News
-  newsTitle: "Aktuelles",
-  newsEmpty: "Es gibt derzeit noch keine Neuigkeiten!",
-  newNewsAvailable: "Neue Neuigkeiten verfügbar!",
-
   // Podcasts
   podcastsTitle: "Podcasts",
   podcastScreenTitle: "Podcasts",
@@ -25,6 +16,9 @@ const de = {
   unmarked_as_listened: "Markierung entfernt",
   continue_listening: "Weiterhören",
   resume: "Fortsetzen",
+  allTopics: "Alle Themen",
+  allAuthors: "Alle Autoren",
+
   // General
   today: "Heute",
   yes: "Ja",
@@ -84,97 +78,16 @@ const de = {
   repeatsWeekly: "Wiederholt sich wöchentlich",
   feedback: "Feedback",
   allDays: "Täglich",
+
   // Navigation
-  knowledge: "Wissen",
   settings: "Einstellungen",
-  questionScreenTitle: "Fragen und Antworten",
-  prayerScreenTitle: "Gebete und mehr",
-  newsArticleScreenTitle: "Artikel",
   home: "Home",
-  calendarScreenTitle: "Kalender",
-  quranScreen: "Quran",
-  historyScreen: "Geschichtliches",
-  edit: "Bearbeiten",
+
   // Database
   updateAvailable: "Update Verfügbar",
   newAppVersionAvailable: "Eine neue Version ist im App-Store verfügbar!",
-  databaseUpdateQuestions: "Die Fragen wurden aktualisiert!",
-  databaseUpdatePrayer: "Die Gebete wurden aktualisiert!",
-  databaseUpdateCalendar: "Der Kalender wurde aktualisiert!",
-  databaseUpdateQuran: "Die Übersetzung/Tafsir des Qurans wurden aktualisiert!",
   databaseUpdatePaypal: "Der PayPal-Link wurde aktualisiert!",
   update: "Aktualisieren",
-
-  // Questions
-  categories: "Kategorien",
-  latestQuestions: "Neueste Fragen",
-  relatedQuestions: "Verwandte Fragen",
-  errorLoadingSubcategories: "Kategorien konnten nicht geladen werden!",
-  subcategoriesLoading: "Unterkategorien werden geladen...",
-  errorLoadingQuestions: "Fragen konnten nicht geladen werden!",
-  noQuestionsFound: "Keine Fragen in dieser Kategorie gefunden!",
-
-  titleSearchSelectQuestions: "Wähle die Fragen aus",
-  titleSearchPlaceholder: "Suche nach einem Titel",
-  titleSearchNoResults: "Keine passenden Titel gefunden",
-  close: "Schließen",
-  // Questionslinks
-  rechtsfragen: "Rechtsfragen",
-  quran: "Quran",
-  geschichte: "Geschichte",
-  glaubensfragen: "Glaubensfragen",
-  ethik: "Ethik",
-  ratschläge: "Ratschläge",
-  videos: "Videos",
-  removeProgress: "Fortschritt entfernen",
-  markAsRead: "Als gelesen markieren",
-
-  // Books and PDF
-  readingSettings: "Format",
-  pageLayout: "Seitenlayout",
-  horizontal: "Horizontal",
-  horizontalInfoText: "Swipe nach rechts/inks um die Seite zu wechseln",
-  vertical: "Vertikal",
-  verticalInfoText: "Swipe  nach unten/oben um die Seite zu wechseln",
-
-  // Prayer
-  dua: "Dua",
-  ziyarat: "Ziyarat",
-  salat: "Salat",
-  munajat: "Munajat",
-  tasbih: "Tasbih",
-  special: "Speziell",
-  names: "Asma-ul-Husna",
-  showAll: "Alles anzeigen",
-  allTopics: "Alle Themen",
-  allAuthors: "Alle Autoren",
-  noSearchResult: "Kein Ergebnis gefunden",
-  bottomInformationRenderPrayer: "Wird wie folgt ausgesprochen: ",
-  noName: "Bitte gebe einen Namen an",
-  prayerTime: "Gebetszeiten",
-  showPrayerRecommendation: "Empfehlungen",
-  // Tasbih
-  dhikrFree: "Frei",
-  dhikrSubhanallah: "Subhanallah",
-  dhikrAlhamdulillah: "Alhamdulillah",
-  dhikrAllahuAkbar: "Allahu Akbar",
-  dhikrLaIlahaIllallah: "La ilaha illallah",
-  dhikrAstaghfirullah: "Astaghfirullah",
-  dhikrAstaghfirullahWaAtubuIlaih: "Astaghfirullah wa atubu ilaih",
-  dhikrHadhaMaqam: "Hadha maqam al-´a´idh bika min an-naar",
-  dhikrAlAfu: "Al-´afu",
-  dhikrFortyPrayer: "Bittgebete für 40 gläubige",
-  TasbihFatima: "Tasbih Fatima Zahra (a.)",
-  QunutSalatUlWitr: "Qunut-Bittgebet Salat ul-Witr",
-  freeMode: "Freier Modus",
-  freeModeDescription: "Wähle irgendeinen Dhikr",
-  setMaximumReps: "Maximale Wiederholungen einstellen:",
-  resetCurrent: "Aktuelles zurücksetzen",
-  resetAll: "Alle zurücksetzen",
-  stepCompleteNext: "Schritt abgeschlossen! Nächster...",
-  tap: "Tippen",
-  totalDhikr: "Gesamter Dhikr:",
-  completedText: "abgeschlossen ✓",
 
   // Push-notification
   pushNotificationsDisabledTitle: "Push-Benachrichtigungen Deaktiviert",
@@ -186,268 +99,31 @@ const de = {
   errorTogglingNotifications:
     "Fehler beim Ändern der Benachrichtigungseinstellungen:",
   noInternetConnectionTitle: "Keine Internetverbindung",
-  noInternetConnectionMessage:
-    "Die Änderungen konnten nicht vorgenommen werden, weil keine Internetverbindung besteht.",
+  noInternetConnectionMessage: "Bitte überprüfe deine Verbindung.",
   ok: "OK",
-
-  // Weekly calendar
-  weeklyToDoTitle: "Wochenplan",
-  weeklyToDoSubtitle: "Plane deine Woche",
-  addWeekly: "Hinzufügen",
-  addForDay: "Hinzufügen für",
-  enterTodo: "Gib dein Todo ein...",
-  add: "Hinzufügen",
-  cancel: "Abbrechen",
-  noPlansForToday: "Es sind noch keine Pläne für diesen Tag vorhanden!",
-  undo: "Alle zurücksetzen",
-  undoProgressText:
-    "Bist du sicher, dass du alle Einträge für diesen Tag zurücksetzen möchtest?",
-
-  setReminder: "Erinnerung einstellen",
-  hours: "Stunden",
-  minutes: "Minuten",
-  repeatWeekly: "Wöchentlich wiederholen",
-
-  // Days of week
-  days: {
-    short: ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"],
-    full: [
-      "Montag",
-      "Dienstag",
-      "Mittwoch",
-      "Donnerstag",
-      "Freitag",
-      "Samstag",
-      "Sonntag",
-    ],
-  },
-
-  // Delete confirmation
-  confirmDelete: "Löschen bestätigen",
-  deleteTodo: "Möchtest du dieses To-do wirklich löschen?",
-  deleteFolder: "Möchtest du diesen Ordner wirklich löschen?",
-  delete: "Löschen",
 
   //search
   noSearchResults: "Keine Suchergebnisse gefunden!",
   searchPlaceholder: "Suche nach Fragen, Gebeten, News-Artikel oder Podcasts",
-  question: "Frage",
-  prayer: "Gebet",
   podcast: "Podcasts",
-  newsArticle: "Neuigkeiten",
   searchContent: "Inhalt suchen",
-  searchQuranPrayers: "Quran & Gebete suchen...",
   searching: "Suche läuft...",
   searchMinimumChars: "Geben Sie mindestens 2 Zeichen ein",
   noResultsFound: "Keine Ergebnisse gefunden",
-  surah: "Sure",
-  ayah: "Vers",
-  ayahs: "Verse",
-  tab_pdfs: "PDFs",
-  // Tabs (short labels)
-  tab_quran: "Qur’an",
-  tab_questions: "Fragen",
-  tab_prayers: "Bittgebete",
   tab_podcasts: "Podcasts",
-  tab_newsArticles: "Artikel",
 
   // Placeholders (per tab)
-  placeholder_quran: "Qur’an durchsuchen",
-  placeholder_questions: "Fragen durchsuchen",
-  placeholder_prayers: "Bittgebete durchsuchen",
   placeholder_podcasts: "Podcasts durchsuchen",
-  placeholder_newsArticles: "Artikel durchsuchen",
-  placeholder_pdfs: "PDFs durchsuchen",
+
   // Meta / errors
   results_count: "{{count}} Treffer",
   search_failed: "Suche fehlgeschlagen. Bitte erneut versuchen.",
-
-  // Quran row label
-  quran_sura_aya: "Sure {{sura}}:{{aya}}",
-
-  // videos
-  noVideoFound: "Es wurden keine Videos für diese Kategorie gefunden!",
-
-  // User questions
-  yourQuestions: "Deine Fragen",
-  still_days_left: "Noch {{count}} Tag{{e}} übrig bis die Frage gelöscht wird",
-  expires_today: "Läuft heute ab!",
-  expired_days_ago:
-    "Abgelaufen vor {{count}} Tag{{en}} - Gelesen am {{dateTime}}",
-  not_read_yet: "Noch nicht gelesen",
-  day_plural: "e",
-  day_singular: "",
-  askQuestionQuestionSendSuccess: "Deine Frage wurde erfolgreich gesendet!",
 
   // No internet
   noInternetTitle: "Keine Internetverbindung",
   internetBackTitle: "Verbindung wiederhergestellt",
   noInternetMessage: "Du erhälst keine updates in dieser Zeit!",
 
-  // Account
-  successDeletion: "Account erfolgreich gelöscht!",
-  authFailed: "Authentifizierung fehlgeschlagen",
-  deleteUserToOftenText: "Zu viele Versuche. Bitte versuche es in",
-  deleteUserToOftenMinutesAgain: "Minuten erneut.",
-  deleteUserNotLoggedIn: "Du bist nicht eingeloggt!",
-  errorDeleteAccount: "Fehler beim Löschen des Accounts",
-  timeOverStepped: "Zeitüberschreitung. Bitte versuche es erneut.",
-  somethingWentWrong: "Etwas ist schiefgelaufen",
-  deleteAccount: "Account Löschen",
-  deleteAccountConfirmation1:
-    " Bist du sicher, dass du deinen Account löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden.",
-  deleteAccountConfirmation2: "Alle deine Daten werden permanent gelöscht.",
-  yesDeleteAccount: "Ja, Account löschen",
-  abort: "Abbrechen",
-  confirmPassowrdTitle: "Passwort bestätigen",
-  confirmPasswordText:
-    "Bitte gib dein Passwort ein, um die Löschung zu bestätigen.",
-
-  resetPasswordCodeRequired: "Code wird benötigt",
-  resetPasswordNewPasswordRequired: "Passwort wird benötigt",
-  resetPasswordNewPasswordMinLength:
-    "Das Passwort muss mindestens 8 Zeichen lang sein.",
-  resetPasswordConfirmPasswordRequired: "Passwortbestätigung wird benötigt",
-  resetPasswordConfirmPasswordMinLength:
-    "Die Passwortbestätigung muss mindestens 8 Zeichen lang sein.",
-  resetPasswordPasswordsDoNotMatch: "Passwörter stimmen nicht überein",
-
-  errorTitle: "Fehler",
-  successTitle: "Erfolg",
-
-  resetPasswordEmailRequired: "E-Mail wird benötigt",
-  resetPasswordSessionError:
-    "Die Sitzung konnte nach der Code-Bestätigung nicht erstellt werden.",
-  resetPasswordInvalidOrExpiredCode: "Der Code ist ungültig oder abgelaufen.",
-  unexpectedErrorMessage: "Ein unerwarteter Fehler ist aufgetreten.",
-
-  resetPasswordResendSuccessMessage:
-    "Ein neuer Code wurde an deine E-Mail-Adresse gesendet.",
-  resetPasswordSuccessMessage: "Dein Passwort wurde erfolgreich aktualisiert.",
-
-  resetPasswordCodePlaceholder: "Reset-Code eingeben",
-  resetPasswordNewPasswordPlaceholder: "Neues Passwort eingeben",
-  resetPasswordConfirmPasswordPlaceholder: "Passwort bestätigen",
-
-  resetPasswordSubmitButton: "Passwort aktualisieren",
-  resetPasswordResendDisabledText:
-    "Maximale Versuche erreicht. Bitte versuche es später erneut.",
-  resetPasswordResendButton: "Neuen Code anfordern",
-  noAnswereToQuestion: "Neue Nachricht verfügbar",
-
-  // Auth / Login
-  adminLoginTitle: "Admin Login",
-  emailPlaceholder: "E-Mail",
-  passwordPlaceholder: "Passwort",
-  forgotPassword: "Passwort vergessen?",
-  loginButton: "Anmelden",
-  loadingButton: "Wird geladen...",
-  signupNow: "Jetzt kostenlos registrieren!",
-  noInternetConnection: "Keine Internetverbindung",
-  checkInternet: "Bitte überprüfe dein Internet.",
-  loginFailed: "Login fehlgeschlagen",
-  invalidCredentials: "E-Mail oder Passwort ist falsch.",
-  userNotFound: "Benutzer existiert nicht.",
-  emailNotConfirmed: "E-Mail ist noch nicht bestätigt.",
-  loginErrorGeneric: "Es gab einen Fehler beim Login.",
-  loginSuccess: "Du wurdest erfolgreich angemeldet!",
-  signupTitle:
-    "Erstelle jetzt einen kostenlosen Account, um deine Fragen versenden zu können.",
-  usernamePlaceholder: "Benutzername",
-  confirmPasswordPlaceholder: "Passwort bestätigen",
-  registerButton: "Registrieren",
-  alreadyHaveAccount: "Hast du bereits einen Account?",
-
-  emailVerificationTitle: "E-Mail-Verifizierung",
-  emailVerificationSubtitle:
-    "Bitte gib den Code ein, der an {{email}} gesendet wurde.",
-  emailVerificationNote:
-    "Falls du keinen Code bekommen hast, überprüfe zuerst deinen Spam-Ordner, bevor du einen neuen anforderst!",
-  verificationCodePlaceholder: "Dein Verifizierungscode",
-  verifyButton: "Verifizieren",
-  cancelButton: "Abbrechen",
-  resendCodeButton: "Code erneut senden",
-
-  tooManyAttemptsTitle: "Zu viele Versuche",
-  tooManyAttemptsMessage:
-    "Du hast die maximale Anzahl an Verifizierungsversuchen überschritten. Bitte fordere einen neuen Code an.",
-  maxResendAttemptsMessage:
-    "Du hast die maximale Anzahl an erneuten Sendeversuchen erreicht. Bitte später erneut registrieren!",
-  verificationTimeoutMessage:
-    "Die Verifizierung ist abgelaufen. Bitte erneut versuchen.",
-  codeResentMessage: "Ein neuer Bestätigungscode wurde gesendet!",
-  registrationSuccessToast: "Registrierung erfolgreich!",
-
-  usernameNotEmpty: "Benutzername darf nicht leer sein.",
-  usernameMinLength: "Der Benutzername muss mindestens 3 Zeichen lang sein.",
-  usernameInvalidChars:
-    "Der Benutzername darf nur Buchstaben, Zahlen, Binde- und Unterstriche enthalten.",
-  usernameAlreadyInUse: "Dieser Benutzername ist bereits vergeben.",
-  emailNotEmpty: "E-Mail darf nicht leer sein.",
-  emailInvalid: "Bitte gib eine gültige E-Mail-Adresse ein.",
-  emailAlreadyInUse: "Diese E-Mail-Adresse ist bereits registriert.",
-  passwordNotEmpty: "Passwort darf nicht leer sein.",
-  passwordMinLength: "Das Passwort muss mindestens 8 Zeichen lang sein.",
-  passwordFormat:
-    "Das Passwort muss mindestens einen Großbuchstaben, einen Kleinbuchstaben, eine Zahl und ein Sonderzeichen enthalten.",
-  passwordMismatch: "Die Passwörter stimmen nicht überein.",
-  captchaCancelled: "Captcha wurde abgebrochen. Bitte erneut versuchen.",
-  noInternetHeader: "Keine Internetverbindung!",
-  noInternetBody:
-    "Bitte stelle sicher, dass du mit dem Internet verbunden bist, damit du Updates erhalten kannst!",
-  signUpErrorGeneral: "Fehler beim Registrieren!",
-  signUpUserNameMin: "Benutzername muss mindestens 3 Zeichen lang sein",
-  signUpUserPasswordMin: "Passwort muss mindestens 8 Zeichen lang sein",
-  signUpUserPasswordFormat:
-    "Passwort muss mindestens einen Großbuchstaben, einen Kleinbuchstaben, eine Zahl und ein Sonderzeichen enthalten",
-  signUpUserPasswordConformation: "Passwörter stimmen nicht überein",
-  signUpUserNameAlreadyInUsage: "Dieser Benutzername ist bereits vergeben!",
-  signUpUserEmailAlreadyInUsage: "Diese E-Mail wird bereits verwendet!",
-  signUpUsernameNotEmpty: "Benutzername darf nicht leer sein.",
-  signUpEmailNotEmpty: "E-Mail darf nicht leer sein.",
-  signUpPasswordNotEmpty: "Passwort darf nicht leer sein.",
-  signUpEmailInvalid: "Bitte gib eine gültige E-Mail-Adresse ein.",
-  signUpUsernameInvalidChars:
-    "Der Benutzername darf nur Buchstaben, Zahlen, Binde- und Unterstriche enthalten.",
-  cancelCaptcha:
-    "Bitte nicht wegklicken, da die Überprüfung sonst abgebrochen wird!",
-  // Settings
-  logout: "Abmelden",
-  login: "Anmelden",
-  displayAndNotifications: "Darstellung & Benachrichtigung",
-  display: "Darstellung",
-  darkMode: "Dunkelmodus",
-  enableDarkMode: "Dunkles Erscheinungsbild aktivieren",
-  notifications: "Benachrichtigungen",
-  receivePushNotifications: "Push-Benachrichtigungen erhalten",
-  account: "Account",
-  changePassword: "Passwort ändern",
-  questionsInDatabase: "Fragen in der Datenbank: {{count}}",
-  databaseVersion: "Datenbank-Version: {{version}}",
-  appVersion: "App-Version: {{version}}",
-  dataPrivacy: "Datenschutz",
-  aboutTheApp: "Über die App",
-  recommendations: "Empfehlungen",
-  ourRecommendations: "Unsere Empfehlungen",
-  imprint: "Impressum",
-  hardResetDatabase: "Datenbank neu laden",
-  hardResetDatabaseText:
-    "Dies wird die Datanbank neu laden und möglicherweise Fehler beheben.",
-  pleaseEnterEmail: "Bitte E-Mail eingeben.",
-  pleaseEnterValidEmail: "Bitte eine gültige E-Mail eingeben.",
-  pleaseEnterPassword: "Bitte Passwort eingeben.",
-
-  clearAppCache: "App-Cache löschen",
-  clearAppCacheText:
-    "Löscht alle zwischengespeicherten Dateien der App. Inhalte müssen danach ggf. neu geladen werden.",
-  clearAppCacheConfirmTitle: "Cache löschen",
-  clearAppCacheConfirmMessage:
-    "Möchtest du wirklich alle zwischengespeicherten Dateien der App löschen?",
-  clearAppCacheSuccessMessage: "Der App-Cache wurde erfolgreich gelöscht.",
-  clearAppCacheErrorMessage:
-    "Beim Löschen des App-Caches ist ein Fehler aufgetreten.",
-  arabicDateAdjustment: "Arabisches Datum anpassen",
-  arabicDateAdjustmentDescription: "Tage hinzufügen oder subtrahieren",
   // Language selector
   language: "Sprache",
   selectAppLanguage: "App-Sprache wählen",
@@ -460,167 +136,6 @@ const de = {
     ar: "العربية",
   },
 
-  // Calendar
-  recommendedActs: "Empfohlene Handlungen",
-  addToPlan: "Zum Wochenplan hinzufügen",
-  selectActsTitle: "Handlungen auswählen",
-  selectDay: "Tag auswählen",
-  addSelected: "Hinzufügen",
-  selectAll: "Alle auswählen",
-  deselectAll: "Alle abwählen",
-  calendarTitle: "Islamischer Kalender",
-  calendarYearRange: "{{range}} n. H.",
-  legend: "LEGENDE",
-  filterMajor: "Hauptfest",
-  filterMinor: "Nebentag",
-  legendHeader: "Legende:",
-  legendToday: "Heute",
-  legendNext: "Demnächst",
-  legendUpcoming: "Bevorstehend",
-  legendMajorEvent: "Großes Ereignis",
-  legendMinorEvent: "Kleines Ereignis",
-  countdownToday: "Heute!",
-  countdownDaysToGo: "Noch {{count}} Tage",
-  homeCalendarSectionTitle: "Islamischer Kalender",
-
-  // Quran
-  basmala: "Im Namen Allahs, des Allerbarmers, des Barmherzigen!",
-  quranTitle: "Edler Quran",
-  quranSubtitle: "Kapitelliste (Suren)",
-  selectLanguage: "Sprache wählen",
-  totalSuras: "Suren insgesamt",
-  ayatCount: "Verse",
-  revelationOrder: "Offenbarungsreihenfolge",
-  type: "Typ",
-  words: "Wörter",
-  letters: "Buchstaben",
-  makki: "Mekkanisch",
-  madani: "Medinensisch",
-  lastRead: "Zuletzt gelesen",
-  juz: "Juz",
-  sura: "Sura",
-  page: "Seite",
-  clearAllBookmarksQuran: "Alle Lesezeichen entfernen",
-  chooseReciter: "Rezitator auswählen",
-  // History
-  sectionsTitle: {
-    prophets: "Propheten",
-    ahlulbayt: "Ahlul-Bayt",
-    ashura: "Ashura",
-  },
-  prophets: {
-    adam: "Adam (s.)",
-    nuh: "Nuh (s.)",
-    ibrahim: "Ibrahim (s.)",
-    lut: "Lut (s.)",
-    ismail: "Ismail (s.)",
-    yaqub: "Yaqub (s.)",
-    yusuf: "Yusuf (s.)",
-    ayyub: "Ayyub (s.)",
-    musa: "Musa (s.)",
-    harun: "Harun (s.)",
-    dawud: "Dawud (s.)",
-    sulayman: "Sulayman (s.)",
-    yunus: "Yunus (s.)",
-    zakariya: "Zakariya (s.)",
-    yahya: "Yahya (s.)",
-    isa: "Isa (s.)",
-    muhammad: "Muhammad (s.)",
-  },
-  ahlulbayt: {
-    muhammad: "Prophet Muhammad (s.)",
-    fatima: "Fatima Zahra (a.)",
-    ali: "Imam Ali al-Murtadha (a.)",
-    hasan: " Imam Hasan al-Mudschtaba (a.)",
-    husain: "Imam Husain Sayyid-ul-Schuhada (a.)",
-    zainUlAbidin: "Imam Ali Zain-ul-Abidin (a.)",
-    baqir: "Imam Muhammad al-Baqir (a.)",
-    sadiq: "Imam Dschafar al-Sadiq (a.)",
-    kathim: "Imam Musa al-Kathim (a.)",
-    ridha: "Imam Ali al-Ridha (a.)",
-    dschawad: "Imam Muhammad al-Dschawad at-Taqi (a.)",
-    hadi: "Imam Ali al-Hadi al-Naqi (a.)",
-    askari: "Imam Hasan al-Askari (a.)",
-    mahdi: "Imam Mahdi al-Muntathar (a.) ",
-  },
-  ashura: {
-    day1: "Tag 1",
-    day2: "Tag 2",
-    day3: "Tag 3",
-    day4: "Tag 4",
-    day5: "Tag 5",
-    day6: "Tag 6",
-    day7: "Tag 7",
-    day8: "Tag 8",
-    day9: "Tag 9",
-    day10: "Tag 10",
-  },
-
-  sections: {
-    life: "Leben",
-    status: "Stellung & Abstammung",
-    family: "Familie",
-    revelation: "Offenbarung & Mission",
-    migration: "Hidschra & Sieg",
-    miracles: "Wunder",
-    titles: "Ehrentitel",
-  },
-  content: {
-    born: "Geboren 570 n.Chr. in Mekka",
-    died: "Gestorben 632 n.Chr. in Medina",
-    age: "Verstarb im Alter von 63 Jahren",
-    seal: "Das Siegel der Propheten und das beste aller Geschöpfe",
-    lineage: "Sein Stammbaum reicht bis zu Abraham (a.) über Ismael (a.)",
-    alamin:
-      "Schon vor seiner Berufung galt er als 'Al-Amin' – der Vertrauenswürdige",
-    khadija: "Er heiratete Chadidscha (a.) und hatte mit ihr Fatima (a.)",
-    ali: "Imam Ali (a.) bereitete seine Beisetzung vor",
-    hira: "In der Höhle Hira empfing er durch Gabriel (a.) die erste Offenbarung",
-    mission:
-      "Er rief zu reinem Monotheismus, Gerechtigkeit und Gleichberechtigung auf",
-    persecution:
-      "Wegen der Verfolgung durch die Mekkaner wanderte er nach Medina aus",
-    return: "Nach Jahren kehrte er zurück und befreite Mekka friedlich",
-    kaaba:
-      "Er zerstörte die Götzen in der Kaaba und stellte die Pilgerfahrt [Hadsch] wieder her",
-    quran: "Er vollbrachte viele Wunder, das größte ist der Heilige Quran",
-  },
-  titles: {
-    mustafa: "Mustafa",
-    mercy: "Gnade für die Welten",
-    perfect: "Al-Insan al-Kamil",
-    perfectDesc: "Der vollkommene Mensch",
-  },
-
-  askQuestion: {
-    titleLabel: "Titel *",
-    titlePlaceholder: "Titel deiner Frage",
-    marjaLabel: "Marja *",
-    marjaSistani: "Sayid as-Sistani",
-    marjaKhamenei: "Sayid al-Khamenei",
-    marjaNoFiqh: "Keine Rechtsfrage",
-    questionLabel: "Frage *",
-    questionPlaceholder: "Wie lautet deine Frage?",
-    ageLabel: "Alter *",
-    agePlaceholder: "Dein Alter",
-    genderLabel: "Geschlecht *",
-    genderMale: "Männlich",
-    genderFemale: "Weiblich",
-    submitButton: "Frage absenden",
-    similarModalTitle: "Ähnliche Fragen gefunden",
-    modalCancel: "Abbrechen",
-    modalSubmitAnyway: "Trotzdem absenden",
-    noInternetTitle: "Keine Internetverbindung",
-    noInternetMessage: "Bitte überprüfe dein Internet.",
-    mustBeLoggedIn: "Du musst eingeloggt sein, um eine Frage zu stellen.",
-    errors: {
-      titleRequired: "Bitte gib einen Titel ein!",
-      marjaRequired: "Bitte wähle einen Marja aus!",
-      questionRequired: "Bitte gib deine Frage ein!",
-      ageRequired: "Bitte gib dein Alter ein!",
-      genderRequired: "Bitte wähle dein Geschlecht aus!",
-    },
-  },
   // Gregorian month names
   months: {
     1: "Januar",

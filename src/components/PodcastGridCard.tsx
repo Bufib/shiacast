@@ -4,6 +4,7 @@
 // import { formatDate } from "../../utils/formatDate";
 // import { Feather } from "@expo/vector-icons";
 // import { LinearGradient } from "expo-linear-gradient";
+// import { useIsPodcastListened } from "@/hooks/usePodcastListenedStore";
 
 // export default function PodcastGridCard({
 //   podcast,
@@ -15,10 +16,11 @@
 // }: PodcastGridCardType) {
 //   const formattedDate = formatDate(podcast.created_at);
 //   const hasCover = Boolean(podcast.image_url);
+//   const isListened = useIsPodcastListened(podcast?.id, lang);
 
 //   return (
 //     <View style={[styles.cardShadow, { width }]}>
-//       <View style={styles.card}>
+//       <View style={[styles.card, isListened && styles.cardListened]}>
 //         {hasCover ? (
 //           <>
 //             <Image
@@ -60,6 +62,17 @@
 //         >
 //           <Feather name="mic" size={18} color="#fff" />
 //         </View>
+
+//         {isListened && (
+//           <View
+//             style={[
+//               styles.listenedBadge,
+//               rtl ? styles.listenedBadgeRtl : styles.listenedBadgeLtr,
+//             ]}
+//           >
+//             <Feather name="check" size={16} color="#fff" />
+//           </View>
+//         )}
 
 //         <View style={styles.cardContent}>
 //           <View style={styles.titleContainer}>
@@ -141,6 +154,10 @@
 //     backgroundColor: "#1a1a1a",
 //   },
 
+//   cardListened: {
+//     opacity: 0.78,
+//   },
+
 //   cardOverlay: {
 //     ...StyleSheet.absoluteFillObject,
 //     backgroundColor: "rgba(0, 0, 0, 0.2)",
@@ -165,6 +182,31 @@
 
 //   vinylRecordRtl: {
 //     left: 12,
+//   },
+
+//   listenedBadge: {
+//     position: "absolute",
+//     top: 12,
+//     width: 28,
+//     height: 28,
+//     borderRadius: 14,
+//     backgroundColor: "rgba(46, 204, 113, 0.95)",
+//     justifyContent: "center",
+//     alignItems: "center",
+//     zIndex: 4,
+//     shadowColor: "#000",
+//     shadowOffset: { width: 0, height: 1 },
+//     shadowOpacity: 0.25,
+//     shadowRadius: 2,
+//     elevation: 4,
+//   },
+
+//   listenedBadgeLtr: {
+//     left: 12,
+//   },
+
+//   listenedBadgeRtl: {
+//     right: 12,
 //   },
 
 //   cardContent: {
@@ -238,6 +280,7 @@
 //   },
 // });
 
+
 import { PodcastGridCardType } from "@/constants/Types";
 import { Image } from "expo-image";
 import { StyleSheet, Text, View } from "react-native";
@@ -246,21 +289,30 @@ import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useIsPodcastListened } from "@/hooks/usePodcastListenedStore";
 
+type Props = PodcastGridCardType & { height?: number };
+
 export default function PodcastGridCard({
   podcast,
   width,
+  height,
   rtl,
   lang,
   listenText,
   gradientColors,
-}: PodcastGridCardType) {
+}: Props) {
   const formattedDate = formatDate(podcast.created_at);
   const hasCover = Boolean(podcast.image_url);
   const isListened = useIsPodcastListened(podcast?.id, lang);
 
   return (
     <View style={[styles.cardShadow, { width }]}>
-      <View style={[styles.card, isListened && styles.cardListened]}>
+      <View
+        style={[
+          styles.card,
+          isListened && styles.cardListened,
+          height ? { height } : null,
+        ]}
+      >
         {hasCover ? (
           <>
             <Image

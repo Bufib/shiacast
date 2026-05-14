@@ -212,6 +212,7 @@ export const SupabaseRealtimeProvider = ({
             new: payload.new as PodcastRealtimeRow | undefined,
             old: payload.old as PodcastRealtimeRow | undefined,
           };
+         
           await invalidatePodcastQueries(normalizedPayload);
           incrementPodcastVersion();
           if (payload.eventType === "DELETE") {
