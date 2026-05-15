@@ -1,3 +1,4 @@
+// //! Funktioniert perfket
 // import {
 //   setAudioModeAsync,
 //   useAudioPlayerStatus,
@@ -36,8 +37,9 @@
 //   return "idle";
 // }
 
-// export default function GlobalVideoHost({ children }: PropsWithChildren) {
+// export default function GlobalAudioHost({ children }: PropsWithChildren) {
 //   const audioStatus = useAudioPlayerStatus(globalPlayer);
+
 //   const setPlaying = useGlobalPlayer((state) => state._setPlaying);
 //   const setTime = useGlobalPlayer((state) => state._setTime);
 //   const setStatus = useGlobalPlayer((state) => state._setStatus);
@@ -51,6 +53,7 @@
 //       if (__DEV__) {
 //         const message =
 //           error instanceof Error ? error.message : "Failed to set audio mode";
+
 //         console.warn("[globalPodcastAudioPlayer]", message);
 //       }
 //     });
@@ -71,7 +74,7 @@
 //   return <>{children}</>;
 // }
 
-
+//! Funktioniert perfket
 import {
   setAudioModeAsync,
   useAudioPlayerStatus,
@@ -109,13 +112,13 @@ function getStoreStatus(status: AudioStatus): PlayerStatus {
 
   return "idle";
 }
-
 export default function GlobalAudioHost({ children }: PropsWithChildren) {
   const audioStatus = useAudioPlayerStatus(globalPlayer);
-
-  const setPlaying = useGlobalPlayer((state) => state._setPlaying);
-  const setTime = useGlobalPlayer((state) => state._setTime);
-  const setStatus = useGlobalPlayer((state) => state._setStatus);
+  const currentKey = useGlobalPlayer((s) => s.currentKey);
+  const stoppedByUser = useGlobalPlayer((s) => s.stoppedByUser);
+  const setPlaying = useGlobalPlayer((s) => s._setPlaying);
+  const setTime = useGlobalPlayer((s) => s._setTime);
+  const setStatus = useGlobalPlayer((s) => s._setStatus);
 
   useEffect(() => {
     setAudioModeAsync({
@@ -126,7 +129,6 @@ export default function GlobalAudioHost({ children }: PropsWithChildren) {
       if (__DEV__) {
         const message =
           error instanceof Error ? error.message : "Failed to set audio mode";
-
         console.warn("[globalPodcastAudioPlayer]", message);
       }
     });
@@ -136,13 +138,25 @@ export default function GlobalAudioHost({ children }: PropsWithChildren) {
     setTime(audioStatus.currentTime, audioStatus.duration);
     setPlaying(audioStatus.playing);
 
+    // User has unloaded — native player may still report `isLoaded: true`
+    // because we don't call replace(null), so force idle here.
+    if (!currentKey) {
+      setStatus("idle");
+      return;
+    }
+
+    if (stoppedByUser && !audioStatus.playing) {
+      setStatus("ready");
+      return;
+    }
+
     if (audioStatus.didJustFinish) {
       setStatus("ready");
       return;
     }
 
     setStatus(getStoreStatus(audioStatus));
-  }, [audioStatus, setPlaying, setStatus, setTime]);
+  }, [audioStatus, currentKey, stoppedByUser, setPlaying, setStatus, setTime]);
 
   return <>{children}</>;
 }
