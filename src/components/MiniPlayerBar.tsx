@@ -199,6 +199,7 @@ export default function MiniPlayerBar({ bottomOffset = 50 }: Props) {
           filename,
           currentUri,
           artwork,
+          image_url: artwork
         }),
       },
     });

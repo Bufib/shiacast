@@ -651,10 +651,16 @@ export function usePodcastPlayer(podcast: PodcastPlayerPropsType["podcast"]) {
     gcTime: 24 * 60 * 60 * 1000,
   });
 
-  const artworkUri: string | undefined =
-    coverUrl ?? logoAsset?.uri ?? undefined;
+  const passedArtworkUrl =
+    (podcast as any)?.image_url ?? (podcast as any)?.artwork ?? undefined;
 
-  const coverSource = coverUrl ? { uri: coverUrl } : LOCAL_PODCAST_ARTWORK;
+  const artworkUri: string | undefined =
+    coverUrl ?? passedArtworkUrl ?? logoAsset?.uri ?? undefined;
+
+  const coverSource =
+    coverUrl || passedArtworkUrl
+      ? { uri: coverUrl ?? passedArtworkUrl }
+      : LOCAL_PODCAST_ARTWORK;
 
   const {
     isPlaying,
@@ -742,7 +748,7 @@ export function usePodcastPlayer(podcast: PodcastPlayerPropsType["podcast"]) {
   const manuallyLoadedRef = useRef(false);
   const wasPlayingRef = useRef(false);
   const startPosRef = useRef(0);
-const setLastPlayed = useLastPlayedPodcastStore((s) => s.setLastPlayed);
+  const setLastPlayed = useLastPlayedPodcastStore((s) => s.setLastPlayed);
   const isThisEpisodeLoaded =
     podcastId === podcast?.id &&
     Boolean(currentUri || currentKey) &&
@@ -925,10 +931,10 @@ const setLastPlayed = useLastPlayedPodcastStore((s) => s.setLastPlayed);
   }, [podcast?.id]);
 
   useEffect(() => {
-  if (isPlaying && isThisEpisodeLoaded && podcast?.id) {
-    setLastPlayed(podcast);
-  }
-}, [isPlaying, isThisEpisodeLoaded, podcast?.id, podcast, setLastPlayed]);
+    if (isPlaying && isThisEpisodeLoaded && podcast?.id) {
+      setLastPlayed(podcast);
+    }
+  }, [isPlaying, isThisEpisodeLoaded, podcast?.id, podcast, setLastPlayed]);
 
   const onPressToggleFavorite = async () => {
     if (!podcast?.id) return;
