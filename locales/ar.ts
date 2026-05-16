@@ -93,7 +93,7 @@ const ar = {
   imprint: "البيانات القانونية",
   podcastEmpty: "لا توجد حاليًا أي بودكاستات بعد",
   appVersion: "إصدار التطبيق",
-
+  podcastsEmpty: "لا توجد بودكاستات حتى الآن",
   // Navigation
   settings: "الإعدادات",
   home: "الرئيسية",

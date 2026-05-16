@@ -122,14 +122,14 @@ const de = {
 
   //search
   noSearchResults: "Keine Suchergebnisse gefunden!",
-  searchPlaceholder: "Suche nach Fragen, Gebeten, News-Artikel oder Podcasts",
+  searchPlaceholder: "Suche nach Fragen, Gebeten, News-Artikel oder ¨",
   podcast: "Podcasts",
   searchContent: "Inhalt suchen",
   searching: "Suche läuft...",
   searchMinimumChars: "Geben Sie mindestens 2 Zeichen ein",
   noResultsFound: "Keine Ergebnisse gefunden",
   tab_podcasts: "Podcasts",
-
+  podcastsEmpty: "Es gibt noch keine Podcasts",
   // Placeholders (per tab)
   placeholder_podcasts: "Podcasts durchsuchen",
 

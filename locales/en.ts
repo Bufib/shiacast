@@ -94,7 +94,7 @@ const en = {
   imprint: "Legal notice",
   podcastEmpty: "There are currently no podcasts yet",
   appVersion: "App version",
-
+  podcastsEmpty: "There are no podcasts yet",
   // Navigation
   settings: "Settings",
   home: "Home",
