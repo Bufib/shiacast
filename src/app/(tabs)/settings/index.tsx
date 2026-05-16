@@ -42,7 +42,7 @@ const Settings = () => {
   const { t } = useTranslation();
 
   const { fadeAnim, onLayout } = useScreenFadeIn(800);
-
+  const version = Constants.expoConfig?.version;
   useEffect(() => {
     (async () => {
       try {
@@ -74,7 +74,7 @@ const Settings = () => {
           styles.container,
           { backgroundColor: Colors[colorScheme].background },
         ]}
-        edges={["top", "bottom"]}
+        edges={["top"]}
       >
         <View style={[styles.header, rtl && styles.rtl]}>
           <ThemedText
@@ -174,7 +174,8 @@ const Settings = () => {
             <ThemedText
               style={[styles.versionText, rtl && { textAlign: "right" }]}
             >
-              {t("appVersion", { version: Constants.expoConfig?.version })}
+              {t("appVersion")} : {}
+              {version}
             </ThemedText>
           </View>
 
@@ -307,11 +308,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 20,
   },
-  questionCount: {
-    fontSize: 16,
-    opacity: 0.5,
-    marginBottom: 8,
-  },
+
   versionText: {
     fontSize: 14,
     opacity: 0.5,

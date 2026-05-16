@@ -76,6 +76,24 @@ const ar = {
   feedback: "ملاحظات",
   allDays: "يوميًا",
 
+  darkMode: "الوضع الداكن",
+  enableDarkmode: "تفعيل الوضع الداكن",
+  notifications: "الإشعارات",
+  receivePushNotifications: "استلام الإشعارات",
+  clearAppCache: "مسح ذاكرة التخزين المؤقت للتطبيق",
+  clearAppCacheText:
+    "يحذف جميع الملفات المخزنة مؤقتًا في التطبيق. قد تحتاج المحتويات بعد ذلك إلى التحميل من جديد.",
+  clearAppCacheConfirmTitle: "مسح ذاكرة التخزين المؤقت",
+  clearAppCacheConfirmMessage:
+    "هل تريد حقًا حذف جميع الملفات المخزنة مؤقتًا في التطبيق؟",
+  clearAppCacheSuccessMessage: "تم مسح ذاكرة التخزين المؤقت للتطبيق بنجاح.",
+  clearAppCacheErrorMessage: "حدث خطأ أثناء مسح ذاكرة التخزين المؤقت للتطبيق.",
+  dataPrivacy: "حماية البيانات",
+  aboutTheApp: "حول التطبيق",
+  imprint: "البيانات القانونية",
+  podcastEmpty: "لا توجد حاليًا أي بودكاستات بعد",
+  appVersion: "إصدار التطبيق",
+
   // Navigation
   settings: "الإعدادات",
   home: "الرئيسية",

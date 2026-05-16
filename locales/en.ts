@@ -77,6 +77,24 @@ const en = {
   feedback: "Feedback",
   allDays: "Daily",
 
+  darkMode: "Dark mode",
+  enableDarkmode: "Enable dark mode",
+  notifications: "Notifications",
+  receivePushNotifications: "Receive notifications",
+  clearAppCache: "Clear app cache",
+  clearAppCacheText:
+    "Deletes all cached files of the app. Content may need to be loaded again afterwards.",
+  clearAppCacheConfirmTitle: "Clear cache",
+  clearAppCacheConfirmMessage:
+    "Do you really want to delete all cached files of the app?",
+  clearAppCacheSuccessMessage: "The app cache has been cleared successfully.",
+  clearAppCacheErrorMessage: "An error occurred while clearing the app cache.",
+  dataPrivacy: "Data privacy",
+  aboutTheApp: "About the app",
+  imprint: "Legal notice",
+  podcastEmpty: "There are currently no podcasts yet",
+  appVersion: "App version",
+
   // Navigation
   settings: "Settings",
   home: "Home",

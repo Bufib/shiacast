@@ -79,6 +79,24 @@ const de = {
   feedback: "Feedback",
   allDays: "Täglich",
 
+  darkMode: "Dunkelmodus",
+  enableDarkmode: "Dunkelmodus aktivieren",
+  notifications: "Benachrichtigungen",
+  receivePushNotifications: "Erhalte Benachrichtigungen",
+  clearAppCache: "App-Cache löschen",
+  clearAppCacheText:
+    "Löscht alle zwischengespeicherten Dateien der App. Inhalte müssen danach ggf. neu geladen werden.",
+  clearAppCacheConfirmTitle: "Cache löschen",
+  clearAppCacheConfirmMessage:
+    "Möchtest du wirklich alle zwischengespeicherten Dateien der App löschen?",
+  clearAppCacheSuccessMessage: "Der App-Cache wurde erfolgreich gelöscht.",
+  clearAppCacheErrorMessage:
+    "Beim Löschen des App-Caches ist ein Fehler aufgetreten.",
+  dataPrivacy: "Datenschutz",
+  aboutTheApp: "Über die App",
+  imprint: "Impressum",
+  podcastEmpty: "Es gibt derzeit noch keine Podcasts",
+  appVersion: "App-Version",
   // Navigation
   settings: "Einstellungen",
   home: "Home",

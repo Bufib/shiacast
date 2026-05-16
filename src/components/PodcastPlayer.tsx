@@ -831,13 +831,13 @@ import {
   Text,
   TouchableOpacity,
   useColorScheme,
+  useWindowDimensions,
   View,
 } from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { ImageBackground } from "expo-image";
 import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
 import { Colors } from "@/constants/Colors";
 import type { PodcastPlayerPropsType } from "@/constants/Types";
 import HeaderLeftBackButton from "@/components/HeaderLeftBackButton";
@@ -847,6 +847,7 @@ import { ThemedView } from "@/components/ThemedView";
 import { usePodcastPlayer } from "@/hooks/usePodcastPlayer";
 import { StatusBar } from "expo-status-bar";
 import { useConnectionStatus } from "@/hooks/useConnectionStatus";
+import { returnSize } from "../../utils/sizes";
 
 const ACCENT = "#ff7648";
 const PLAY_BG = "#101b35";
@@ -868,7 +869,8 @@ export default function PodcastPlayer({ podcast }: PodcastPlayerPropsType) {
   const isDark = colorScheme === "dark";
   const insets = useSafeAreaInsets();
   const hasInternet = useConnectionStatus();
-
+  const { width, height } = useWindowDimensions();
+  const { imageSizePodcastPlayer } = returnSize(width, height);
   const {
     coverSource,
     isFavorite,
@@ -951,7 +953,7 @@ export default function PodcastPlayer({ podcast }: PodcastPlayerPropsType) {
       <ImageBackground
         source={coverSource}
         placeholder={require("@/assets/images/icon.png")}
-        style={styles.cover}
+        style={{ width: "100%", height: `${imageSizePodcastPlayer}%` }}
         contentFit="cover"
         transition={200}
       >
@@ -983,8 +985,13 @@ export default function PodcastPlayer({ podcast }: PodcastPlayerPropsType) {
         </View>
       </ImageBackground>
 
-      <View style={[styles.content, {backgroundColor: Colors[colorScheme].background}]}>
-        <ThemedText style={styles.title}  numberOfLines={2}>
+      <View
+        style={[
+          styles.content,
+          { backgroundColor: Colors[colorScheme].background },
+        ]}
+      >
+        <ThemedText style={styles.title} numberOfLines={2}>
           {podcast.title}
         </ThemedText>
 
@@ -1333,10 +1340,7 @@ const styles = StyleSheet.create({
   },
 
   // Cover
-  cover: {
-    width: "100%",
-    height: "55%",
-  },
+  cover: {},
   coverHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -1384,7 +1388,7 @@ const styles = StyleSheet.create({
     paddingBottom: 5,
     fontSize: 23,
     fontWeight: 600,
-    lineHeight: 30
+    lineHeight: 30,
   },
 
   // Meta row (slim, compact)

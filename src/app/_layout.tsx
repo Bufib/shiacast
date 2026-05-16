@@ -1,4 +1,5 @@
 // import "react-native-reanimated";
+// import "../../utils/i18n";
 // import React, { useCallback, useEffect, useRef, useState } from "react";
 // import { Appearance, BackHandler, Platform, View } from "react-native";
 // import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -6,47 +7,38 @@
 // import { MenuProvider } from "react-native-popup-menu";
 // import Toast from "react-native-toast-message";
 // import AsyncStorage from "@react-native-async-storage/async-storage";
-
 // import {
 //   DarkTheme,
 //   DefaultTheme,
 //   ThemeProvider,
 // } from "@react-navigation/native";
-
 // import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 // import { Stack } from "expo-router";
 // import * as SplashScreen from "expo-splash-screen";
 // import { StatusBar } from "expo-status-bar";
 // import { setAudioModeAsync } from "expo-audio";
-
 // import AppReviewPrompt from "@/components/AppReviewPrompt";
 // import MiniPlayerBar from "@/components/MiniPlayerBar";
-// import { NoInternet } from "@/components/NoInternet";
 // import { SupabaseRealtimeProvider } from "@/components/SupabaseRealtimeProvider";
 // import ForceUpdateGate from "@/components/ForceUpdateGate";
 // import IntroVideo, { useIntroVideo } from "@/components/Intro";
 // import LanguageSelection from "@/components/LanguageSelectionScreen";
-
 // import { LanguageProvider, useLanguage } from "../../contexts/LanguageContext";
 // import { useColorScheme } from "../hooks/useColorScheme";
 // import { useConnectionStatus } from "../hooks/useConnectionStatus";
-// import { usePushNotifications } from "../hooks/usePushNotifications";
-
 // import { useFontSizeStore } from "../../stores/fontSizeStore";
 // import useNotificationStore from "../../stores/notificationStore";
 // import { useLastPlayedPodcastStore } from "../../stores/useLastPlayedPodcastStore";
-
 // import { usePodcastListenedStore } from "@/hooks/usePodcastListenedStore";
 // import { cleanupPodcastCache } from "../../utils/podcastCache";
-
 // import GlobalAudioHost from "../../player/GlobalAudioHost";
-
-// import "../../utils/i18n";
+// import { supabase } from "../../utils/supabase";
+// import { useTranslation } from "react-i18next";
 
 // if (typeof (BackHandler as any).removeEventListener !== "function") {
 //   (BackHandler as any).removeEventListener = (
 //     eventName: any,
-//     handler: () => boolean
+//     handler: () => boolean,
 //   ) => {
 //     const subscription = BackHandler.addEventListener(eventName, handler);
 //     subscription.remove();
@@ -60,15 +52,13 @@
 // function AppContent() {
 //   const colorScheme = useColorScheme() || "light";
 //   const { ready: languageContextReady } = useLanguage();
-
 //   const [storesHydrated, setStoresHydrated] = useState(false);
-
 //   const hasInternet = useConnectionStatus();
-//   const { expoPushToken } = usePushNotifications();
-
 //   const hasHiddenSplashRef = useRef(false);
 //   const hasShownOfflineToastRef = useRef(false);
+//   // const hasFetchedPaypalRef = useRef(false);
 
+//   const { t } = useTranslation();
 //   useEffect(() => {
 //     const setColorTheme = async () => {
 //       try {
@@ -131,12 +121,6 @@
 //   }, []);
 
 //   useEffect(() => {
-//     if (expoPushToken) {
-//       console.log("Push Token:", expoPushToken);
-//     }
-//   }, [expoPushToken]);
-
-//   useEffect(() => {
 //     const essentialsReady = languageContextReady && storesHydrated;
 
 //     if (!essentialsReady) return;
@@ -146,8 +130,8 @@
 
 //       Toast.show({
 //         type: "error",
-//         text1: "Keine Internetverbindung",
-//         text2: "Bitte überprüfe deine Verbindung.",
+//         text1: t("noInternetConnectionTitle"),
+//         text2: t("noInternetConnectionMessage"),
 //         visibilityTime: 5000,
 //       });
 //     }
@@ -155,7 +139,7 @@
 //     if (hasInternet) {
 //       hasShownOfflineToastRef.current = false;
 //     }
-//   }, [languageContextReady, storesHydrated, hasInternet]);
+//   }, [languageContextReady, storesHydrated, hasInternet, t]);
 
 //   const essentialsReady = languageContextReady && storesHydrated;
 
@@ -180,8 +164,6 @@
 //             <QueryClientProvider client={queryClient}>
 //               <SupabaseRealtimeProvider>
 //                 <BottomSheetModalProvider>
-//                   <NoInternet showUI={!hasInternet} showToast={false} />
-
 //                   <ForceUpdateGate>
 //                     <Stack
 //                       screenOptions={{
@@ -261,6 +243,13 @@
 //     hideRootSplashOnce,
 //   ]);
 
+//   console.log("[Intro debug]", {
+//     hasStoredLanguage,
+//     hasPlayedIntro,
+//     audioReady,
+//     languageReady,
+//   });
+
 //   if (!audioReady || !languageReady) {
 //     return null;
 //   }
@@ -299,8 +288,15 @@
 
 import "react-native-reanimated";
 import "../../utils/i18n";
+
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Appearance, BackHandler, Platform, View } from "react-native";
+import {
+  Appearance,
+  BackHandler,
+  Platform,
+  StyleSheet,
+  View,
+} from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { MenuProvider } from "react-native-popup-menu";
@@ -316,6 +312,8 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { setAudioModeAsync } from "expo-audio";
+import { useTranslation } from "react-i18next";
+
 import AppReviewPrompt from "@/components/AppReviewPrompt";
 import MiniPlayerBar from "@/components/MiniPlayerBar";
 import { SupabaseRealtimeProvider } from "@/components/SupabaseRealtimeProvider";
@@ -331,8 +329,6 @@ import { useLastPlayedPodcastStore } from "../../stores/useLastPlayedPodcastStor
 import { usePodcastListenedStore } from "@/hooks/usePodcastListenedStore";
 import { cleanupPodcastCache } from "../../utils/podcastCache";
 import GlobalAudioHost from "../../player/GlobalAudioHost";
-import { supabase } from "../../utils/supabase";
-import { useTranslation } from "react-i18next";
 
 if (typeof (BackHandler as any).removeEventListener !== "function") {
   (BackHandler as any).removeEventListener = (
@@ -348,16 +344,27 @@ void SplashScreen.preventAutoHideAsync().catch(() => {});
 
 const queryClient = new QueryClient();
 
-function AppContent() {
+type AppContentProps = {
+  audioReady: boolean;
+};
+
+function AppContent({ audioReady }: AppContentProps) {
   const colorScheme = useColorScheme() || "light";
-  const { ready: languageContextReady } = useLanguage();
+
+  const { ready: languageContextReady, hasStoredLanguage } = useLanguage();
+
+  const { hasPlayed: hasPlayedIntro, markAsPlayed: markIntroAsPlayed } =
+    useIntroVideo();
+
   const [storesHydrated, setStoresHydrated] = useState(false);
+
   const hasInternet = useConnectionStatus();
+
   const hasHiddenSplashRef = useRef(false);
   const hasShownOfflineToastRef = useRef(false);
-  // const hasFetchedPaypalRef = useRef(false);
 
   const { t } = useTranslation();
+
   useEffect(() => {
     const setColorTheme = async () => {
       try {
@@ -419,36 +426,9 @@ function AppContent() {
     cleanupPodcastCache().catch(console.warn);
   }, []);
 
-  // useEffect(() => {
-  //   if (!hasInternet || hasFetchedPaypalRef.current) return;
-
-  //   const fetchAndStorePaypalLink = async () => {
-  //     try {
-  //       const { data, error } = await supabase
-  //         .from("paypal")
-  //         .select("paypal_link")
-  //         .maybeSingle();
-
-  //       if (error) {
-  //         console.warn("Failed to fetch PayPal link:", error.message);
-  //         return;
-  //       }
-
-  //       if (data?.paypal_link) {
-  //         await AsyncStorage.setItem("paypal", data.paypal_link);
-  //         hasFetchedPaypalRef.current = true;
-  //       }
-  //     } catch (err) {
-  //       console.warn("Failed to fetch/store PayPal link:", err);
-  //     }
-  //   };
-
-  //   fetchAndStorePaypalLink();
-  // }, [hasInternet]);
+  const essentialsReady = languageContextReady && storesHydrated;
 
   useEffect(() => {
-    const essentialsReady = languageContextReady && storesHydrated;
-
     if (!essentialsReady) return;
 
     if (!hasInternet && !hasShownOfflineToastRef.current) {
@@ -465,24 +445,47 @@ function AppContent() {
     if (hasInternet) {
       hasShownOfflineToastRef.current = false;
     }
-  }, [languageContextReady, storesHydrated, hasInternet, t]);
+  }, [essentialsReady, hasInternet, t]);
 
-  const essentialsReady = languageContextReady && storesHydrated;
-
-  const hideSplashOnFirstVisibleLayout = useCallback(() => {
+  const hideSplashIfReady = useCallback(() => {
     if (hasHiddenSplashRef.current) return;
+    if (!audioReady) return;
+    if (!essentialsReady) return;
+    if (hasPlayedIntro === null) return;
 
     hasHiddenSplashRef.current = true;
     void SplashScreen.hideAsync().catch(() => {});
-  }, []);
+  }, [audioReady, essentialsReady, hasPlayedIntro]);
 
-  if (!essentialsReady) return null;
+  useEffect(() => {
+    hideSplashIfReady();
+  }, [hideSplashIfReady]);
 
-  
+  const gateMode: "language" | "intro" | null =
+    !audioReady || !essentialsReady || hasPlayedIntro === null
+      ? null
+      : !hasStoredLanguage
+        ? "language"
+        : hasPlayedIntro === false
+          ? "intro"
+          : null;
+
+  const showAppGate = gateMode !== null;
+
+  if (__DEV__) {
+    console.log("[Layout debug]", {
+      audioReady,
+      essentialsReady,
+      hasStoredLanguage,
+      hasPlayedIntro,
+      gateMode,
+      showAppGate,
+    });
+  }
 
   return (
-    <View style={{ flex: 1 }} onLayout={hideSplashOnFirstVisibleLayout}>
-      <GestureHandlerRootView style={{ flex: 1 }}>
+    <View style={styles.root} onLayout={hideSplashIfReady}>
+      <GestureHandlerRootView style={styles.root}>
         <ThemeProvider
           value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
         >
@@ -492,25 +495,38 @@ function AppContent() {
             <QueryClientProvider client={queryClient}>
               <SupabaseRealtimeProvider>
                 <BottomSheetModalProvider>
-                  <ForceUpdateGate>
-                    <Stack
-                      screenOptions={{
-                        headerShown: false,
-                        headerBackButtonMenuEnabled: false,
-                      }}
-                    >
-                      <Stack.Screen name="index" />
-                      <Stack.Screen name="(tabs)" />
-                      <Stack.Screen name="(podcast)" />
-                      <Stack.Screen
-                        name="+not-found"
-                        options={{ headerShown: true }}
-                      />
-                    </Stack>
-                  </ForceUpdateGate>
+                  <Stack
+                    screenOptions={{
+                      headerShown: false,
+                      headerBackButtonMenuEnabled: false,
+                    }}
+                  >
+                    <Stack.Screen name="index" />
+                    <Stack.Screen name="(tabs)" />
+                    <Stack.Screen name="(podcast)" />
+                    <Stack.Screen
+                      name="+not-found"
+                      options={{ headerShown: true }}
+                    />
+                  </Stack>
 
                   <MiniPlayerBar />
                   <AppReviewPrompt />
+
+                  {showAppGate && (
+                    <View style={styles.gateOverlay} pointerEvents="auto">
+                      {gateMode === "language" && <LanguageSelection />}
+
+                      {gateMode === "intro" && (
+                        <IntroVideo
+                          source={require("@/assets/videos/intro.mp4")}
+                          onComplete={markIntroAsPlayed}
+                        />
+                      )}
+                    </View>
+                  )}
+
+                  <ForceUpdateGate />
                 </BottomSheetModalProvider>
               </SupabaseRealtimeProvider>
             </QueryClientProvider>
@@ -526,20 +542,6 @@ function AppContent() {
 function RootLayoutContent() {
   const [audioReady, setAudioReady] = useState(Platform.OS !== "ios");
 
-  const { ready: languageReady, hasStoredLanguage } = useLanguage();
-
-  const { hasPlayed: hasPlayedIntro, markAsPlayed: markIntroAsPlayed } =
-    useIntroVideo();
-
-  const hasHiddenSplashForRootRef = useRef(false);
-
-  const hideRootSplashOnce = useCallback(() => {
-    if (hasHiddenSplashForRootRef.current) return;
-
-    hasHiddenSplashForRootRef.current = true;
-    void SplashScreen.hideAsync().catch(() => {});
-  }, []);
-
   useEffect(() => {
     if (Platform.OS !== "ios") return;
 
@@ -552,51 +554,9 @@ function RootLayoutContent() {
       .finally(() => setAudioReady(true));
   }, []);
 
-  useEffect(() => {
-    if (!audioReady || !languageReady) return;
-
-    if (!hasStoredLanguage) {
-      hideRootSplashOnce();
-      return;
-    }
-
-    if (hasPlayedIntro === false) {
-      hideRootSplashOnce();
-    }
-  }, [
-    audioReady,
-    languageReady,
-    hasStoredLanguage,
-    hasPlayedIntro,
-    hideRootSplashOnce,
-  ]);
-
-  console.log("[Intro debug]", { hasStoredLanguage, hasPlayedIntro, audioReady, languageReady });
-
-  if (!audioReady || !languageReady) {
-    return null;
-  }
-
-  if (!hasStoredLanguage) {
-    return <LanguageSelection />;
-  }
-
-  if (hasPlayedIntro === null) {
-    return null;
-  }
-
-  if (hasPlayedIntro === false) {
-    return (
-      <IntroVideo
-        source={require("@/assets/videos/intro.mp4")}
-        onComplete={markIntroAsPlayed}
-      />
-    );
-  }
-
   return (
     <GlobalAudioHost>
-      <AppContent />
+      <AppContent audioReady={audioReady} />
     </GlobalAudioHost>
   );
 }
@@ -608,3 +568,15 @@ export default function RootLayout() {
     </LanguageProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+  },
+  gateOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 9998,
+    elevation: 9998,
+    backgroundColor: "#fff",
+  },
+});

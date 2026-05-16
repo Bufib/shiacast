@@ -1,35 +1,32 @@
-import { LoadingIndicator } from "@/components/LoadingIndicator";
 import RetryButton from "@/components/RetryButton";
 import { ThemedText } from "@/components/ThemedText";
 import FilterModal from "@/components/FilterModal";
 import { Colors } from "@/constants/Colors";
-import { useGradient } from "@/hooks/useGradient";
 import { useScreenFadeIn } from "@/hooks/useScreenFadeIn";
 import { useDebouncedValue } from "../../../hooks/useDebouncedValue";
 import { usePodcastFilters } from "../../../hooks/usePodcastFilters";
 import { usePodcastLanguages } from "../../../hooks/usePodcastLanguages";
 import { usePodcastList } from "../../../hooks/usePodcastList";
 import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Animated,
   Keyboard,
+  Platform,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   useColorScheme,
-  useWindowDimensions,
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLanguage } from "../../../../contexts/LanguageContext";
 import PodcastGridList from "@/components/PodcastGridList";
-import { ThemedView } from "@/components/ThemedView";
 import PodcastGridCardSkeleton from "@/components/PodcastGridCardSkeleton";
 import ContinueListeningCard from "@/components/ContinueListeningCard";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const PAGE_SIZE = 20;
 const GRID_GAP = 12;
@@ -66,18 +63,15 @@ export default function HomeScreen() {
     string | null
   >(lang);
   const [filterVisible, setFilterVisible] = useState(false);
-
   const [searchVisible, setSearchVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
   const debouncedSearchQuery = useDebouncedValue(searchQuery.trim(), 350);
-
   const activeFilterCount =
     (selectedTopic ? 1 : 0) +
     (selectedAuthor ? 1 : 0) +
     (selectedPodcastLanguage !== lang ? 1 : 0);
   const hasActiveSearch = debouncedSearchQuery.length > 0;
-
   const { languages } = usePodcastLanguages();
   const { availableTopics, availableAuthors } = usePodcastFilters({
     language: selectedPodcastLanguage,
@@ -426,8 +420,11 @@ export default function HomeScreen() {
           opacity: fadeAnim,
           backgroundColor: colors.background,
           paddingTop: insets.top,
-          paddingBottom: insets.bottom,
         },
+        Platform.OS === "ios" &&
+          parseInt(Platform.Version, 10) >= 26 && {
+            paddingBottom: insets.bottom,
+          },
       ]}
     >
       <FilterModal

@@ -2,7 +2,7 @@
 import React, { useCallback, useEffect } from "react";
 import { Platform, Linking } from "react-native";
 import * as StoreReview from "expo-store-review";
-import useAppReviewStore from "../../stores/useAppReviewStore";
+import { useAppReviewStore } from "../../stores/useAppReviewStore";
 const AppReviewPrompt: React.FC = () => {
   const { installDate, setInstallDate, setHasRated, isEligibleForReview } =
     useAppReviewStore();

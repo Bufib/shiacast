@@ -14,6 +14,7 @@
 //   setLastPlayed: (podcast: PodcastType) => void;
 //   dismiss: () => void;
 //   clear: () => void;
+//   undismiss: () => void
 // };
 
 // export const useLastPlayedPodcastStore = create<LastPlayedState>()(
@@ -22,30 +23,25 @@
 //       entry: null,
 
 //       setLastPlayed: (podcast) => {
-//         const current = get().entry;
-
-//         // Bei gleichem Podcast: dismissed-Status erhalten.
-//         // Bei neuem Podcast: dismissed zurücksetzen, damit Card wieder erscheint.
-//         const dismissed =
-//           current?.podcast?.id === podcast.id ? current.dismissed : false;
-
 //         set({
 //           entry: {
 //             podcast,
 //             lastPlayedAt: Date.now(),
-//             dismissed,
+//             dismissed: false,
 //           },
 //         });
 //       },
 
 //       dismiss: () => {
 //         set((state) =>
-//           state.entry
-//             ? { entry: { ...state.entry, dismissed: true } }
-//             : state,
+//           state.entry ? { entry: { ...state.entry, dismissed: true } } : state,
 //         );
 //       },
-
+//       undismiss: () => {
+//         set((state) =>
+//           state.entry ? { entry: { ...state.entry, dismissed: false } } : state,
+//         );
+//       },
 //       clear: () => set({ entry: null }),
 //     }),
 //     {
@@ -75,14 +71,14 @@ type LastPlayedState = {
   setLastPlayed: (podcast: PodcastType) => void;
   dismiss: () => void;
   clear: () => void;
-  undismiss: () => void
+  undismiss: () => void;
+  clearStorage: () => Promise<void>;
 };
 
 export const useLastPlayedPodcastStore = create<LastPlayedState>()(
   persist(
     (set, get) => ({
       entry: null,
-
       setLastPlayed: (podcast) => {
         set({
           entry: {
@@ -92,7 +88,6 @@ export const useLastPlayedPodcastStore = create<LastPlayedState>()(
           },
         });
       },
-
       dismiss: () => {
         set((state) =>
           state.entry ? { entry: { ...state.entry, dismissed: true } } : state,
@@ -104,6 +99,12 @@ export const useLastPlayedPodcastStore = create<LastPlayedState>()(
         );
       },
       clear: () => set({ entry: null }),
+
+      // Resets state AND removes the key from AsyncStorage
+      clearStorage: async () => {
+        set({ entry: null });
+        await useLastPlayedPodcastStore.persist.clearStorage();
+      },
     }),
     {
       name: "last-played-podcast",

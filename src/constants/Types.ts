@@ -20,7 +20,7 @@ export type LanguageType = {
 export type InternalLinkType = "questionLink" | "prayerLink" | "quranLink";
 
 export type SizesType = {
-  elementSize: number;
+  imageSizePodcastPlayer: number;
   fontSize: number;
   badgeSize: number;
   iconSize: number;
