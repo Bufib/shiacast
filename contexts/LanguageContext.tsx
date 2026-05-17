@@ -1,3 +1,5 @@
+
+//! Mit sprachauswahl
 // import { LanguageContextType, LanguageCode } from "@/constants/Types";
 // import AsyncStorage from "@react-native-async-storage/async-storage";
 // import React, {
@@ -13,8 +15,11 @@
 
 // const DEFAULT_LANG: LanguageCode = "de";
 // const LANGUAGE_STORAGE_KEY = "language";
+// const USER_PICKED_KEY = "userPickedLanguage";
 
-// function isValidLanguage(value: string | null): value is LanguageCode {
+// function isValidLanguage(
+//   value: string | null | undefined,
+// ): value is LanguageCode {
 //   return value === "de" || value === "en" || value === "ar";
 // }
 
@@ -28,7 +33,6 @@
 
 // export function LanguageProvider({ children }: { children: ReactNode }) {
 //   const { i18n, ready: i18nReady } = useTranslation();
-
 //   const [lang, setLang] = useState<LanguageCode>(DEFAULT_LANG);
 //   const [checkedStorage, setCheckedStorage] = useState(false);
 //   const [hasStoredLanguage, setHasStoredLanguage] = useState(false);
@@ -38,30 +42,38 @@
 
 //     const loadStoredLanguage = async () => {
 //       try {
-//         const storedLanguage = await AsyncStorage.getItem(LANGUAGE_STORAGE_KEY);
+//         const entries = await AsyncStorage.multiGet([
+//           USER_PICKED_KEY,
+//           LANGUAGE_STORAGE_KEY,
+//         ]);
+//         const userPicked = entries[0][1];
+//         const storedLanguage = entries[1][1];
 
-//         if (isValidLanguage(storedLanguage)) {
-//           await i18n.changeLanguage(storedLanguage);
+//         if (__DEV__) {
+//           console.log("[LanguageContext] load:", {
+//             userPicked,
+//             storedLanguage,
+//           });
+//         }
 
+//         if (userPicked === "1" && isValidLanguage(storedLanguage)) {
+//           if (i18n.language !== storedLanguage) {
+//             await i18n.changeLanguage(storedLanguage);
+//           }
 //           if (!mounted) return;
-
 //           setLang(storedLanguage);
 //           setHasStoredLanguage(true);
 //         } else {
-//           await i18n.changeLanguage(DEFAULT_LANG);
-
 //           if (!mounted) return;
-
-//           setLang(DEFAULT_LANG);
+//           const current = i18n.language;
+//           setLang(isValidLanguage(current) ? current : DEFAULT_LANG);
 //           setHasStoredLanguage(false);
 //         }
 //       } catch (error) {
 //         if (__DEV__) {
 //           console.warn("Failed to load language from storage:", error);
 //         }
-
 //         if (!mounted) return;
-
 //         setLang(DEFAULT_LANG);
 //         setHasStoredLanguage(false);
 //       } finally {
@@ -95,11 +107,19 @@
 //   const setAppLanguage = useCallback(
 //     async (language: LanguageCode) => {
 //       try {
+//         // Erst atomar in Storage schreiben, dann i18n umschalten.
+//         // multiSet stellt sicher, dass beide Keys oder keiner geschrieben werden.
+//         await AsyncStorage.multiSet([
+//           [LANGUAGE_STORAGE_KEY, language],
+//           [USER_PICKED_KEY, "1"],
+//         ]);
 //         await i18n.changeLanguage(language);
-//         await AsyncStorage.setItem(LANGUAGE_STORAGE_KEY, language);
-
 //         setLang(language);
 //         setHasStoredLanguage(true);
+
+//         if (__DEV__) {
+//           console.log("[LanguageContext] picked:", language);
+//         }
 //       } catch (error) {
 //         console.warn("Failed to change language:", error);
 //       }
@@ -132,6 +152,8 @@
 //   return useContext(LanguageContext);
 // }
 
+
+
 import { LanguageContextType, LanguageCode } from "@/constants/Types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, {
@@ -149,6 +171,10 @@ const DEFAULT_LANG: LanguageCode = "de";
 const LANGUAGE_STORAGE_KEY = "language";
 const USER_PICKED_KEY = "userPickedLanguage";
 
+// TODO: Für späteres Release auf `false` setzen, damit die
+// Sprachauswahl wieder angezeigt wird.
+const FORCE_DEFAULT_LANGUAGE = true;
+
 function isValidLanguage(
   value: string | null | undefined,
 ): value is LanguageCode {
@@ -165,6 +191,7 @@ const LanguageContext = createContext<LanguageContextType>({
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const { i18n, ready: i18nReady } = useTranslation();
+
   const [lang, setLang] = useState<LanguageCode>(DEFAULT_LANG);
   const [checkedStorage, setCheckedStorage] = useState(false);
   const [hasStoredLanguage, setHasStoredLanguage] = useState(false);
@@ -174,10 +201,29 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
     const loadStoredLanguage = async () => {
       try {
+        if (FORCE_DEFAULT_LANGUAGE) {
+          if (i18n.language !== DEFAULT_LANG) {
+            await i18n.changeLanguage(DEFAULT_LANG);
+          }
+          if (!mounted) return;
+          setLang(DEFAULT_LANG);
+          setHasStoredLanguage(true);
+
+          if (__DEV__) {
+            console.log(
+              "[LanguageContext] FORCE_DEFAULT_LANGUAGE aktiv – Sprache auf",
+              DEFAULT_LANG,
+              "gesetzt, Auswahl übersprungen.",
+            );
+          }
+          return;
+        }
+
         const entries = await AsyncStorage.multiGet([
           USER_PICKED_KEY,
           LANGUAGE_STORAGE_KEY,
         ]);
+
         const userPicked = entries[0][1];
         const storedLanguage = entries[1][1];
 
@@ -245,7 +291,9 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
           [LANGUAGE_STORAGE_KEY, language],
           [USER_PICKED_KEY, "1"],
         ]);
+
         await i18n.changeLanguage(language);
+
         setLang(language);
         setHasStoredLanguage(true);
 

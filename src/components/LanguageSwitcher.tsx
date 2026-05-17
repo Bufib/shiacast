@@ -39,7 +39,13 @@ export function LanguageSwitcher({ disabled }: { disabled: boolean }) {
   };
 
   return (
-    <View style={[styles.container, rtl && styles.rtlContainer]}>
+    <View
+      style={[
+        styles.container,
+        rtl && styles.rtlContainer,
+        disabled && { backgroundColor: "#ccc" },
+      ]}
+    >
       <View style={[rtl && styles.rtlTextContainer]}>
         <ThemedText style={[styles.title, rtl && styles.rtlText]}>
           {t("language")}
@@ -93,7 +99,8 @@ export function LanguageSwitcher({ disabled }: { disabled: boolean }) {
               lang === "en" && styles.buttonActive,
               {
                 opacity: pressed ? 0.8 : 1,
-                paddingHorizontal: isLarge ? 12 : 7,
+                // paddingHorizontal: isLarge ? 12 : 7,
+                //! Entfernen die //
               },
               rtl && { marginLeft: 0, marginRight: 8 },
 
@@ -149,11 +156,14 @@ export function LanguageSwitcher({ disabled }: { disabled: boolean }) {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     paddingVertical: 12,
     marginBottom: 8,
+    paddingHorizontal: 5, //! Entfernen
+    borderRadius: 10, //! Entfernen
   },
   title: {
     fontSize: 16,

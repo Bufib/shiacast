@@ -288,7 +288,6 @@
 
 import "react-native-reanimated";
 import "../../utils/i18n";
-
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Appearance,

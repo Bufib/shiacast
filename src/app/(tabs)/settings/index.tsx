@@ -152,7 +152,8 @@ const Settings = () => {
               />
             </View>
 
-            <LanguageSwitcher disabled={false} />
+            <LanguageSwitcher disabled={true} />
+            {/* //! Auf false */}
 
             <View style={{ gap: 10 }}>
               <ClearAppCacheButton />
@@ -230,30 +231,23 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingLeft: 20,
+    paddingLeft: 15,
     paddingVertical: 15,
     borderBottomWidth: 1,
     borderBottomColor: "rgba(0,0,0,0.1)",
   },
   headerTitle: {},
-  loginButton: {
-    paddingVertical: 8,
-    paddingLeft: 15,
-  },
+
   buttonContainer: {
     paddingRight: 15,
     backgroundColor: "transparent",
   },
-  loginButtonText: {
-    color: Colors.universal.link,
-    fontSize: 19,
-    fontWeight: "500",
-  },
+
   scrollView: {
     flex: 1,
   },
   section: {
-    padding: 20,
+    padding: 15,
     borderBottomWidth: 1,
     borderBottomColor: "rgba(0,0,0,0.1)",
   },
@@ -326,41 +320,6 @@ const styles = StyleSheet.create({
   },
   rtl: {
     flexDirection: "row-reverse",
-  },
-  arabicDateSection: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 12,
-    marginBottom: 8,
-  },
-  dateAdjustControls: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  dateAdjustButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  dateAdjustButtonText: {
-    fontSize: 22,
-    fontWeight: "600",
-  },
-  dateOffsetDisplay: {
-    minWidth: 48,
-    height: 40,
-    borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: 10,
-  },
-  dateOffsetText: {
-    fontSize: 17,
-    fontWeight: "600",
   },
 });
 
