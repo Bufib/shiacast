@@ -280,7 +280,6 @@
 //   },
 // });
 
-
 import { PodcastGridCardType } from "@/constants/Types";
 import { Image } from "expo-image";
 import { StyleSheet, Text, View } from "react-native";
@@ -376,7 +375,7 @@ export default function PodcastGridCard({
                   writingDirection: rtl ? "rtl" : "ltr",
                 },
               ]}
-              numberOfLines={4}
+              numberOfLines={3}
               ellipsizeMode="tail"
             >
               {podcast.title}
@@ -451,7 +450,7 @@ const styles = StyleSheet.create({
   },
 
   cardOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: "rgba(0, 0, 0, 0.2)",
     zIndex: 1,
   },
@@ -511,8 +510,6 @@ const styles = StyleSheet.create({
   titleContainer: {
     flex: 1,
     justifyContent: "center",
-    paddingTop: 44,
-    marginBottom: 12,
   },
 
   cardTitle: {

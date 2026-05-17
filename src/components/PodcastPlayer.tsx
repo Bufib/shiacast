@@ -952,10 +952,10 @@ export default function PodcastPlayer({ podcast }: PodcastPlayerPropsType) {
     >
       <ImageBackground
         source={coverSource}
-        placeholder={require("@/assets/images/icon.png")}
+        // placeholder={require("@/assets/images/icon.png")}
         style={{ width: "100%", height: `${imageSizePodcastPlayer}%` }}
         contentFit="cover"
-        transition={200}
+        // transition={200}
       >
         <View style={[styles.coverHeader, { paddingTop: insets.top + 4 }]}>
           <HeaderLeftBackButton color={"white"} size={40} />

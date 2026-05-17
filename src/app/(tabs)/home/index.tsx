@@ -171,8 +171,8 @@ export default function HomeScreen() {
                 ref={searchInputRef}
                 value={searchQuery}
                 onChangeText={setSearchQuery}
-                placeholder={t("search") || "Suchen"}
-                placeholderTextColor={colors.tabIconDefault}
+                placeholder={t("search")}
+                placeholderTextColor={Colors[colorScheme].text}
                 returnKeyType="search"
                 autoCorrect={false}
                 autoCapitalize="none"
