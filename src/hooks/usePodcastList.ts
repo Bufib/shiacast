@@ -54,6 +54,7 @@ export function usePodcastList({
         .from("podcasts")
         .select("*")
         .order("created_at", { ascending: false })
+        .order("id", { ascending: false })
         .range(pageParam, pageParam + pageSize - 1);
 
       if (language !== null) {
@@ -102,8 +103,18 @@ export function usePodcastList({
     refetchOnReconnect: true,
   });
 
+  // const podcasts = useMemo(() => {
+  //   return query.data?.pages.flatMap((page) => page.items) ?? [];
+  // }, [query.data]);
+
   const podcasts = useMemo(() => {
-    return query.data?.pages.flatMap((page) => page.items) ?? [];
+    const all = query.data?.pages.flatMap((page) => page.items) ?? [];
+    const seen = new Set<PodcastType["id"]>();
+    return all.filter((p) => {
+      if (seen.has(p.id)) return false;
+      seen.add(p.id);
+      return true;
+    });
   }, [query.data]);
 
   return {

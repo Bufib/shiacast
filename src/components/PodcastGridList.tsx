@@ -238,7 +238,6 @@ export default function PodcastGridList({
       refreshing={refreshing}
       onRefresh={onRefresh}
       onEndReached={onEndReached}
-      onEndReachedThreshold={0.4}
       ListHeaderComponent={ListHeaderComponent}
       ListEmptyComponent={ListEmptyComponent}
       ListFooterComponent={
