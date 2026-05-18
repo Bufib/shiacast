@@ -192,16 +192,7 @@ export default function MiniPlayerBar({ bottomOffset = 50 }: Props) {
   const openFull = () => {
     router.push({
       pathname: "/(podcast)/indexPodcast",
-      params: {
-        podcast: JSON.stringify({
-          id: podcastId,
-          title: title,
-          filename,
-          currentUri,
-          artwork,
-          image_url: artwork
-        }),
-      },
+      params: { id: String(podcastId) },
     });
   };
 

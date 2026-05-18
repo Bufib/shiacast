@@ -209,7 +209,7 @@ export default function PodcastGridList({
             onPress={() =>
               router.push({
                 pathname: "/indexPodcast",
-                params: { podcast: JSON.stringify(item) },
+                params: { id: String(item.id) },
               })
             }
           >

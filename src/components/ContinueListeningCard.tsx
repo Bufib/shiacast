@@ -47,7 +47,7 @@ export default function ContinueListeningCard() {
   const onPress = () => {
     router.push({
       pathname: "/indexPodcast",
-      params: { podcast: JSON.stringify(podcast) },
+      params: { id: String(podcast.id) },
     });
   };
 
