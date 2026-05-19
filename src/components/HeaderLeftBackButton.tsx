@@ -1,7 +1,20 @@
 import { Ionicons } from "@expo/vector-icons";
+import { useColorScheme } from "@/hooks/useColorScheme";
 import { router } from "expo-router";
 import React from "react";
-import { TouchableOpacity, useColorScheme } from "react-native";
+import {
+  TouchableOpacity,
+  type StyleProp,
+  type ViewStyle
+} from "react-native";
+
+type Props = {
+  color?: string | null;
+  size?: number | null;
+  style?: StyleProp<ViewStyle>;
+  route?: string;
+  dismiss?: boolean;
+};
 
 const HeaderLeftBackButton = ({
   color,
@@ -9,23 +22,22 @@ const HeaderLeftBackButton = ({
   style,
   route,
   dismiss = false,
-}: {
-  color?: string | null;
-  size?: number | null;
-  style?: any;
-  route?: any;
-  dismiss?: boolean;
-}) => {
-  const colorScheme = useColorScheme() || "light";
+}: Props) => {
+  const colorScheme = useColorScheme();
+
   return (
     <TouchableOpacity
-      onPress={() =>
-        route
-          ? dismiss
-            ? router.dismissTo(route)
-            : router.replace(route)
-          : router.back()
-      }
+      onPress={() => {
+        if (route) {
+          if (dismiss) {
+            router.dismissTo(route as any);
+          } else {
+            router.replace(route as any);
+          }
+        } else {
+          router.back();
+        }
+      }}
       hitSlop={10}
       style={style}
     >

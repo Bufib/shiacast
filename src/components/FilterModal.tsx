@@ -1,4 +1,5 @@
 import { Colors } from "@/constants/Colors";
+import { useColorScheme } from "@/hooks/useColorScheme";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
@@ -6,8 +7,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
-  useColorScheme,
+  View
 } from "react-native";
 import {
   BottomSheetBackdrop,
@@ -15,6 +15,8 @@ import {
   BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+import { getLanguageLabel } from "../../utils/languageLabel";
 
 type FilterModalProps = {
   visible: boolean;
@@ -29,19 +31,6 @@ type FilterModalProps = {
   onSelectTopic: (topic: string | null) => void;
   onSelectAuthor: (author: string | null) => void;
   onSelectLanguage: (language: string | null) => void;
-};
-
-const getLanguageLabel = (language: string) => {
-  switch (language) {
-    case "de":
-      return "Deutsch";
-    case "en":
-      return "English";
-    case "ar":
-      return "العربية";
-    default:
-      return language.toUpperCase();
-  }
 };
 
 export default function FilterModal({
@@ -59,7 +48,7 @@ export default function FilterModal({
   onSelectLanguage,
 }: FilterModalProps) {
   const { t } = useTranslation();
-  const colorScheme = useColorScheme() ?? "light";
+  const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
   const insets = useSafeAreaInsets();
   const sheetRef = useRef<BottomSheetModal>(null);
@@ -112,7 +101,6 @@ export default function FilterModal({
       backgroundStyle={{ backgroundColor: panelBg }}
       handleIndicatorStyle={{ backgroundColor: isDark ? "#4a5a6e" : "#dde0e6" }}
     >
-      {/* Header */}
       <View style={styles.panelHeader}>
         <View style={styles.panelTitleRow}>
           <Ionicons
@@ -124,7 +112,7 @@ export default function FilterModal({
           <Text
             style={[styles.panelTitle, { color: isDark ? "#fff" : "#111" }]}
           >
-            Filter
+            {t("filter")}
           </Text>
         </View>
         <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
@@ -150,14 +138,10 @@ export default function FilterModal({
           { paddingBottom: insets.bottom + 16 },
         ]}
       >
-        {/* Topics section */}
         {topics.length > 0 && (
           <View style={styles.section}>
             <Text style={[styles.sectionLabel, { color: sectionLabelColor }]}>
-              {t("allTopics")
-                .replace("Alle ", "")
-                .replace("All ", "")
-                .toUpperCase()}
+              {t("topics").toUpperCase()}
             </Text>
             <View style={styles.chipsWrap}>
               <TouchableOpacity
@@ -211,14 +195,10 @@ export default function FilterModal({
           </View>
         )}
 
-        {/* Authors section */}
         {authors.length > 0 && (
           <View style={styles.section}>
             <Text style={[styles.sectionLabel, { color: sectionLabelColor }]}>
-              {t("allAuthors")
-                .replace("Alle ", "")
-                .replace("All ", "")
-                .toUpperCase()}
+              {t("authors").toUpperCase()}
             </Text>
             <View style={styles.chipsWrap}>
               <TouchableOpacity
@@ -272,7 +252,6 @@ export default function FilterModal({
           </View>
         )}
 
-        {/* Language selector */}
         <View style={styles.section}>
           <Text style={[styles.sectionLabel, { color: sectionLabelColor }]}>
             {t("language").toUpperCase()}
@@ -296,7 +275,7 @@ export default function FilterModal({
                   selectedLanguage === null && styles.chipTextActive,
                 ]}
               >
-                All languages
+                {t("allLanguages")}
               </Text>
             </TouchableOpacity>
             {languageOptions.map((language) => (
@@ -326,7 +305,6 @@ export default function FilterModal({
           </View>
         </View>
 
-        {/* Clear button */}
         {hasActiveFilters && (
           <TouchableOpacity
             style={styles.clearBtn}
@@ -342,7 +320,7 @@ export default function FilterModal({
               color={Colors.universal.primary}
               style={{ marginRight: 6 }}
             />
-            <Text style={styles.clearBtnText}>Filter zurücksetzen</Text>
+            <Text style={styles.clearBtnText}>{t("resetFilters")}</Text>
           </TouchableOpacity>
         )}
       </BottomSheetScrollView>

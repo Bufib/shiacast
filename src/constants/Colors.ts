@@ -1,7 +1,54 @@
 const tintColorLight = "#2ea853";
 const tintColorDark = "#fff";
 
-export const Colors: any = {
+type ThemePalette = {
+  // Navigation
+  tint: string;
+  icon: string;
+  tabIconDefault: string;
+  tabIconSelected: string;
+
+  // TabView
+  indicatorColor: string;
+  inactiveLabelColor: string;
+  activeLabelColor: string;
+
+  // General
+  text: string;
+  inversTextColor: string;
+  background: string;
+  backgroundElement: string;
+  contrast: string;
+  border: string;
+  shadow: string;
+  loadingIndicator: string;
+  error: string;
+  defaultIcon: string;
+  devider: string;
+
+  // Switch
+  trackColor: string;
+  thumbColor: string;
+};
+
+type UniversalPalette = {
+  primary: string;
+  secondary: string;
+  third: string;
+  grayedOut: string;
+  link: string;
+  externalLinkIcon: string;
+  favorite: string;
+  error: string;
+};
+
+type ColorsType = {
+  light: ThemePalette;
+  dark: ThemePalette;
+  universal: UniversalPalette;
+};
+
+export const Colors: ColorsType = {
   light: {
     // Navigation
     tint: tintColorLight,
@@ -18,6 +65,7 @@ export const Colors: any = {
     text: "#11181C",
     inversTextColor: "#ECEDEE",
     background: "#f2f2f2",
+    backgroundElement: "#F0F0F3",
     contrast: "#fff",
     border: "#000",
     shadow: "#000",
@@ -29,44 +77,6 @@ export const Colors: any = {
     // Switch
     trackColor: "#767577",
     thumbColor: "#f4f3f4",
-
-    // Prayer viewer colors
-    prayerHeaderBackground: "#1F6E8C",
-    prayerArabicText: "#0D4D6C",
-    prayerTransliterationText: "#525252",
-    prayerButtonBackground: "rgba(31, 110, 140, 0.15)",
-    prayerButtonBackgroundActive: "#f2f2f2",
-    prayerButtonText: "#1F6E8C",
-    prayerButtonTextActive: "#FFFFFF",
-    prayerIntroductionBackground: "#84CEEB",
-    prayerLoadingIndicator: "#1F6E8C",
-    prayerBookmark: "#B3D7EC",
-
-    // Search
-    itemTypeColor: "#666",
-
-    // Home screen
-    homeCalendarCardBackground: "#289d4b",
-    homeCalendarDatePillBackground: "rgba(255,255,255,0.08)",
-    homeCalendarDivider: "rgba(255,255,255,0.12)",
-    homeCalendarMonthText: "rgba(255,255,255,0.6)",
-    homeCalendarGregorianText: "rgba(255,255,255,0.55)",
-    homeCalendarBadgeText: "rgba(255,255,255,0.7)",
-    homeCalendarChevron: "#fff",
-    homeCalendarTodayDot: "#5DCAA5",
-    homeCalendarUpcomingDot: "#F4A62A",
-
-    homeUpdateBannerBackground: "#1D9E75",
-    homeUpdateBannerText: "#fff",
-
-    homeSectionLabel: "#8a8a80",
-    homeShowAllText: "#1D9E75",
-
-    homeAdminButtonBackground: "#1a1a18",
-    homeAdminButtonIcon: "#FAFAF8",
-
-    homeLoadMoreButtonBackground: "rgba(0,0,0,0.05)",
-    homeLoadMoreButtonText: "#11181C",
   },
 
   dark: {
@@ -85,6 +95,7 @@ export const Colors: any = {
     text: "#ECEDEE",
     inversTextColor: "#11181C",
     background: "#242c40",
+    backgroundElement: "#212225",
     contrast: "#34495e",
     border: "#fff",
     shadow: "#fff",
@@ -96,46 +107,6 @@ export const Colors: any = {
     // Switch
     trackColor: "#057958",
     thumbColor: "#f4f3f4",
-
-    // Prayer viewer colors
-    prayerHeaderBackground: "#0F5A78",
-    prayerArabicText: "#64B5F6",
-    prayerTransliterationText: "#B0BEC5",
-    prayerTranslationText: "#E2F0F9",
-    prayerButtonBackground: "rgba(31, 110, 140, 0.3)",
-    prayerButtonBackgroundActive: "#f2f2f2",
-    prayerButtonText: "#84CEEB",
-    prayerButtonTextActive: "#E2F0F9",
-    prayerIntroductionBackground: "#1D3E53",
-    prayerLoadingIndicator: "#84CEEB",
-    prayerBookmark: "#4B7E94",
-    grayedOut: "#B0BEC5",
-
-    // Search
-    itemTypeColor: "#ccc",
-
-    // Home screen
-    homeCalendarCardBackground: "#305b6e",
-    homeCalendarDatePillBackground: "rgba(93, 202, 165, 0.12)",
-    homeCalendarDivider: "#333",
-    homeCalendarMonthText: "rgba(255,255,255,0.55)",
-    homeCalendarGregorianText: "rgba(255,255,255,0.5)",
-    homeCalendarBadgeText: "rgba(255,255,255,0.65)",
-    homeCalendarChevron: "rgba(255,255,255,0.35)",
-    homeCalendarTodayDot: "#5DCAA5",
-    homeCalendarUpcomingDot: "#EF9F27",
-
-    homeUpdateBannerBackground: "#0F6E56",
-    homeUpdateBannerText: "#fff",
-
-    homeSectionLabel: "#8E8E93",
-    homeShowAllText: "#5DCAA5",
-
-    homeAdminButtonBackground: "#2C2C2E",
-    homeAdminButtonIcon: "#fff",
-
-    homeLoadMoreButtonBackground: "rgba(255,255,255,0.08)",
-    homeLoadMoreButtonText: "#ECEDEE",
   },
 
   universal: {
@@ -144,14 +115,8 @@ export const Colors: any = {
     third: "#08832d",
     grayedOut: "#888",
     link: "#0a84ff",
-    questionLinks: "#2ea853",
-    prayerLinks: "#84CEEB",
     externalLinkIcon: "#057958",
     favorite: "#F59E0B",
-    chatBubbleQuestion: "#b7d6ef",
-    chatBubbleAnswer: "#b3e1c1",
     error: "#f44336",
   },
 };
-
-export const CALENDARPALLETTE = ["#9ACD32", "#A9DFBF", "#E74C3C", "#F7DC6F"];

@@ -1,42 +1,43 @@
-// src/hooks/useGradient.ts
 import { gradientColorPalette } from "@/constants/Gradients";
 import { UseGradientOptionsType } from "@/constants/Types";
-import { useCallback, useEffect, useState } from "react";
+import { useMemo } from "react";
 
-export function useGradient(options: UseGradientOptionsType = {}) {
-  const { customGradients, defaultIndex = 0 } = options;
+// Stabiler FNV-1a-Hash. Identische Inputs → identische Outputs.
+function hashSeed(seed: string | number): number {
+  const str = typeof seed === "number" ? String(seed) : seed;
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < str.length; i++) {
+    hash ^= str.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return hash >>> 0;
+}
 
-  // Use custom gradients or defaults
-  const gradients = customGradients || gradientColorPalette;
+type Options = UseGradientOptionsType & {
+  /** Stabiler Schlüssel (z.B. Video-ID), damit der Gradient nicht springt. */
+  seed?: string | number;
+};
 
-  // Set initial gradient
-  const initialIndex = defaultIndex < gradients.length ? defaultIndex : 0;
-  const [gradientColors, setGradientColors] = useState<any>(
-    gradients[initialIndex]
-  );
+export function useGradient(options: Options = {}) {
+  const { customGradients, defaultIndex = 0, seed } = options;
 
-  // Function to select a random preset gradient
-  const selectRandomPreset = useCallback(() => {
-    const randomIndex = Math.floor(Math.random() * gradients.length);
-    setGradientColors(gradients[randomIndex]);
-  }, [gradients, setGradientColors]);
+  const gradients = customGradients ?? gradientColorPalette;
 
-  // Function to select a specific gradient by index
-  const selectGradient = (index: number) => {
-    if (index >= 0 && index < gradients.length) {
-      setGradientColors(gradients[index]);
+  const gradientColors = useMemo(() => {
+    if (gradients.length === 0) return [] as string[];
+
+    if (seed !== undefined && seed !== null) {
+      const idx = hashSeed(seed) % gradients.length;
+      return gradients[idx];
     }
-  };
 
-  // Initialize with a random gradient on mount
-  useEffect(() => {
-    selectRandomPreset();
-  }, [selectRandomPreset]);
+    const safeIndex =
+      defaultIndex >= 0 && defaultIndex < gradients.length ? defaultIndex : 0;
+    return gradients[safeIndex];
+  }, [gradients, seed, defaultIndex]);
 
   return {
     gradientColors,
-    selectRandomPreset,
-    selectGradient,
     availableGradients: gradients,
   };
 }

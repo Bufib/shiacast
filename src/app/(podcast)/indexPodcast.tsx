@@ -1,20 +1,19 @@
 import HeaderLeftBackButton from "@/components/HeaderLeftBackButton";
+import { useColorScheme } from "@/hooks/useColorScheme";
 import { LoadingIndicator } from "@/components/LoadingIndicator";
-import PodcastGridCard from "@/components/PodcastGridCard";
+import VideoGridCard from "@/components/VideoGridCard";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { Colors } from "@/constants/Colors";
-import { useGradient } from "@/hooks/useGradient";
-import { usePodcastById } from "@/hooks/usePodcastById";
+import { useVideoById } from "@/hooks/useVideoById";
 import { useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ScrollView,
   StyleSheet,
-  useColorScheme,
   useWindowDimensions,
-  View,
+  View
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLanguage } from "../../../contexts/LanguageContext";
@@ -22,16 +21,15 @@ import { useLanguage } from "../../../contexts/LanguageContext";
 export default function PodcastScreen() {
   const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const podcastId = id ? Number(id) : null;
-  const colorScheme = useColorScheme() || "light";
+  const videoId = id ? Number(id) : null;
+  const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const { lang, rtl } = useLanguage();
-  const { gradientColors } = useGradient();
   const [isPlaying, setIsPlaying] = useState(false);
 
-  const { data: podcast, isLoading, isError } = usePodcastById(podcastId);
+  const { data: video, isLoading, isError } = useVideoById(videoId);
 
   if (isLoading) {
     return (
@@ -41,7 +39,7 @@ export default function PodcastScreen() {
     );
   }
 
-  if (isError || !podcast) {
+  if (isError || !video) {
     return (
       <ThemedView style={styles.center}>
         <ThemedText style={styles.errorText}>{t("error")}</ThemedText>
@@ -64,12 +62,11 @@ export default function PodcastScreen() {
         ]}
         showsVerticalScrollIndicator={false}
       >
-        <PodcastGridCard
-          podcast={podcast}
+        <VideoGridCard
+          video={video}
           width={width - 32}
           rtl={rtl}
           lang={lang}
-          gradientColors={gradientColors}
           isPlaying={isPlaying}
           onRequestPlay={() => setIsPlaying(true)}
           onStopPlaying={() => setIsPlaying(false)}

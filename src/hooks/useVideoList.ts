@@ -5,17 +5,17 @@ import {
   useInfiniteQuery,
 } from "@tanstack/react-query";
 
-import { PodcastType } from "@/constants/Types";
+import { VideoType } from "@/constants/Types";
 import { supabase } from "../../utils/supabase";
-import { attachPodcastImageUrls } from "../../utils/podcastStorage";
-import { matchesTopic } from "../../utils/podcastTopics";
+import { attachVideoImageUrls } from "../../utils/videoStorage";
+import { matchesTopic } from "../../utils/videoTopics";
 
-export type PodcastPage = {
-  items: PodcastType[];
+export type VideoPage = {
+  items: VideoType[];
   nextOffset?: number;
 };
 
-type UsePodcastListArgs = {
+type UseVideoListArgs = {
   language: string | null;
   selectedTopic?: string | null;
   selectedAuthor?: string | null;
@@ -23,24 +23,24 @@ type UsePodcastListArgs = {
   pageSize?: number;
 };
 
-export function usePodcastList({
+export function useVideoList({
   language,
   selectedTopic = null,
   selectedAuthor = null,
   searchQuery = "",
   pageSize = 20,
-}: UsePodcastListArgs) {
+}: UseVideoListArgs) {
   const trimmedSearchQuery = searchQuery.trim();
 
   const query = useInfiniteQuery<
-    PodcastPage,
+    VideoPage,
     Error,
-    InfiniteData<PodcastPage>,
+    InfiniteData<VideoPage>,
     QueryKey,
     number
   >({
     queryKey: [
-      "podcasts",
+      "videos",
       "grid",
       language,
       selectedTopic,
@@ -74,18 +74,18 @@ export function usePodcastList({
 
       if (error) throw error;
 
-      const rawRows = (data ?? []) as PodcastType[];
+      const rawRows = (data ?? []) as VideoType[];
 
       const filteredRows = selectedTopic
-        ? rawRows.filter((podcast) =>
-            matchesTopic(podcast.podcast_topic, selectedTopic),
+        ? rawRows.filter((video) =>
+            matchesTopic(video.podcast_topic, selectedTopic),
           )
         : rawRows;
 
-      const itemsWithImages = attachPodcastImageUrls(filteredRows);
+      const itemsWithImages = attachVideoImageUrls(filteredRows);
 
       return {
-        items: itemsWithImages as PodcastType[],
+        items: itemsWithImages as VideoType[],
         nextOffset:
           rawRows.length === pageSize ? pageParam + pageSize : undefined,
       };
@@ -94,31 +94,26 @@ export function usePodcastList({
     getNextPageParam: (lastPage) => lastPage.nextOffset,
 
     initialPageParam: 0,
-    enabled: true,
+    placeholderData: (prev) => prev,
     retry: 3,
     staleTime: 12 * 60 * 60 * 1000,
     gcTime: 7 * 24 * 60 * 60 * 1000,
-    refetchOnMount: "always",
     refetchOnWindowFocus: false,
     refetchOnReconnect: true,
   });
 
-  // const podcasts = useMemo(() => {
-  //   return query.data?.pages.flatMap((page) => page.items) ?? [];
-  // }, [query.data]);
-
-  const podcasts = useMemo(() => {
+  const videos = useMemo(() => {
     const all = query.data?.pages.flatMap((page) => page.items) ?? [];
-    const seen = new Set<PodcastType["id"]>();
-    return all.filter((p) => {
-      if (seen.has(p.id)) return false;
-      seen.add(p.id);
+    const seen = new Set<VideoType["id"]>();
+    return all.filter((v) => {
+      if (seen.has(v.id)) return false;
+      seen.add(v.id);
       return true;
     });
   }, [query.data]);
 
   return {
     ...query,
-    podcasts,
+    videos,
   };
 }

@@ -1,5 +1,10 @@
-import { ScrollView, useColorScheme, View, StyleSheet } from "react-native";
+import {
+  ScrollView,
+  View,
+  StyleSheet
+} from "react-native";
 import { ThemedView } from "@/components/ThemedView";
+import { useColorScheme } from "@/hooks/useColorScheme";
 import React from "react";
 import Markdown from "react-native-markdown-display";
 import { Colors } from "@/constants/Colors";
@@ -42,7 +47,7 @@ export default function Impressum() {
 
   const quelle = `Quelle: `;
   const link = `[http://www.e-recht24.de](http://www.e-recht24.de)`;
-  const colorScheme = useColorScheme() || "light";
+  const colorScheme = useColorScheme();
   const { t } = useTranslation();
 
   return (

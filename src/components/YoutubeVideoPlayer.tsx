@@ -18,6 +18,7 @@ export default function YoutubeVideoPlayer({
       videoId={videoId}
       initialPlayerParams={initialPlayerParams}
       onChangeState={onChangeState}
+      i18nIsDynamicList
       onError={onError}
       webViewStyle={{ backgroundColor: "#000" }}
     />

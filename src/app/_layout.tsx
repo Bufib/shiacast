@@ -3,7 +3,6 @@ import "../../utils/i18n";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Appearance,
-  BackHandler,
   Platform,
   StyleSheet,
   View,
@@ -25,43 +24,77 @@ import { StatusBar } from "expo-status-bar";
 import { useTranslation } from "react-i18next";
 
 import AppReviewPrompt from "@/components/AppReviewPrompt";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import ForceUpdateGate from "@/components/ForceUpdateGate";
 import IntroVideo, { useIntroVideo } from "@/components/Intro";
 import LanguageSelection from "@/components/LanguageSelectionScreen";
 import { SupabaseRealtimeProvider } from "@/components/SupabaseRealtimeProvider";
-import { usePodcastFinishedStore } from "@/hooks/usePodcastFinishedStore";
-import { usePodcastListenedStore } from "@/hooks/usePodcastListenedStore";
+import { useVideoFinishedStore } from "@/hooks/useVideoFinishedStore";
+import { useVideoWatchedStore } from "@/hooks/useVideoWatchedStore";
 import { LanguageProvider, useLanguage } from "../../contexts/LanguageContext";
 import useNotificationStore from "../../stores/notificationStore";
 import { useColorScheme } from "../hooks/useColorScheme";
 import { useConnectionStatus } from "../hooks/useConnectionStatus";
+import { usePushNotifications } from "../hooks/usePushNotifications";
 import { useFontSizeStore } from "../../stores/fontSizeStore";
-
-if (typeof (BackHandler as any).removeEventListener !== "function") {
-  (BackHandler as any).removeEventListener = (
-    eventName: any,
-    handler: () => boolean,
-  ) => {
-    const subscription = BackHandler.addEventListener(eventName, handler);
-    subscription.remove();
-  };
-}
 
 void SplashScreen.preventAutoHideAsync().catch(() => {});
 
 const queryClient = new QueryClient();
 
+function useAllStoresHydrated() {
+  const [hydrated, setHydrated] = useState(() => {
+    return (
+      useFontSizeStore.persist.hasHydrated() &&
+      useNotificationStore.persist.hasHydrated() &&
+      useVideoFinishedStore.persist.hasHydrated() &&
+      useVideoWatchedStore.persist.hasHydrated()
+    );
+  });
+
+  useEffect(() => {
+    if (hydrated) return;
+
+    const stores = [
+      useFontSizeStore,
+      useNotificationStore,
+      useVideoFinishedStore,
+      useVideoWatchedStore,
+    ];
+
+    const checkHydration = () => {
+      const allHydrated = stores.every((s) => s.persist.hasHydrated());
+      if (allHydrated) setHydrated(true);
+    };
+
+    const unsubscribes = stores.map((store) =>
+      store.persist.onFinishHydration(() => checkHydration()),
+    );
+
+    checkHydration();
+
+    return () => {
+      unsubscribes.forEach((unsub) => unsub());
+    };
+  }, [hydrated]);
+
+  return hydrated;
+}
+
 function AppContent() {
   const colorScheme = useColorScheme() || "light";
-
   const { ready: languageContextReady, hasStoredLanguage } = useLanguage();
 
   const { hasPlayed: hasPlayedIntro, markAsPlayed: markIntroAsPlayed } =
     useIntroVideo();
 
-  const [storesHydrated, setStoresHydrated] = useState(false);
+  const storesHydrated = useAllStoresHydrated();
 
   const hasInternet = useConnectionStatus();
+
+  // Push-Notification-Registration: kein Auto-Permission-Request,
+  // nur reagieren wenn User in Settings den Toggle aktiviert + OS-Permission granted.
+  usePushNotifications();
 
   const hasHiddenSplashRef = useRef(false);
   const hasShownOfflineToastRef = useRef(false);
@@ -86,42 +119,10 @@ function AppContent() {
     setColorTheme();
   }, []);
 
+  // Permission-Status nach Hydration einmal abfragen (kein automatischer Request).
   useEffect(() => {
-    const checkHydration = () => {
-      const allHydrated =
-        useFontSizeStore.persist.hasHydrated() &&
-        useNotificationStore.persist.hasHydrated() &&
-        usePodcastFinishedStore.persist.hasHydrated() &&
-        usePodcastListenedStore.persist.hasHydrated();
-
-      if (allHydrated) {
-        setStoresHydrated(true);
-        useNotificationStore.getState().checkPermissions();
-        return true;
-      }
-
-      return false;
-    };
-
-    if (checkHydration()) return;
-
-    const intervalId = setInterval(() => {
-      if (checkHydration()) {
-        clearInterval(intervalId);
-      }
-    }, 50);
-
-    return () => clearInterval(intervalId);
-  }, []);
-
-  useEffect(() => {
-    if (storesHydrated && Platform.OS === "ios") {
-      const { getNotifications, permissionStatus, toggleGetNotifications } =
-        useNotificationStore.getState();
-
-      if (!getNotifications && permissionStatus === "undetermined") {
-        toggleGetNotifications();
-      }
+    if (storesHydrated) {
+      useNotificationStore.getState().checkPermissions();
     }
   }, [storesHydrated]);
 
@@ -164,7 +165,7 @@ function AppContent() {
       ? null
       : !hasStoredLanguage
         ? "language"
-        : hasPlayedIntro === false
+        : hasPlayedIntro === false && Platform.OS !== "web"
           ? "intro"
           : null;
 
@@ -178,6 +179,7 @@ function AppContent() {
         >
           <StatusBar style="auto" />
 
+          <ErrorBoundary>
           <MenuProvider>
             <QueryClientProvider client={queryClient}>
               <SupabaseRealtimeProvider>
@@ -217,6 +219,7 @@ function AppContent() {
               </SupabaseRealtimeProvider>
             </QueryClientProvider>
           </MenuProvider>
+          </ErrorBoundary>
 
           <Toast />
         </ThemeProvider>
@@ -225,14 +228,10 @@ function AppContent() {
   );
 }
 
-function RootLayoutContent() {
-  return <AppContent />;
-}
-
 export default function RootLayout() {
   return (
     <LanguageProvider>
-      <RootLayoutContent />
+      <AppContent />
     </LanguageProvider>
   );
 }

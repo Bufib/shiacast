@@ -1,10 +1,11 @@
 import React from "react";
+import { useColorScheme } from "@/hooks/useColorScheme";
 import { NativeTabs } from "expo-router/unstable-native-tabs";
 import { Colors } from "@/constants/Colors";
-import { useColorScheme } from "react-native";
 import { useTranslation } from "react-i18next";
-export default function TabLayout() {
-  const colorScheme = useColorScheme() || "light";
+
+export default function AppTabs() {
+  const colorScheme = useColorScheme();
   const { t } = useTranslation();
 
   return (
@@ -19,9 +20,7 @@ export default function TabLayout() {
       <NativeTabs.Trigger name="home" disableTransparentOnScrollEdge>
         <NativeTabs.Trigger.Label>{t("home")}</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
-          // iOS (SF Symbols)
           sf="house.fill"
-          // Android (Material Symbols)
           md="home"
           renderingMode="template"
         />

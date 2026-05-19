@@ -1,67 +1,32 @@
-
-
 import { create } from "zustand";
 
-export type Dataset = "podcast";
+export type Dataset = "video";
 
 interface DataVersionStore {
-  // per-dataset data ticks
-  podcastVersion: number;
+  videoVersion: number;
+  videoFavoritesVersion: number;
 
-  // per-dataset favorites ticks
-  podcastFavoritesVersion: number;
+  incrementVideoVersion: () => void;
+  incrementVideoFavoritesVersion: () => void;
 
-  // per-dataset data updaters
-  incrementPodcastVersion: () => void;
+  resetVideoVersion: () => void;
+  resetVideoFavoritesVersion: () => void;
 
-  // per-dataset favorites updaters
-  incrementPodcastFavoritesVersion: () => void;
-
-  // per-dataset data resets
-  resetPodcastVersion: () => void;
-
-  // per-dataset favorites resets
-  resetPodcastFavoritesVersion: () => void;
-
-  // all reset
   resetAllVersions: () => void;
 }
 
 export const useDataVersionStore = create<DataVersionStore>((set) => ({
-  // Data versions
-  podcastVersion: 0,
+  videoVersion: 0,
+  videoFavoritesVersion: 0,
 
-  // Favorites versions
-  podcastFavoritesVersion: 0,
+  incrementVideoVersion: () =>
+    set((state) => ({ videoVersion: state.videoVersion + 1 })),
 
-  // Data incrementers
-  incrementPodcastVersion: () =>
-    set((state) => ({
-      podcastVersion: state.podcastVersion + 1,
-    })),
+  incrementVideoFavoritesVersion: () =>
+    set((state) => ({ videoFavoritesVersion: state.videoFavoritesVersion + 1 })),
 
-  // Favorites incrementers
-  incrementPodcastFavoritesVersion: () =>
-    set((state) => ({
-      podcastFavoritesVersion: state.podcastFavoritesVersion + 1,
-    })),
+  resetVideoVersion: () => set({ videoVersion: 0 }),
+  resetVideoFavoritesVersion: () => set({ videoFavoritesVersion: 0 }),
 
-  // Data resets
-  resetPodcastVersion: () =>
-    set({
-      podcastVersion: 0,
-    }),
-
-  // Favorites resets
-  resetPodcastFavoritesVersion: () =>
-    set({
-      podcastFavoritesVersion: 0,
-    }),
-
-  // Reset all
-  resetAllVersions: () =>
-    set({
-      podcastVersion: 0,
-      podcastFavoritesVersion: 0,
-    }),
+  resetAllVersions: () => set({ videoVersion: 0, videoFavoritesVersion: 0 }),
 }));

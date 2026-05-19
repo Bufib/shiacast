@@ -1,4 +1,5 @@
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { useColorScheme } from "@/hooks/useColorScheme";
 import { ThemedText } from "@/components/ThemedText";
 import { Colors } from "@/constants/Colors";
 import { useLanguage } from "../../../../contexts/LanguageContext";
@@ -17,9 +18,8 @@ import {
   ScrollView,
   StyleSheet,
   Switch,
-  useColorScheme,
   View,
-  Animated,
+  Animated
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -28,7 +28,7 @@ import FeedbackButton from "@/components/FeedbackButton";
 import { useScreenFadeIn } from "@/hooks/useScreenFadeIn";
 
 const Settings = () => {
-  const colorScheme = useColorScheme() || "light";
+  const colorScheme = useColorScheme();
   const [isDarkMode, setIsDarkMode] = useState(colorScheme === "dark");
   const [payPalLink, setPayPalLink] = useState<string | null>("");
 
@@ -43,15 +43,19 @@ const Settings = () => {
   const { fadeAnim, onLayout } = useScreenFadeIn(800);
   const version = Constants.expoConfig?.version;
   useEffect(() => {
+    let mounted = true;
     (async () => {
       try {
         const paypal = await AsyncStorage.getItem("paypal");
-        setPayPalLink(paypal);
+        if (mounted) setPayPalLink(paypal);
       } catch (error: any) {
-        Alert.alert("Fehler", error.message);
+        if (mounted) Alert.alert(t("errorTitle"), error.message);
       }
     })();
-  }, []);
+    return () => {
+      mounted = false;
+    };
+  }, [t]);
 
   const toggleDarkMode = async () => {
     const newDarkMode = !isDarkMode;
@@ -77,10 +81,7 @@ const Settings = () => {
       >
         <View style={[styles.header, rtl && styles.rtl]}>
           <ThemedText
-            style={[
-              styles.headerTitle,
-              rtl && { textAlign: "right", paddingRight: 15 },
-            ]}
+            style={[rtl && { textAlign: "right", paddingRight: 15 }]}
             type="title"
           >
             {t("settings")}
@@ -235,13 +236,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "rgba(0,0,0,0.1)",
   },
-  headerTitle: {},
-
-  buttonContainer: {
-    paddingRight: 15,
-    backgroundColor: "transparent",
-  },
-
   scrollView: {
     flex: 1,
   },
@@ -249,12 +243,6 @@ const styles = StyleSheet.create({
     padding: 15,
     borderBottomWidth: 1,
     borderBottomColor: "rgba(0,0,0,0.1)",
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    marginBottom: 15,
-    opacity: 0.8,
   },
   settingRow: {
     flexDirection: "row",
@@ -272,23 +260,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     opacity: 0.6,
   },
-  settingButton: {
-    padding: 16,
-    borderRadius: 10,
-    marginBottom: 12,
-    backgroundColor: "#ccc",
-  },
-  settingButtonText: {
-    fontSize: 16,
-    fontWeight: "500",
-    textAlign: "center",
-  },
-  deleteButton: {
-    backgroundColor: "rgba(255,0,0,0.1)",
-  },
-  deleteButtonText: {
-    color: "#ff4444",
-  },
   paypalButton: {
     alignItems: "center",
     padding: 20,
@@ -301,7 +272,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 20,
   },
-
   versionText: {
     fontSize: 14,
     opacity: 0.5,

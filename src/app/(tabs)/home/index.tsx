@@ -1,56 +1,48 @@
 import RetryButton from "@/components/RetryButton";
+import { useColorScheme } from "@/hooks/useColorScheme";
 import { ThemedText } from "@/components/ThemedText";
 import FilterModal from "@/components/FilterModal";
 import { Colors } from "@/constants/Colors";
 import { useScreenFadeIn } from "@/hooks/useScreenFadeIn";
 import { useDebouncedValue } from "../../../hooks/useDebouncedValue";
-import { usePodcastFilters } from "../../../hooks/usePodcastFilters";
-import { usePodcastLanguages } from "../../../hooks/usePodcastLanguages";
-import { usePodcastList } from "../../../hooks/usePodcastList";
+import { useVideoFilters } from "../../../hooks/useVideoFilters";
+import { useVideoLanguages } from "../../../hooks/useVideoLanguages";
+import { useVideoList } from "../../../hooks/useVideoList";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Animated,
   Keyboard,
+  LayoutAnimation,
   Platform,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  useColorScheme,
-  View,
+  UIManager,
+  View
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLanguage } from "../../../../contexts/LanguageContext";
-import PodcastGridList from "@/components/PodcastGridList";
-import PodcastGridCardSkeleton from "@/components/PodcastGridCardSkeleton";
+import VideoGridList from "@/components/VideoGridList";
+import VideoGridCardSkeleton from "@/components/VideoGridCardSkeleton";
+import { getLanguageLabel } from "../../../../utils/languageLabel";
+
+if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 
 const PAGE_SIZE = 20;
-const GRID_GAP = 12;
 const HORIZONTAL_PADDING = 16;
-const CARD_HEIGHT = 230;
-
-const getLanguageLabel = (language: string | null) => {
-  if (language === null) return "All languages";
-  switch (language) {
-    case "de":
-      return "Deutsch";
-    case "en":
-      return "English";
-    case "ar":
-      return "العربية";
-    default:
-      return language.toUpperCase();
-  }
-};
 
 export default function HomeScreen() {
-  const colorScheme = useColorScheme() ?? "light";
+  const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const { t } = useTranslation();
   const { lang, rtl } = useLanguage();
   const { fadeAnim, onLayout } = useScreenFadeIn(800);
+  const listOpacity = useRef(new Animated.Value(1)).current;
   const insets = useSafeAreaInsets();
 
   const searchInputRef = useRef<TextInput>(null);
@@ -63,6 +55,7 @@ export default function HomeScreen() {
   const [filterVisible, setFilterVisible] = useState(false);
   const [searchVisible, setSearchVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isManualRefreshing, setIsManualRefreshing] = useState(false);
 
   const debouncedSearchQuery = useDebouncedValue(searchQuery.trim(), 350);
   const activeFilterCount =
@@ -70,23 +63,24 @@ export default function HomeScreen() {
     (selectedAuthor ? 1 : 0) +
     (selectedPodcastLanguage !== lang ? 1 : 0);
   const hasActiveSearch = debouncedSearchQuery.length > 0;
-  const { languages } = usePodcastLanguages();
-  const { availableTopics, availableAuthors } = usePodcastFilters({
+  const { languages } = useVideoLanguages();
+  const { availableTopics, availableAuthors } = useVideoFilters({
     language: selectedPodcastLanguage,
     selectedTopic,
     selectedAuthor,
   });
   const {
-    podcasts,
-    isLoading: podcastsLoading,
-    isError: podcastsError,
-    error: podcastsErrorObj,
-    fetchNextPage: podcastsFetchNextPage,
-    hasNextPage: podcastsHasNextPage,
-    isFetchingNextPage: podcastsIsFetchingNextPage,
-    refetch: podcastsRefetch,
-    isRefetching: podcastsIsRefetching,
-  } = usePodcastList({
+    videos,
+    isLoading: videosLoading,
+    isError: videosError,
+    error: videosErrorObj,
+    fetchNextPage: videosFetchNextPage,
+    hasNextPage: videosHasNextPage,
+    isFetchingNextPage: videosIsFetchingNextPage,
+    refetch: videosRefetch,
+    isRefetching: videosIsRefetching,
+    isFetching: videosIsFetching,
+  } = useVideoList({
     language: selectedPodcastLanguage,
     selectedTopic,
     selectedAuthor,
@@ -104,6 +98,19 @@ export default function HomeScreen() {
   }, [lang, selectedPodcastLanguage]);
 
   useEffect(() => {
+    if (!videosIsRefetching) setIsManualRefreshing(false);
+  }, [videosIsRefetching]);
+
+  useEffect(() => {
+    const isBusyFetching = videosIsFetching && !videosIsFetchingNextPage && !videosLoading;
+    Animated.timing(listOpacity, {
+      toValue: isBusyFetching ? 0.4 : 1,
+      duration: isBusyFetching ? 120 : 280,
+      useNativeDriver: true,
+    }).start();
+  }, [videosIsFetching, videosIsFetchingNextPage, videosLoading, listOpacity]);
+
+  useEffect(() => {
     if (!searchVisible) return;
 
     const timeout = setTimeout(() => {
@@ -113,11 +120,12 @@ export default function HomeScreen() {
     return () => clearTimeout(timeout);
   }, [searchVisible]);
 
-  const clearFilters = () => {
+  const clearFilters = useCallback(() => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setSelectedTopic(null);
     setSelectedAuthor(null);
     setSelectedPodcastLanguage(lang);
-  };
+  }, [lang]);
 
   const clearSearch = () => {
     setSearchQuery("");
@@ -125,12 +133,13 @@ export default function HomeScreen() {
   };
 
   const closeSearch = () => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setSearchQuery("");
     setSearchVisible(false);
     Keyboard.dismiss();
   };
 
-  const renderHeader = () => (
+  const renderHeader = useCallback(() => (
     <View style={styles.headerWrapper}>
       <View
         style={[
@@ -208,7 +217,7 @@ export default function HomeScreen() {
                 },
               ]}
             >
-              {t("podcastsTitle")}
+              {t("videosTitle")}
             </ThemedText>
           )}
         </View>
@@ -369,14 +378,14 @@ export default function HomeScreen() {
         </View>
       )}
     </View>
-  );
+  ), [rtl, searchVisible, searchQuery, colorScheme, colors, t, activeFilterCount, selectedTopic, selectedAuthor, selectedPodcastLanguage, lang, clearFilters]);
 
-  const renderEmpty = () => {
-    if (podcastsLoading) {
-      return <PodcastGridCardSkeleton />;
+  const renderEmpty = useCallback(() => {
+    if (videosLoading) {
+      return <VideoGridCardSkeleton />;
     }
 
-    if (podcastsError) {
+    if (videosError) {
       return (
         <View style={styles.errorContainer}>
           <Text
@@ -387,10 +396,10 @@ export default function HomeScreen() {
               },
             ]}
           >
-            {podcastsErrorObj?.message ?? t("errorLoadingData")}
+            {videosErrorObj?.message ?? t("errorLoadingData")}
           </Text>
 
-          <RetryButton onPress={() => podcastsRefetch()} />
+          <RetryButton onPress={() => videosRefetch()} />
         </View>
       );
     }
@@ -399,14 +408,12 @@ export default function HomeScreen() {
       <View style={styles.emptyContainer}>
         <ThemedText style={styles.emptyText} type="subtitle">
           {hasActiveSearch || activeFilterCount > 0
-            ? t("noSearchResult") || "Keine passenden Podcasts gefunden"
-            : t("podcastsEmpty") ||
-              t("noPodcasts") ||
-              "Keine Podcasts vorhanden"}
+            ? t("noSearchResult")
+            : t("videosEmpty")}
         </ThemedText>
       </View>
     );
-  };
+  }, [videosLoading, videosError, videosErrorObj, t, hasActiveSearch, activeFilterCount, videosRefetch, colors]);
 
   return (
     <Animated.View
@@ -443,23 +450,28 @@ export default function HomeScreen() {
         }}
       />
 
-      <PodcastGridList
-        podcasts={podcasts}
-        ListHeaderComponent={renderHeader}
-        ListEmptyComponent={renderEmpty}
-        refreshing={podcastsIsRefetching && !podcastsIsFetchingNextPage}
-        onRefresh={podcastsRefetch}
-        isLoadingMore={podcastsIsFetchingNextPage}
-        onEndReached={() => {
-          if (
-            podcastsHasNextPage &&
-            !podcastsIsFetchingNextPage &&
-            !podcastsLoading
-          ) {
-            podcastsFetchNextPage();
-          }
-        }}
-      />
+      <Animated.View style={{ flex: 1, opacity: listOpacity }}>
+        <VideoGridList
+          videos={videos}
+          ListHeaderComponent={renderHeader}
+          ListEmptyComponent={renderEmpty}
+          refreshing={isManualRefreshing}
+          onRefresh={() => {
+            setIsManualRefreshing(true);
+            videosRefetch();
+          }}
+          isLoadingMore={videosIsFetchingNextPage}
+          onEndReached={() => {
+            if (
+              videosHasNextPage &&
+              !videosIsFetchingNextPage &&
+              !videosLoading
+            ) {
+              videosFetchNextPage();
+            }
+          }}
+        />
+      </Animated.View>
     </Animated.View>
   );
 }
@@ -468,23 +480,15 @@ const styles = StyleSheet.create({
   animatedContainer: {
     flex: 1,
   },
-
-  listContent: {
-    paddingTop: 18,
-    paddingBottom: 30,
-    paddingHorizontal: HORIZONTAL_PADDING,
-  },
-
   headerWrapper: {
     marginBottom: 16,
+    paddingHorizontal: HORIZONTAL_PADDING,
   },
-
   sectionHeaderRow: {
     minHeight: 40,
     justifyContent: "space-between",
     alignItems: "center",
   },
-
   titleGroup: {
     flex: 1,
     alignItems: "center",
@@ -492,16 +496,13 @@ const styles = StyleSheet.create({
     paddingRight: 12,
     height: 50,
   },
-
   sectionLabel: {
     paddingHorizontal: 6,
   },
-
   headerActions: {
     alignItems: "center",
     gap: 8,
   },
-
   iconButton: {
     width: 38,
     height: 38,
@@ -509,22 +510,20 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-
   searchContainer: {
     minHeight: 44,
     borderRadius: 22,
     alignItems: "center",
     paddingHorizontal: 14,
     gap: 8,
+    flex: 1,
   },
-
   searchInput: {
     flex: 1,
     fontSize: 15,
     fontWeight: "500",
     paddingVertical: 10,
   },
-
   clearSearchButton: {
     width: 26,
     height: 26,
@@ -532,7 +531,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-
   filterBadge: {
     position: "absolute",
     top: -2,
@@ -545,18 +543,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-
   filterBadgeText: {
     color: "#fff",
     fontSize: 10,
     fontWeight: "700",
-  },
-
-  centeredContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: 20,
   },
   activeFiltersRow: {
     alignItems: "center",
@@ -564,177 +554,35 @@ const styles = StyleSheet.create({
     gap: 8,
     marginTop: 10,
   },
-
   filterChip: {
     maxWidth: 170,
     borderRadius: 999,
     paddingHorizontal: 10,
     paddingVertical: 5,
   },
-
   filterChipText: {
     fontSize: 12,
     fontWeight: "600",
   },
-
   clearFiltersText: {
     fontSize: 12,
     fontWeight: "700",
   },
-
-  columnWrapper: {
-    justifyContent: "space-between",
-    marginBottom: GRID_GAP,
-  },
-
-  podcastItem: {
-    marginBottom: 0,
-  },
-
-  cardShadow: {
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.18,
-    shadowRadius: 4,
-    elevation: 3,
-    overflow: "visible",
-  },
-
-  card: {
-    width: "100%",
-    height: CARD_HEIGHT,
-    borderRadius: 26,
-    position: "relative",
-    overflow: "hidden",
-    backgroundColor: "#1a1a1a",
-  },
-
-  cardOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0, 0, 0, 0.2)",
-    zIndex: 1,
-  },
-
-  vinylRecord: {
-    position: "absolute",
-    top: 12,
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    backgroundColor: "rgba(0, 0, 0, 0.22)",
-    justifyContent: "center",
-    alignItems: "center",
-    zIndex: 3,
-  },
-
-  vinylRecordLtr: {
-    right: 12,
-  },
-
-  vinylRecordRtl: {
-    left: 12,
-  },
-
-  cardContent: {
-    flex: 1,
-    padding: 16,
-    justifyContent: "space-between",
-    zIndex: 2,
-  },
-
-  titleContainer: {
-    flex: 1,
-    justifyContent: "center",
-    paddingTop: 44,
-    marginBottom: 12,
-  },
-
-  cardTitle: {
-    fontSize: 17,
-    fontWeight: "900",
-    color: "#FFFFFF",
-    lineHeight: 22,
-    letterSpacing: -0.3,
-    textShadowColor: "rgba(0, 0, 0, 0.45)",
-    textShadowOffset: {
-      width: 0,
-      height: 0,
-    },
-    textShadowRadius: 4,
-  },
-
-  cardFooter: {
-    gap: 8,
-  },
-
-  playSection: {
-    alignItems: "center",
-  },
-
-  playButton: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    backgroundColor: "rgba(255, 255, 255, 0.28)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
-  playText: {
-    flex: 1,
-    fontSize: 11,
-    fontWeight: "800",
-    color: "rgba(255, 255, 255, 0.9)",
-    letterSpacing: 0.8,
-    textTransform: "uppercase",
-  },
-
-  playTextLtr: {
-    marginLeft: 8,
-  },
-
-  playTextRtl: {
-    marginRight: 8,
-  },
-
-  createdAt: {
-    fontSize: 11,
-    fontWeight: "600",
-    color: "rgba(255, 255, 255, 0.78)",
-    letterSpacing: 0.4,
-    textTransform: "uppercase",
-  },
-
-  sectionLoader: {
-    marginVertical: 24,
-  },
-
-  footerLoader: {
-    paddingVertical: 16,
-    alignItems: "center",
-  },
-
   emptyContainer: {
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 32,
     backgroundColor: "transparent",
   },
-
   emptyText: {
     textAlign: "center",
   },
-
   errorContainer: {
     alignItems: "center",
     gap: 10,
     paddingVertical: 20,
     paddingHorizontal: 16,
   },
-
   errorText: {
     fontSize: 16,
     textAlign: "center",

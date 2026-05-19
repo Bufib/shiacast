@@ -54,13 +54,10 @@
           "supportsPictureInPicture": true
         }
       ],
-      "@react-native-community/datetimepicker",
       "expo-image",
       "expo-asset",
       "expo-localization",
-      "expo-sharing",
-      "expo-sqlite",
-      "expo-web-browser"
+      "expo-sharing"
     ],
     "experiments": {
       "typedRoutes": true,
@@ -70,7 +67,9 @@
       "router": {},
       "eas": {
         "projectId": "17addcb3-1e38-464c-a41d-acadb2a72696"
-      }
+      },
+      "supabaseUrl": "https://thqtmzvrjdodgorexjcj.supabase.co",
+      "supabasePublishableKey": "sb_publishable_6cc9AgTAoAY9kXSypBrwfw_KGyuSozE"
     },
     "owner": "hadi_ea"
   }

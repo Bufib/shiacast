@@ -1,16 +1,15 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Alert, Platform } from "react-native";
+import { useCallback, useEffect, useRef } from "react";
+import { Platform } from "react-native";
 import * as Notifications from "expo-notifications";
+import * as Device from "expo-device";
 import Constants from "expo-constants";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
-import uuid from "react-native-uuid";
 
 import { supabase } from "../../utils/supabase";
 import useNotificationStore from "../../stores/notificationStore";
 import { useLanguage } from "../../contexts/LanguageContext";
 
-// Global notification handler
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -21,58 +20,51 @@ Notifications.setNotificationHandler({
   }),
 });
 
-const GUEST_ID_KEY = "guest_id";
 const EXPO_PUSH_TOKEN_KEY = "expo_push_token";
+const GUEST_ID_KEY = "guest_id";
 
-async function getOrCreateGuestId(): Promise<string> {
-  let id = await AsyncStorage.getItem(GUEST_ID_KEY);
-
-  if (!id) {
-    id = String(uuid.v4());
-    await AsyncStorage.setItem(GUEST_ID_KEY, id);
-  }
-
-  return id;
-}
-
-async function getProjectId(): Promise<string | undefined> {
+function getProjectId(): string | undefined {
   return (
     Constants?.expoConfig?.extra?.eas?.projectId ??
-    Constants?.easConfig?.projectId
+    (Constants as any)?.easConfig?.projectId
   );
 }
 
-/**
- * Hook that:
- * - Registers/updates push token in Supabase
- * - Handles notification tap navigation
- * - Removes token from Supabase when notifications are disabled
- *
- * No authStore.
- * No todoReminderStore.
- * No local todo reminder scheduling.
- */
+async function getOrCreateGuestId(): Promise<string> {
+  const stored = await AsyncStorage.getItem(GUEST_ID_KEY);
+  if (stored) return stored;
+
+  const id = `${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
+  await AsyncStorage.setItem(GUEST_ID_KEY, id);
+  return id;
+}
+
 export function usePushNotifications() {
   const router = useRouter();
   const { lang } = useLanguage();
 
   const getNotifications = useNotificationStore((s) => s.getNotifications);
+  const permissionStatus = useNotificationStore((s) => s.permissionStatus);
 
-  const [expoPushToken, setExpoPushToken] = useState<string>("");
-
-  const responseListener = useRef<Notifications.EventSubscription | null>(null);
+  const tokenRef = useRef<string | null>(null);
   const isMountedRef = useRef(true);
+  const responseSubRef = useRef<Notifications.EventSubscription | null>(null);
 
   useEffect(() => {
+    isMountedRef.current = true;
     return () => {
       isMountedRef.current = false;
     };
   }, []);
 
-  const registerOrUpdateToken = useCallback(async () => {
-    if (!getNotifications) return;
+  // Effective state: nur wenn User Toggle aktiv UND OS-Permission granted.
+  const effectiveEnabled =
+    getNotifications && permissionStatus === "granted";
 
+  const registerToken = useCallback(async () => {
     try {
+      if (!Device.isDevice) return;
+
       if (Platform.OS === "android") {
         await Notifications.setNotificationChannelAsync("default", {
           name: "default",
@@ -83,25 +75,22 @@ export function usePushNotifications() {
         });
       }
 
-      const projectId = await getProjectId();
-
-      const tokenResponse = await Notifications.getExpoPushTokenAsync({
-        projectId,
-      });
+      const projectId = getProjectId();
+      const tokenResponse = await Notifications.getExpoPushTokenAsync(
+        projectId ? { projectId } : undefined,
+      );
 
       const token = tokenResponse.data;
+      if (!token) return;
 
+      tokenRef.current = token;
       await AsyncStorage.setItem(EXPO_PUSH_TOKEN_KEY, token);
-
-      if (isMountedRef.current) {
-        setExpoPushToken(token);
-      }
 
       const guestId = await getOrCreateGuestId();
 
       const payload = {
         expo_push_token: token,
-        app_version: Constants.expoConfig?.extra?.appVersion,
+        app_version: Constants.expoConfig?.version,
         platform: Platform.OS,
         language_code: lang || "de",
         guest_id: guestId,
@@ -112,77 +101,66 @@ export function usePushNotifications() {
         .upsert(payload, { onConflict: "expo_push_token" });
 
       if (error) {
-        console.error("Supabase upsert error:", error);
-        Alert.alert("Supabase Error", error.message);
+        console.warn("Supabase upsert push token error:", error.message);
       }
-    } catch (err: any) {
-      console.error("Error registering/updating push token:", err);
-      Alert.alert("Registration Error", err?.message ?? String(err));
+    } catch (err) {
+      console.warn("Failed to register push token:", err);
     }
-  }, [getNotifications, lang]);
+  }, [lang]);
 
-  // Register/update token whenever notification setting or language changes
+  const removeToken = useCallback(async () => {
+    try {
+      const storedToken =
+        tokenRef.current ?? (await AsyncStorage.getItem(EXPO_PUSH_TOKEN_KEY));
+
+      if (!storedToken) return;
+
+      const { error } = await supabase
+        .from("user_tokens")
+        .delete()
+        .eq("expo_push_token", storedToken);
+
+      if (error) {
+        console.warn("Supabase delete push token error:", error.message);
+        return;
+      }
+
+      tokenRef.current = null;
+      await AsyncStorage.removeItem(EXPO_PUSH_TOKEN_KEY);
+    } catch (err) {
+      console.warn("Failed to remove push token:", err);
+    }
+  }, []);
+
+  // Token registrieren/löschen je nach effectiveEnabled.
   useEffect(() => {
-    registerOrUpdateToken();
-  }, [registerOrUpdateToken]);
+    if (effectiveEnabled) {
+      registerToken();
+    } else {
+      removeToken();
+    }
+  }, [effectiveEnabled, registerToken, removeToken]);
 
-  // Handle notification tap
+  // Notification-Tap-Listener.
   useEffect(() => {
-    if (!getNotifications) return;
+    if (!effectiveEnabled) return;
 
-    responseListener.current =
+    responseSubRef.current =
       Notifications.addNotificationResponseReceivedListener((response) => {
         const data = response.notification.request.content.data as
-          | {
-              type?: string;
-              screen?: string;
-              route?: string;
-            }
+          | { route?: string }
           | undefined;
 
-        // You can later customize navigation based on data.type, data.screen, etc.
-        router.push("/(tabs)/home");
+        if (data?.route) {
+          router.push(data.route as any);
+        } else {
+          router.push("/(tabs)/home");
+        }
       });
 
     return () => {
-      responseListener.current?.remove();
-      responseListener.current = null;
+      responseSubRef.current?.remove();
+      responseSubRef.current = null;
     };
-  }, [getNotifications, router]);
-
-  // If user disables notifications in-app, remove token from Supabase
-  useEffect(() => {
-    if (getNotifications) return;
-
-    async function removeToken() {
-      try {
-        const storedToken =
-          expoPushToken || (await AsyncStorage.getItem(EXPO_PUSH_TOKEN_KEY));
-
-        if (!storedToken) return;
-
-        const { error } = await supabase
-          .from("user_tokens")
-          .delete()
-          .eq("expo_push_token", storedToken);
-
-        if (error) {
-          console.error("Supabase delete token error:", error);
-          return;
-        }
-
-        await AsyncStorage.removeItem(EXPO_PUSH_TOKEN_KEY);
-
-        if (isMountedRef.current) {
-          setExpoPushToken("");
-        }
-      } catch (err) {
-        console.error("Error removing push token:", err);
-      }
-    }
-
-    removeToken();
-  }, [getNotifications, expoPushToken]);
-
-  return { expoPushToken };
+  }, [effectiveEnabled, router]);
 }

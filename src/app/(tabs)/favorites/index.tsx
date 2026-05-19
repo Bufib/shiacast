@@ -1,8 +1,8 @@
 import React from "react";
-import RenderFavoritePodcasts from "@/components/RenderFavoritePodcasts";
+import RenderFavoriteVideos from "@/components/RenderFavoriteVideos";
 
 const index = () => {
-  return <RenderFavoritePodcasts />
+  return <RenderFavoriteVideos />;
 };
 
 export default index;

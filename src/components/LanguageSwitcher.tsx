@@ -11,31 +11,27 @@ import { Colors } from "@/constants/Colors";
 import { returnSize } from "../../utils/sizes";
 import { ThemedText } from "./ThemedText";
 import { useTranslation } from "react-i18next";
-/**
- * A small UI widget with three buttons (“Deutsch” / “English” / “العربية”) that uses
- * LanguageContext to switch the app’s i18n language and persist it.
- */
-export function LanguageSwitcher({ disabled }: { disabled: boolean }) {
+import type { LanguageCode } from "@/constants/Types";
+
+type Lang = { code: LanguageCode; labelKey: "deutsch" | "english" | "arabic" };
+
+const LANGS: Lang[] = [
+  { code: "de", labelKey: "deutsch" },
+  { code: "en", labelKey: "english" },
+  { code: "ar", labelKey: "arabic" },
+];
+
+export function LanguageSwitcher({ disabled = false }: { disabled?: boolean }) {
   const { lang, rtl, setAppLanguage, ready: langReady } = useLanguage();
   const { width, height } = useWindowDimensions();
   const { isLarge } = returnSize(width, height);
   const { t } = useTranslation();
-  const selectDeutsch = () => {
-    if (langReady && lang !== "de") {
-      setAppLanguage("de");
-    }
-  };
 
-  const selectEnglish = () => {
-    if (langReady && lang !== "en") {
-      setAppLanguage("en");
-    }
-  };
-
-  const selectArabic = () => {
-    if (langReady && lang !== "ar") {
-      setAppLanguage("ar");
-    }
+  const handlePick = (code: LanguageCode) => {
+    if (disabled) return;
+    if (!langReady) return;
+    if (lang === code) return;
+    setAppLanguage(code);
   };
 
   return (
@@ -43,10 +39,10 @@ export function LanguageSwitcher({ disabled }: { disabled: boolean }) {
       style={[
         styles.container,
         rtl && styles.rtlContainer,
-        disabled && { backgroundColor: "#ccc" },
+        disabled && styles.containerDisabled,
       ]}
     >
-      <View style={[rtl && styles.rtlTextContainer]}>
+      <View>
         <ThemedText style={[styles.title, rtl && styles.rtlText]}>
           {t("language")}
         </ThemedText>
@@ -54,101 +50,34 @@ export function LanguageSwitcher({ disabled }: { disabled: boolean }) {
           {t("selectAppLanguage")}
         </ThemedText>
       </View>
-      <View
-        style={{
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          gap: 5,
-        }}
-      >
-        {disabled && (
-          <ThemedText
-            style={{ fontWeight: 600, color: Colors.universal.error }}
-          >
-            Bald verfügbar
-          </ThemedText>
-        )}
-        <View style={[styles.buttons, rtl && styles.rtlButtons]}>
-          <Pressable
-            onPress={selectDeutsch}
-            style={({ pressed }) => [
-              styles.button,
-              lang === "de" && styles.buttonActive,
-              {
-                opacity: pressed ? 0.8 : 1,
-                paddingHorizontal: isLarge ? 12 : 7,
-              },
-              rtl && { marginLeft: 0, marginRight: 8 },
-            ]}
-          >
-            <Text
-              style={[
-                styles.buttonText,
-                lang === "de" && styles.buttonTextActive,
-              ]}
-            >
-              {t("deutsch")}
-            </Text>
-          </Pressable>
-          <Pressable
-            disabled={disabled}
-            onPress={selectEnglish}
-            style={({ pressed }) => [
-              styles.button,
-              lang === "en" && styles.buttonActive,
-              {
-                opacity: pressed ? 0.8 : 1,
-                paddingHorizontal: isLarge ? 12 : 7,
-                //! Entfernen die //
-              },
-              rtl && { marginLeft: 0, marginRight: 8 },
 
-              disabled && {
-                backgroundColor: "#ccc",
-                borderRadius: 5,
-                borderColor: "#ccc",
-              },
-            ]}
-          >
-            <Text
-              style={[
-                styles.buttonText,
-                lang === "en" && styles.buttonTextActive,
+      <View style={[styles.buttons, rtl && styles.rtlButtons]}>
+        {LANGS.map(({ code, labelKey }) => {
+          const isActive = lang === code;
+          return (
+            <Pressable
+              key={code}
+              disabled={disabled}
+              onPress={() => handlePick(code)}
+              style={({ pressed }) => [
+                styles.button,
+                isActive && styles.buttonActive,
+                {
+                  opacity: pressed ? 0.8 : 1,
+                  paddingHorizontal: isLarge ? 12 : 7,
+                },
+                rtl && { marginLeft: 0, marginRight: 8 },
+                disabled && styles.buttonDisabled,
               ]}
             >
-              {t("english")}
-            </Text>
-          </Pressable>
-          <Pressable
-            disabled={disabled}
-            onPress={selectArabic}
-            style={({ pressed }) => [
-              styles.button,
-              lang === "ar" && styles.buttonActive,
-              {
-                opacity: pressed ? 0.8 : 1,
-                paddingHorizontal: isLarge ? 12 : 7,
-              },
-              rtl && { marginLeft: 0, marginRight: 8 },
-
-              disabled && {
-                backgroundColor: "#ccc",
-                borderRadius: 5,
-                borderColor: "#ccc",
-              },
-            ]}
-          >
-            <Text
-              style={[
-                styles.buttonText,
-                lang === "ar" && styles.buttonTextActive,
-              ]}
-            >
-              {t("arabic")}
-            </Text>
-          </Pressable>
-        </View>
+              <Text
+                style={[styles.buttonText, isActive && styles.buttonTextActive]}
+              >
+                {t(labelKey)}
+              </Text>
+            </Pressable>
+          );
+        })}
       </View>
     </View>
   );
@@ -162,8 +91,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 12,
     marginBottom: 8,
-    // paddingHorizontal: 5, //! Entfernen
-    // borderRadius: 10, //! Entfernen
+  },
+  containerDisabled: {
+    opacity: 0.6,
   },
   title: {
     fontSize: 16,
@@ -187,6 +117,10 @@ const styles = StyleSheet.create({
   buttonActive: {
     backgroundColor: Colors.universal.link,
   },
+  buttonDisabled: {
+    backgroundColor: "#ccc",
+    borderColor: "#ccc",
+  },
   buttonText: {
     fontSize: 14,
     color: Colors.universal.link,
@@ -197,7 +131,6 @@ const styles = StyleSheet.create({
   rtlContainer: {
     flexDirection: "row-reverse",
   },
-  rtlTextContainer: {},
   rtlText: {
     textAlign: "right",
   },

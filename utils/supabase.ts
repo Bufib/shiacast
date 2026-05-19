@@ -3,9 +3,24 @@ import "react-native-url-polyfill/auto";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createClient, processLock } from "@supabase/supabase-js";
 import { AppState, Platform } from "react-native";
+import Constants from "expo-constants";
 
-const supabaseUrl = "https://thqtmzvrjdodgorexjcj.supabase.co";
-const supabasePublishableKey = "sb_publishable_6cc9AgTAoAY9kXSypBrwfw_KGyuSozE";
+type SupabaseExtra = {
+  supabaseUrl?: string;
+  supabasePublishableKey?: string;
+};
+
+const extra =
+  (Constants.expoConfig?.extra as SupabaseExtra | undefined) ?? {};
+
+const supabaseUrl = extra.supabaseUrl;
+const supabasePublishableKey = extra.supabasePublishableKey;
+
+if (!supabaseUrl || !supabasePublishableKey) {
+  throw new Error(
+    "Supabase config missing: set `extra.supabaseUrl` and `extra.supabasePublishableKey` in app.json (or per-environment EAS profile).",
+  );
+}
 
 export const supabase = createClient(supabaseUrl, supabasePublishableKey, {
   auth: {

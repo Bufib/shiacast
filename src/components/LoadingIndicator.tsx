@@ -1,10 +1,10 @@
 import React from "react";
+import { useColorScheme } from "@/hooks/useColorScheme";
 import {
   ActivityIndicator,
-  useColorScheme,
   ActivityIndicatorProps,
   StyleProp,
-  ViewStyle,
+  ViewStyle
 } from "react-native";
 import { Colors } from "@/constants/Colors";
 
@@ -17,7 +17,7 @@ export const LoadingIndicator = ({
   size = "large",
   style,
 }: LoadingIndicatorProps) => {
-  const colorScheme = useColorScheme() ?? "light";
+  const colorScheme = useColorScheme();
 
   return (
     <ActivityIndicator
