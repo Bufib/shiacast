@@ -42,7 +42,7 @@ const queryClient = new QueryClient();
 const favoriteFolderSheetOptions = {
   headerShown: false,
   presentation: "formSheet" as const,
-  sheetAllowedDetents: [0.55, 0.8],
+  sheetAllowedDetents: [0.75, 1],
   sheetInitialDetentIndex: 0,
   sheetGrabberVisible: true,
   sheetCornerRadius: 24,
@@ -58,8 +58,7 @@ const favoriteFolderSheetOptions = {
 const filterSheetOptions = {
   headerShown: false,
   presentation: "formSheet" as const,
-  sheetAllowedDetents: [0.75, 0.9],
-  sheetInitialDetentIndex: 0,
+  sheetAllowedDetents: [0.75, 1],
   sheetGrabberVisible: true,
   sheetCornerRadius: 24,
   gestureEnabled: true,
