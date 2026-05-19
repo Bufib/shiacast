@@ -2,25 +2,18 @@ import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { useVideoFavoriteFoldersStore } from "../../stores/videoFavoriteFoldersStore";
 import { Ionicons } from "@expo/vector-icons";
-import {
-  BottomSheetBackdrop,
-  BottomSheetModal,
-  BottomSheetScrollView,
-  BottomSheetTextInput,
-} from "@gorhom/bottom-sheet";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { router } from "expo-router";
+import React, { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -37,22 +30,13 @@ const FOLDER_COLORS = [
 
 type Props = {
   videoId: number;
-  visible: boolean;
-  onClose: () => void;
 };
 
-export default function VideoFavoriteFolderModal({
-  videoId,
-  visible,
-  onClose,
-}: Props) {
+export default function VideoFavoriteFolderModal({ videoId }: Props) {
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
   const insets = useSafeAreaInsets();
-
-  const sheetRef = useRef<BottomSheetModal>(null);
-  const snapPoints = useMemo(() => ["55%", "80%"], []);
 
   const folders = useVideoFavoriteFoldersStore((s) => s.folders);
   const getVideoFolderIds = useVideoFavoriteFoldersStore(
@@ -63,64 +47,54 @@ export default function VideoFavoriteFolderModal({
   );
   const addFolder = useVideoFavoriteFoldersStore((s) => s.addFolder);
 
-  // Local UI state — mirrors store on open; stays in sync via immediate saves
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [showCreate, setShowCreate] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
   const [newFolderColor, setNewFolderColor] = useState(FOLDER_COLORS[0]);
 
   useEffect(() => {
-    if (visible) {
-      sheetRef.current?.present();
-      setSelectedIds(getVideoFolderIds(videoId));
-      setShowCreate(false);
-      setNewFolderName("");
-      setNewFolderColor(FOLDER_COLORS[0]);
-    } else {
-      sheetRef.current?.dismiss();
-    }
-  }, [visible, videoId, getVideoFolderIds]);
+    setSelectedIds(getVideoFolderIds(videoId));
+    setShowCreate(false);
+    setNewFolderName("");
+    setNewFolderColor(FOLDER_COLORS[0]);
+  }, [videoId, getVideoFolderIds]);
 
-  const renderBackdrop = useCallback(
-    (props: any) => (
-      <BottomSheetBackdrop
-        {...props}
-        disappearsOnIndex={-1}
-        appearsOnIndex={0}
-        opacity={0.5}
-      />
-    ),
-    [],
-  );
+  const closeSheet = useCallback(() => {
+    router.dismiss();
+  }, []);
 
-  // Toggle saves immediately — no "Done to save" required
   const handleToggleFolder = useCallback(
     (folderId: string) => {
-      setSelectedIds((prev) => {
-        const next = prev.includes(folderId)
-          ? prev.filter((id) => id !== folderId)
-          : [...prev, folderId];
-        setVideoFolders(videoId, next);
-        return next;
-      });
+      const next = selectedIds.includes(folderId)
+        ? selectedIds.filter((id) => id !== folderId)
+        : [...selectedIds, folderId];
+
+      setSelectedIds(next);
+      setVideoFolders(videoId, next);
     },
-    [videoId, setVideoFolders],
+    [selectedIds, videoId, setVideoFolders],
   );
 
   const handleCreateFolder = useCallback(() => {
     const name = newFolderName.trim();
     if (!name) return;
+
     const folder = addFolder(name, newFolderColor);
-    // Immediately add to selection and save
-    setSelectedIds((prev) => {
-      const next = [...prev, folder.id];
-      setVideoFolders(videoId, next);
-      return next;
-    });
+    const next = [...selectedIds, folder.id];
+
+    setSelectedIds(next);
+    setVideoFolders(videoId, next);
     setNewFolderName("");
     setNewFolderColor(FOLDER_COLORS[0]);
     setShowCreate(false);
-  }, [newFolderName, newFolderColor, addFolder, videoId, setVideoFolders]);
+  }, [
+    newFolderName,
+    newFolderColor,
+    selectedIds,
+    addFolder,
+    videoId,
+    setVideoFolders,
+  ]);
 
   const panelBg = isDark ? "#1e2a3a" : "#ffffff";
   const sectionLabelColor = isDark ? "#8899aa" : "#888";
@@ -130,38 +104,23 @@ export default function VideoFavoriteFolderModal({
   const inputBg = isDark ? "#2a3a4e" : "#f5f7fa";
 
   return (
-    <BottomSheetModal
-      ref={sheetRef}
-      snapPoints={snapPoints}
-      enableDynamicSizing={false}
-      enablePanDownToClose
-      onDismiss={onClose}
-      backdropComponent={renderBackdrop}
-      backgroundStyle={{ backgroundColor: panelBg }}
-      handleIndicatorStyle={{ backgroundColor: isDark ? "#4a5a6e" : "#dde0e6" }}
-      keyboardBehavior="extend"
-      keyboardBlurBehavior="restore"
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      style={[styles.sheetRoot, { backgroundColor: panelBg }]}
     >
-      {/* Header */}
       <View style={[styles.header, { borderBottomColor: borderColor }]}>
         <Text style={[styles.title, { color: textColor }]}>
           {t("favorites")}
         </Text>
-        <TouchableOpacity
-          onPress={() => sheetRef.current?.dismiss()}
-          style={styles.closeBtn}
-        >
+        <TouchableOpacity onPress={closeSheet} style={styles.closeBtn}>
           <Ionicons name="close" size={22} color={subTextColor} />
         </TouchableOpacity>
       </View>
 
-      {/* Scrollable content */}
-      <BottomSheetScrollView
+      <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={[
-          styles.scrollContent,
-          { paddingBottom: insets.bottom + 32 },
-        ]}
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={styles.scrollContent}
       >
         {folders.length === 0 && !showCreate && (
           <Text style={[styles.emptyText, { color: subTextColor }]}>
@@ -198,7 +157,7 @@ export default function VideoFavoriteFolderModal({
 
         {showCreate ? (
           <View style={[styles.createForm, { borderColor }]}>
-            <BottomSheetTextInput
+            <TextInput
               style={[
                 styles.input,
                 { color: textColor, backgroundColor: inputBg },
@@ -280,9 +239,8 @@ export default function VideoFavoriteFolderModal({
             </Text>
           </TouchableOpacity>
         )}
-      </BottomSheetScrollView>
+      </ScrollView>
 
-      {/* Close button */}
       <View
         style={[
           styles.footer,
@@ -294,17 +252,22 @@ export default function VideoFavoriteFolderModal({
             styles.doneBtn,
             { backgroundColor: Colors.universal.primary },
           ]}
-          onPress={() => sheetRef.current?.dismiss()}
+          onPress={closeSheet}
           activeOpacity={0.8}
         >
           <Text style={styles.doneBtnText}>{t("done")}</Text>
         </TouchableOpacity>
       </View>
-    </BottomSheetModal>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
+  sheetRoot: {
+    flex: 1,
+    overflow: "hidden",
+  },
+
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -329,6 +292,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 20,
     paddingTop: 12,
+    paddingBottom: 16,
     gap: 8,
   },
 
@@ -336,20 +300,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: "center",
     paddingVertical: 24,
-  },
-
-  folderRowMain: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
-
-  deleteBtn: {
-    paddingLeft: 10,
-    paddingVertical: 4,
-    alignItems: "center",
-    justifyContent: "center",
   },
 
   folderRow: {
@@ -454,10 +404,6 @@ const styles = StyleSheet.create({
   },
 
   footer: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
     paddingHorizontal: 20,
     paddingTop: 10,
     borderTopWidth: StyleSheet.hairlineWidth,

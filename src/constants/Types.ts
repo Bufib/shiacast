@@ -60,6 +60,7 @@ export type VideoType = {
   podcast_author?: string;
   image_filename?: string | null;
   image_url: string | null;
+  image_cache_key?: string | null;
 };
 
 export type VideoGridCardType = {

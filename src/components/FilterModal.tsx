@@ -1,88 +1,67 @@
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { useVideoFilters } from "@/hooks/useVideoFilters";
+import { useVideoLanguages } from "@/hooks/useVideoLanguages";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import { router } from "expo-router";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import {
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
-import {
-  BottomSheetBackdrop,
-  BottomSheetModal,
-  BottomSheetScrollView,
-} from "@gorhom/bottom-sheet";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { useLanguage } from "../../contexts/LanguageContext";
+import { useVideoFilterStore } from "../../stores/videoFilterStore";
 import { getLanguageLabel } from "../../utils/languageLabel";
 
-type FilterModalProps = {
-  visible: boolean;
-  onClose: () => void;
-  topics: string[];
-  authors: string[];
-  languages: string[];
-  selectedTopic: string | null;
-  selectedAuthor: string | null;
-  selectedLanguage: string | null;
-  defaultLanguage: string;
-  onSelectTopic: (topic: string | null) => void;
-  onSelectAuthor: (author: string | null) => void;
-  onSelectLanguage: (language: string | null) => void;
-};
-
-export default function FilterModal({
-  visible,
-  onClose,
-  topics,
-  authors,
-  languages,
-  selectedTopic,
-  selectedAuthor,
-  selectedLanguage,
-  defaultLanguage,
-  onSelectTopic,
-  onSelectAuthor,
-  onSelectLanguage,
-}: FilterModalProps) {
+export default function FilterModal() {
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
   const insets = useSafeAreaInsets();
-  const sheetRef = useRef<BottomSheetModal>(null);
+  const { lang } = useLanguage();
 
-  const snapPoints = useMemo(() => ["75%", "90%"], []);
+  const storeDefaultLanguage = useVideoFilterStore((s) => s.defaultLanguage);
+  const selectedTopic = useVideoFilterStore((s) => s.selectedTopic);
+  const selectedAuthor = useVideoFilterStore((s) => s.selectedAuthor);
+  const selectedLanguageValue = useVideoFilterStore((s) => s.selectedLanguage);
+  const setDefaultLanguage = useVideoFilterStore((s) => s.setDefaultLanguage);
+  const setSelectedTopic = useVideoFilterStore((s) => s.setSelectedTopic);
+  const setSelectedAuthor = useVideoFilterStore((s) => s.setSelectedAuthor);
+  const setSelectedLanguage = useVideoFilterStore((s) => s.setSelectedLanguage);
+  const resetFilters = useVideoFilterStore((s) => s.resetFilters);
+
+  const selectedLanguage =
+    storeDefaultLanguage === null ? lang : selectedLanguageValue;
+
+  const { languages } = useVideoLanguages();
+  const { availableTopics, availableAuthors } = useVideoFilters({
+    language: selectedLanguage,
+    selectedTopic,
+    selectedAuthor,
+  });
 
   useEffect(() => {
-    if (visible) {
-      sheetRef.current?.present({ snapIndex: 0 });
-    } else {
-      sheetRef.current?.dismiss();
-    }
-  }, [visible]);
+    setDefaultLanguage(lang);
+  }, [lang, setDefaultLanguage]);
 
-  const renderBackdrop = useCallback(
-    (props: any) => (
-      <BottomSheetBackdrop
-        {...props}
-        disappearsOnIndex={-1}
-        appearsOnIndex={0}
-        opacity={0.5}
-      />
-    ),
-    [],
-  );
+  const closeSheet = useCallback(() => {
+    router.dismiss();
+  }, []);
 
   const languageOptions = useMemo(() => {
-    return [...new Set([defaultLanguage, ...languages])].sort();
-  }, [defaultLanguage, languages]);
+    return [...new Set([lang, ...languages])].sort();
+  }, [lang, languages]);
 
   const hasActiveFilters =
     selectedTopic !== null ||
     selectedAuthor !== null ||
-    selectedLanguage !== defaultLanguage;
+    selectedLanguage !== lang;
 
   const panelBg = isDark ? "#1e2a3a" : "#ffffff";
   const sectionLabelColor = isDark ? "#8899aa" : "#888";
@@ -91,16 +70,7 @@ export default function FilterModal({
   const activeBg = Colors.universal.primary;
 
   return (
-    <BottomSheetModal
-      ref={sheetRef}
-      snapPoints={snapPoints}
-      enableDynamicSizing={false}
-      enablePanDownToClose
-      onDismiss={onClose}
-      backdropComponent={renderBackdrop}
-      backgroundStyle={{ backgroundColor: panelBg }}
-      handleIndicatorStyle={{ backgroundColor: isDark ? "#4a5a6e" : "#dde0e6" }}
-    >
+    <View style={[styles.sheetRoot, { backgroundColor: panelBg }]}>
       <View style={styles.panelHeader}>
         <View style={styles.panelTitleRow}>
           <Ionicons
@@ -115,7 +85,7 @@ export default function FilterModal({
             {t("filter")}
           </Text>
         </View>
-        <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
+        <TouchableOpacity onPress={closeSheet} style={styles.closeBtn}>
           <Ionicons
             name="close"
             size={22}
@@ -131,14 +101,14 @@ export default function FilterModal({
         ]}
       />
 
-      <BottomSheetScrollView
+      <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[
           styles.scrollContent,
           { paddingBottom: insets.bottom + 16 },
         ]}
       >
-        {topics.length > 0 && (
+        {availableTopics.length > 0 && (
           <View style={styles.section}>
             <Text style={[styles.sectionLabel, { color: sectionLabelColor }]}>
               {t("topics").toUpperCase()}
@@ -153,7 +123,7 @@ export default function FilterModal({
                     borderColor: activeBg,
                   },
                 ]}
-                onPress={() => onSelectTopic(null)}
+                onPress={() => setSelectedTopic(null)}
               >
                 <Text
                   style={[
@@ -165,7 +135,7 @@ export default function FilterModal({
                   {t("allTopics")}
                 </Text>
               </TouchableOpacity>
-              {topics.map((topic) => (
+              {availableTopics.map((topic) => (
                 <TouchableOpacity
                   key={topic}
                   style={[
@@ -177,7 +147,7 @@ export default function FilterModal({
                     },
                   ]}
                   onPress={() =>
-                    onSelectTopic(selectedTopic === topic ? null : topic)
+                    setSelectedTopic(selectedTopic === topic ? null : topic)
                   }
                 >
                   <Text
@@ -195,7 +165,7 @@ export default function FilterModal({
           </View>
         )}
 
-        {authors.length > 0 && (
+        {availableAuthors.length > 0 && (
           <View style={styles.section}>
             <Text style={[styles.sectionLabel, { color: sectionLabelColor }]}>
               {t("authors").toUpperCase()}
@@ -210,7 +180,7 @@ export default function FilterModal({
                     borderColor: activeBg,
                   },
                 ]}
-                onPress={() => onSelectAuthor(null)}
+                onPress={() => setSelectedAuthor(null)}
               >
                 <Text
                   style={[
@@ -222,7 +192,7 @@ export default function FilterModal({
                   {t("allAuthors")}
                 </Text>
               </TouchableOpacity>
-              {authors.map((author) => (
+              {availableAuthors.map((author) => (
                 <TouchableOpacity
                   key={author}
                   style={[
@@ -234,7 +204,7 @@ export default function FilterModal({
                     },
                   ]}
                   onPress={() =>
-                    onSelectAuthor(selectedAuthor === author ? null : author)
+                    setSelectedAuthor(selectedAuthor === author ? null : author)
                   }
                 >
                   <Text
@@ -266,7 +236,7 @@ export default function FilterModal({
                   borderColor: activeBg,
                 },
               ]}
-              onPress={() => onSelectLanguage(null)}
+              onPress={() => setSelectedLanguage(null)}
             >
               <Text
                 style={[
@@ -289,7 +259,7 @@ export default function FilterModal({
                     borderColor: activeBg,
                   },
                 ]}
-                onPress={() => onSelectLanguage(language)}
+                onPress={() => setSelectedLanguage(language)}
               >
                 <Text
                   style={[
@@ -308,11 +278,7 @@ export default function FilterModal({
         {hasActiveFilters && (
           <TouchableOpacity
             style={styles.clearBtn}
-            onPress={() => {
-              onSelectTopic(null);
-              onSelectAuthor(null);
-              onSelectLanguage(defaultLanguage);
-            }}
+            onPress={() => resetFilters(lang)}
           >
             <Ionicons
               name="refresh-outline"
@@ -323,12 +289,16 @@ export default function FilterModal({
             <Text style={styles.clearBtnText}>{t("resetFilters")}</Text>
           </TouchableOpacity>
         )}
-      </BottomSheetScrollView>
-    </BottomSheetModal>
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  sheetRoot: {
+    flex: 1,
+    overflow: "hidden",
+  },
   panelHeader: {
     flexDirection: "row",
     alignItems: "center",
@@ -343,7 +313,6 @@ const styles = StyleSheet.create({
   panelTitle: {
     fontSize: 18,
     fontWeight: "700",
-    letterSpacing: -0.3,
   },
   closeBtn: {
     width: 32,

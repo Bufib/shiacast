@@ -114,8 +114,14 @@ export function useVideoFilters({
     refetchOnWindowFocus: false,
   });
 
-  const allTopics = query.data?.topics ?? [];
-  const allAuthors = query.data?.authors ?? [];
+  const allTopics = useMemo(
+    () => query.data?.topics ?? [],
+    [query.data?.topics],
+  );
+  const allAuthors = useMemo(
+    () => query.data?.authors ?? [],
+    [query.data?.authors],
+  );
   const pairs = query.data?.pairs;
 
   // Abhängige Filter (Topic↔Author) funktionieren nur exakt, wenn wir die

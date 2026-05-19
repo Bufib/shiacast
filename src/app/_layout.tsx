@@ -1,14 +1,8 @@
 import "react-native-reanimated";
 import "../../utils/i18n";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import {
-  Appearance,
-  Platform,
-  StyleSheet,
-  View,
-} from "react-native";
+import { Appearance, Platform, StyleSheet, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { MenuProvider } from "react-native-popup-menu";
 import Toast from "react-native-toast-message";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -37,10 +31,43 @@ import { useColorScheme } from "../hooks/useColorScheme";
 import { useConnectionStatus } from "../hooks/useConnectionStatus";
 import { usePushNotifications } from "../hooks/usePushNotifications";
 import { useFontSizeStore } from "../../stores/fontSizeStore";
+import { useVideoFavoriteFoldersStore } from "../../stores/videoFavoriteFoldersStore";
 
 void SplashScreen.preventAutoHideAsync().catch(() => {});
 
 const queryClient = new QueryClient();
+
+const favoriteFolderSheetOptions = {
+  headerShown: false,
+  presentation: "formSheet" as const,
+  sheetAllowedDetents: [0.55, 0.8],
+  sheetInitialDetentIndex: 0,
+  sheetGrabberVisible: true,
+  sheetCornerRadius: 24,
+  gestureEnabled: true,
+  contentStyle: { backgroundColor: "transparent" },
+  webModalStyle: {
+    width: 560,
+    minHeight: "55%",
+    height: "80%",
+  },
+};
+
+const filterSheetOptions = {
+  headerShown: false,
+  presentation: "formSheet" as const,
+  sheetAllowedDetents: [0.75, 0.9],
+  sheetInitialDetentIndex: 0,
+  sheetGrabberVisible: true,
+  sheetCornerRadius: 24,
+  gestureEnabled: true,
+  contentStyle: { backgroundColor: "transparent" },
+  webModalStyle: {
+    width: 640,
+    minHeight: "75%",
+    height: "90%",
+  },
+};
 
 function useAllStoresHydrated() {
   const [hydrated, setHydrated] = useState(() => {
@@ -48,7 +75,8 @@ function useAllStoresHydrated() {
       useFontSizeStore.persist.hasHydrated() &&
       useNotificationStore.persist.hasHydrated() &&
       useVideoFinishedStore.persist.hasHydrated() &&
-      useVideoWatchedStore.persist.hasHydrated()
+      useVideoWatchedStore.persist.hasHydrated() &&
+      useVideoFavoriteFoldersStore.persist.hasHydrated()
     );
   });
 
@@ -60,6 +88,7 @@ function useAllStoresHydrated() {
       useNotificationStore,
       useVideoFinishedStore,
       useVideoWatchedStore,
+      useVideoFavoriteFoldersStore,
     ];
 
     const checkHydration = () => {
@@ -177,13 +206,11 @@ function AppContent() {
         <ThemeProvider
           value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
         >
-          <StatusBar style="auto" />
-
+          <StatusBar style={"auto"} />
           <ErrorBoundary>
-          <MenuProvider>
-            <QueryClientProvider client={queryClient}>
-              <SupabaseRealtimeProvider>
-                <BottomSheetModalProvider>
+            <MenuProvider>
+              <QueryClientProvider client={queryClient}>
+                <SupabaseRealtimeProvider>
                   <Stack
                     screenOptions={{
                       headerShown: false,
@@ -193,6 +220,14 @@ function AppContent() {
                     <Stack.Screen name="index" />
                     <Stack.Screen name="(tabs)" />
                     <Stack.Screen name="(podcast)" />
+                    <Stack.Screen
+                      name="favorite-folders"
+                      options={favoriteFolderSheetOptions}
+                    />
+                    <Stack.Screen
+                      name="video-filters"
+                      options={filterSheetOptions}
+                    />
                     <Stack.Screen
                       name="+not-found"
                       options={{ headerShown: true }}
@@ -215,10 +250,9 @@ function AppContent() {
                   )}
 
                   <ForceUpdateGate />
-                </BottomSheetModalProvider>
-              </SupabaseRealtimeProvider>
-            </QueryClientProvider>
-          </MenuProvider>
+                </SupabaseRealtimeProvider>
+              </QueryClientProvider>
+            </MenuProvider>
           </ErrorBoundary>
 
           <Toast />

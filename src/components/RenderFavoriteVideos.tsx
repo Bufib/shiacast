@@ -14,11 +14,12 @@ import { useTranslation } from "react-i18next";
 import {
   Alert,
   Animated,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -38,27 +39,22 @@ export default function RenderFavoriteVideos() {
   const removeFolder = useVideoFavoriteFoldersStore((s) => s.removeFolder);
 
   const handleDeleteFolder = (folderId: string, folderName: string) => {
-    Alert.alert(
-      t("confirm"),
-      `"${folderName}"`,
-      [
-        { text: t("back"), style: "cancel" },
-        {
-          text: t("remove"),
-          style: "destructive",
-          onPress: () => {
-            removeFolder(folderId);
-            if (selectedFolderId === folderId) setSelectedFolderId(null);
-            if (folders.length <= 1) setIsEditingFolders(false);
-          },
+    Alert.alert(t("confirm"), `"${folderName}"`, [
+      { text: t("back"), style: "cancel" },
+      {
+        text: t("remove"),
+        style: "destructive",
+        onPress: () => {
+          removeFolder(folderId);
+          if (selectedFolderId === folderId) setSelectedFolderId(null);
+          if (folders.length <= 1) setIsEditingFolders(false);
         },
-      ],
-    );
+      },
+    ]);
   };
 
   const allFavoriteIds = useMemo(
-    () =>
-      favorites.filter((f) => f.folderIds.length > 0).map((f) => f.videoId),
+    () => favorites.filter((f) => f.folderIds.length > 0).map((f) => f.videoId),
     [favorites],
   );
 
@@ -75,119 +71,128 @@ export default function RenderFavoriteVideos() {
     isError,
   } = useVideosByIdsForFavorites({ ids: filteredIds, language: lang });
 
-  const folderBar = folders.length > 0 ? (
-    <View style={styles.folderBarRow}>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={[
-          styles.folderBarContent,
-          { flexDirection: rtl ? "row-reverse" : "row" },
-        ]}
-        style={styles.folderBarScroll}
-      >
-      {/* "All" chip */}
-      <TouchableOpacity
-        onPress={() => setSelectedFolderId(null)}
-        style={[
-          styles.chip,
-          {
-            backgroundColor: !selectedFolderId
-              ? Colors.universal.primary
-              : colors.contrast,
-            borderColor: !selectedFolderId
-              ? Colors.universal.primary
-              : colors.tabIconDefault + "40",
-          },
-        ]}
-        activeOpacity={0.75}
-      >
-        <Text
-          style={[
-            styles.chipText,
-            { color: !selectedFolderId ? "#fff" : colors.text },
+  const folderBar =
+    folders.length > 0 ? (
+      <View style={styles.folderBarRow}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={[
+            styles.folderBarContent,
+            { flexDirection: rtl ? "row-reverse" : "row" },
           ]}
+          style={styles.folderBarScroll}
         >
-          {t("all")}
-        </Text>
-      </TouchableOpacity>
-
-      {folders.map((folder) => {
-        const isSelected = selectedFolderId === folder.id;
-        return (
-          <View
-            key={folder.id}
-            style={[styles.chipWrapper, isEditingFolders && styles.chipWrapperEditing]}
+          {/* "All" chip */}
+          <TouchableOpacity
+            onPress={() => setSelectedFolderId(null)}
+            style={[
+              styles.chip,
+              {
+                backgroundColor: !selectedFolderId
+                  ? Colors.universal.primary
+                  : colors.contrast,
+                borderColor: !selectedFolderId
+                  ? Colors.universal.primary
+                  : colors.tabIconDefault + "40",
+              },
+            ]}
+            activeOpacity={0.75}
           >
-            <TouchableOpacity
-              onPress={() =>
-                setSelectedFolderId(isSelected ? null : folder.id)
-              }
+            <Text
               style={[
-                styles.chip,
-                {
-                  backgroundColor: isSelected ? folder.color : colors.contrast,
-                  borderColor: isSelected
-                    ? folder.color
-                    : colors.tabIconDefault + "40",
-                },
+                styles.chipText,
+                { color: !selectedFolderId ? "#fff" : colors.text },
               ]}
-              activeOpacity={0.75}
             >
+              {t("all")}
+            </Text>
+          </TouchableOpacity>
+
+          {folders.map((folder) => {
+            const isSelected = selectedFolderId === folder.id;
+            return (
               <View
+                key={folder.id}
                 style={[
-                  styles.chipDot,
-                  { backgroundColor: isSelected ? "#fff" : folder.color },
+                  styles.chipWrapper,
+                  isEditingFolders && styles.chipWrapperEditing,
                 ]}
-              />
-              <Text
-                style={[
-                  styles.chipText,
-                  { color: isSelected ? "#fff" : colors.text },
-                ]}
-                numberOfLines={1}
               >
-                {folder.name}
-              </Text>
-            </TouchableOpacity>
-            {isEditingFolders && (
-              <TouchableOpacity
-                onPress={() => handleDeleteFolder(folder.id, folder.name)}
-                hitSlop={8}
-                style={styles.chipDeleteBadge}
-              >
-                <View style={styles.chipDeleteBadgeInner}>
-                  <Ionicons name="close" size={10} color="#fff" />
-                </View>
-              </TouchableOpacity>
-            )}
-          </View>
-        );
-      })}
-      </ScrollView>
-      <TouchableOpacity
-        onPress={() => setIsEditingFolders((v) => !v)}
-        style={styles.editFoldersBtn}
-        hitSlop={8}
-      >
-        <Ionicons
-          name={isEditingFolders ? "checkmark" : "create-outline"}
-          size={18}
-          color={Colors.universal.primary}
-        />
-      </TouchableOpacity>
-    </View>
-  ) : null;
+                <TouchableOpacity
+                  onPress={() =>
+                    setSelectedFolderId(isSelected ? null : folder.id)
+                  }
+                  style={[
+                    styles.chip,
+                    {
+                      backgroundColor: isSelected
+                        ? folder.color
+                        : colors.contrast,
+                      borderColor: isSelected
+                        ? folder.color
+                        : colors.tabIconDefault + "40",
+                    },
+                  ]}
+                  activeOpacity={0.75}
+                >
+                  <View
+                    style={[
+                      styles.chipDot,
+                      { backgroundColor: isSelected ? "#fff" : folder.color },
+                    ]}
+                  />
+                  <Text
+                    style={[
+                      styles.chipText,
+                      { color: isSelected ? "#fff" : colors.text },
+                    ]}
+                    numberOfLines={1}
+                  >
+                    {folder.name}
+                  </Text>
+                </TouchableOpacity>
+                {isEditingFolders && (
+                  <TouchableOpacity
+                    onPress={() => handleDeleteFolder(folder.id, folder.name)}
+                    hitSlop={8}
+                    style={styles.chipDeleteBadge}
+                  >
+                    <View style={styles.chipDeleteBadgeInner}>
+                      <Ionicons name="close" size={15} color="#fff" />
+                    </View>
+                  </TouchableOpacity>
+                )}
+              </View>
+            );
+          })}
+        </ScrollView>
+      </View>
+    ) : null;
 
   const renderHeader = () => (
     <View>
       <View
         style={[
           styles.titleRow,
-          { flexDirection: rtl ? "row-reverse" : "row" },
+          {
+            flexDirection: rtl ? "row-reverse" : "row",
+            justifyContent: "space-between",
+          },
         ]}
       >
         <ThemedText type="title">{t("favorites")}</ThemedText>
+        <TouchableOpacity
+          onPress={() => setIsEditingFolders((v) => !v)}
+          style={styles.editFoldersBtn}
+          hitSlop={8}
+        >
+          <Ionicons
+            name={isEditingFolders ? "checkmark" : "create-outline"}
+            size={30}
+            color={Colors.universal.primary}
+          />
+        </TouchableOpacity>
       </View>
       {folderBar}
     </View>
@@ -226,8 +231,11 @@ export default function RenderFavoriteVideos() {
           opacity: fadeAnim,
           backgroundColor: colors.background,
           paddingTop: insets.top,
-          paddingBottom: insets.bottom,
         },
+        // Platform.OS === "ios" &&
+        //   parseInt(Platform.Version, 10) >= 26 && {
+        //     paddingBottom: insets.bottom,
+        //   },
       ]}
     >
       <VideoGridList
@@ -249,9 +257,9 @@ const styles = StyleSheet.create({
   },
 
   titleRow: {
-    paddingHorizontal: 16,
     paddingTop: 10,
     paddingBottom: 8,
+    marginBottom: 10,
   },
 
   folderBar: {
@@ -259,8 +267,7 @@ const styles = StyleSheet.create({
   },
 
   folderBarContent: {
-    paddingHorizontal: 16,
-    gap: 8,
+    gap: 10,
   },
 
   chip: {
@@ -289,16 +296,13 @@ const styles = StyleSheet.create({
     position: "relative",
   },
 
-  chipWrapperEditing: {
-    marginTop: 8,
-    marginRight: 6,
-  },
+  chipWrapperEditing: {},
 
   chipDeleteBadge: {
     position: "absolute",
-    top: -8,
-    right: -8,
-    zIndex: 10,
+    top: 0,
+    right: -5,
+    zIndex: 99,
   },
 
   chipDeleteBadgeInner: {
@@ -315,17 +319,15 @@ const styles = StyleSheet.create({
   folderBarRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 12,
+    marginBottom: 10,
+    padding: 10,
   },
 
   folderBarScroll: {
     flex: 1,
   },
 
-  editFoldersBtn: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-  },
+  editFoldersBtn: {},
 
   editFoldersBtnText: {
     fontSize: 13,

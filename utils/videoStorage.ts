@@ -18,13 +18,22 @@ function getPublicImageUrl(filename: string): string {
   return data.publicUrl;
 }
 
+function getImageCacheKey(filename: string): string {
+  return `${IMAGE_BUCKET}:${cleanBucketPath(filename, IMAGE_BUCKET)}`;
+}
+
 export function attachVideoImageUrls<
   T extends { image_filename?: string | null },
->(videos: T[]): (T & { image_url: string | null })[] {
+>(
+  videos: T[],
+): (T & { image_url: string | null; image_cache_key: string | null })[] {
   return videos.map((video) => ({
     ...video,
     image_url: video.image_filename
       ? getPublicImageUrl(video.image_filename)
+      : null,
+    image_cache_key: video.image_filename
+      ? getImageCacheKey(video.image_filename)
       : null,
   }));
 }

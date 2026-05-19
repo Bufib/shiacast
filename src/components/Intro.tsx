@@ -73,8 +73,6 @@ export default function IntroVideo({ source, onComplete }: IntroVideoProps) {
 
   return (
     <View style={styles.container}>
-      <StatusBar hidden />
-
       <VideoView
         player={player}
         style={styles.video}

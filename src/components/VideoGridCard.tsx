@@ -15,17 +15,12 @@ import { formatDate } from "../../utils/formatDate";
 import { getYoutubeVideoId, parseYoutubeTime } from "../../utils/youtube";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
+import { router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
-} from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Toast from "react-native-toast-message";
-import VideoFavoriteFolderModal from "@/components/VideoFavoriteFolderModal";
 import { useVideoFavoriteFoldersStore } from "../../stores/videoFavoriteFoldersStore";
 
 type Props = VideoGridCardType;
@@ -64,7 +59,6 @@ export default function VideoGridCard({
   const videoId = useMemo(() => getYoutubeVideoId(videoUrl), [videoUrl]);
 
   const playerHeight = Math.round(width * PLAYER_ASPECT_RATIO);
-  const hasCover = Boolean(video.image_url);
 
   // Deterministischer Gradient pro Video-ID. Wenn der Aufrufer einen eigenen
   // gradientColors-Prop übergibt, hat dieser Vorrang.
@@ -126,7 +120,6 @@ export default function VideoGridCard({
     s.isVideoFavorited(video.id),
   );
 
-  const [folderModalVisible, setFolderModalVisible] = useState(false);
   const [hasVideoError, setHasVideoError] = useState(false);
 
   // Lazy-Mount: Player erst nach Tap montieren – spart RAM/CPU bei langen Listen.
@@ -143,8 +136,11 @@ export default function VideoGridCard({
   }, [isPlaying]);
 
   const onPressToggleFavorite = useCallback(() => {
-    setFolderModalVisible(true);
-  }, []);
+    router.push({
+      pathname: "/favorite-folders",
+      params: { videoId: String(video.id) },
+    });
+  }, [video.id]);
 
   const onPressToggleWatched = useCallback(() => {
     const willBeWatched = !isWatched;
@@ -210,80 +206,64 @@ export default function VideoGridCard({
     ? `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`
     : null;
 
-  return (
-    <>
-      <VideoFavoriteFolderModal
-        videoId={video.id}
-        visible={folderModalVisible}
-        onClose={() => setFolderModalVisible(false)}
-      />
+  const coverImageSource = useMemo(() => {
+    if (!video.image_url) return null;
 
-      <View style={[styles.cardShadow, { width }]}>
-        <View style={[styles.card, { backgroundColor: colors.contrast }]}>
-          {videoId && !hasVideoError ? (
-            playerMounted ? (
-              <View style={[styles.playerClip, { height: playerHeight }]}>
-                <YoutubeVideoPlayer
-                  key={playerKey}
-                  height={playerHeight}
-                  width={width}
-                  play={isPlaying}
-                  videoId={videoId}
-                  initialPlayerParams={initialPlayerParams}
-                  onChangeState={onStateChange}
-                  onError={() => setHasVideoError(true)}
-                />
-              </View>
-            ) : (
-              <TouchableOpacity
-                accessibilityRole="button"
-                accessibilityLabel={t("playVideo")}
-                activeOpacity={0.9}
-                onPress={onPressPlay}
-                style={[styles.playerClip, { height: playerHeight }]}
-              >
-                {thumbnailUrl ? (
-                  <Image
-                    source={{ uri: thumbnailUrl }}
-                    style={StyleSheet.absoluteFill}
-                    contentFit="cover"
-                    transition={150}
-                  />
-                ) : (
-                  <View
-                    style={[
-                      StyleSheet.absoluteFill,
-                      { backgroundColor: "#000" },
-                    ]}
-                  />
-                )}
-                <View style={styles.thumbnailOverlay} />
-                <View style={styles.playButtonWrapper}>
-                  <Ionicons name="play-circle" size={70} color="#FFFFFF" />
-                </View>
-              </TouchableOpacity>
-            )
+    return {
+      uri: video.image_url,
+      cacheKey:
+        video.image_cache_key ??
+        `video-cover:${video.image_filename ?? video.id}`,
+    };
+  }, [video.id, video.image_cache_key, video.image_filename, video.image_url]);
+
+  const thumbnailImageSource = useMemo(() => {
+    if (!thumbnailUrl || !videoId) return null;
+
+    return {
+      uri: thumbnailUrl,
+      cacheKey: `youtube-thumbnail:${videoId}:hqdefault`,
+    };
+  }, [thumbnailUrl, videoId]);
+
+  return (
+    <View style={[styles.cardShadow, { width }, isWatched && {}]}>
+      <View style={[styles.card, { backgroundColor: colors.contrast }]}>
+        {videoId && !hasVideoError ? (
+          playerMounted ? (
+            <View style={[styles.playerClip, { height: playerHeight }]}>
+              <YoutubeVideoPlayer
+                key={playerKey}
+                height={playerHeight}
+                width={width}
+                play={isPlaying}
+                videoId={videoId}
+                initialPlayerParams={initialPlayerParams}
+                onChangeState={onStateChange}
+                onError={() => setHasVideoError(true)}
+              />
+            </View>
           ) : (
-            <View style={[styles.videoFallback, { height: playerHeight }]}>
-              {hasCover ? (
-                <>
-                  <Image
-                    source={{ uri: video.image_url! }}
-                    style={StyleSheet.absoluteFill}
-                    contentFit="cover"
-                  />
-                  <LinearGradient
-                    colors={[
-                      "rgba(0,0,0,0.15)",
-                      "rgba(0,0,0,0.45)",
-                      "rgba(0,0,0,0.85)",
-                    ]}
-                    locations={[0, 0.55, 1]}
-                    style={StyleSheet.absoluteFill}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 0, y: 1 }}
-                  />
-                </>
+            <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel={t("playVideo")}
+              activeOpacity={0.9}
+              onPress={onPressPlay}
+              style={[
+                styles.playerClip,
+                { height: playerHeight },
+                isWatched && { opacity: 0.7 },
+              ]}
+            >
+              {coverImageSource ? (
+                <Image
+                  source={coverImageSource}
+                  style={StyleSheet.absoluteFill}
+                  contentFit="cover"
+                  cachePolicy="memory-disk"
+                  priority="high"
+                  recyclingKey={coverImageSource.cacheKey}
+                />
               ) : (
                 <LinearGradient
                   style={StyleSheet.absoluteFill}
@@ -293,121 +273,163 @@ export default function VideoGridCard({
                 />
               )}
 
-              <View style={styles.fallbackContent}>
-                <Ionicons name="logo-youtube" size={34} color="#FFFFFF" />
-                <Text style={styles.fallbackText}>{t("videoUnavailable")}</Text>
+              {thumbnailImageSource && (
+                <Image
+                  source={thumbnailImageSource}
+                  placeholder={coverImageSource ?? undefined}
+                  placeholderContentFit="cover"
+                  style={StyleSheet.absoluteFill}
+                  contentFit="cover"
+                  cachePolicy="memory-disk"
+                  priority={coverImageSource ? "low" : "normal"}
+                  transition={coverImageSource ? 250 : 150}
+                  recyclingKey={thumbnailImageSource.cacheKey}
+                />
+              )}
+              <View style={styles.thumbnailOverlay} />
+              <View style={styles.playButtonWrapper}>
+                <Ionicons name="play-circle" size={70} color="#FFFFFF" />
               </View>
-            </View>
-          )}
-
-          <View style={styles.content}>
-            <View
-              style={[
-                styles.titleRow,
-                { flexDirection: rtl ? "row-reverse" : "row" },
-              ]}
-            >
-              <View style={styles.titleContainer}>
-                <View
-                  style={[
-                    styles.titleLine,
-                    { flexDirection: rtl ? "row-reverse" : "row" },
+            </TouchableOpacity>
+          )
+        ) : (
+          <View style={[styles.videoFallback, { height: playerHeight }]}>
+            {coverImageSource ? (
+              <>
+                <Image
+                  source={coverImageSource}
+                  style={StyleSheet.absoluteFill}
+                  contentFit="cover"
+                  cachePolicy="memory-disk"
+                  priority="high"
+                  recyclingKey={coverImageSource.cacheKey}
+                />
+                <LinearGradient
+                  colors={[
+                    "rgba(0,0,0,0.15)",
+                    "rgba(0,0,0,0.45)",
+                    "rgba(0,0,0,0.85)",
                   ]}
-                >
-                  {isWatched && (
-                    <View
-                      style={[
-                        styles.watchedBadge,
-                        { backgroundColor: Colors.universal.primary },
-                      ]}
-                    >
-                      <Ionicons name="eye" size={11} color="#fff" />
-                    </View>
-                  )}
-                  <Text
-                    style={[
-                      styles.cardTitle,
-                      {
-                        color: colors.text,
-                        textAlign: rtl ? "right" : "left",
-                        writingDirection: rtl ? "rtl" : "ltr",
-                        flex: 1,
-                      },
-                    ]}
-                    numberOfLines={2}
-                    ellipsizeMode="tail"
-                  >
-                    {video.title}
-                  </Text>
-                </View>
+                  locations={[0, 0.55, 1]}
+                  style={StyleSheet.absoluteFill}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 0, y: 1 }}
+                />
+              </>
+            ) : (
+              <LinearGradient
+                style={StyleSheet.absoluteFill}
+                colors={effectiveGradient as any}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+              />
+            )}
 
+            <View style={styles.fallbackContent}>
+              <Ionicons name="logo-youtube" size={34} color="#FFFFFF" />
+              <Text style={styles.fallbackText}>{t("videoUnavailable")}</Text>
+            </View>
+          </View>
+        )}
+
+        <View style={[styles.content]}>
+          <View
+            style={[
+              styles.titleRow,
+              { flexDirection: rtl ? "row-reverse" : "row" },
+              isWatched && { opacity: 0.7 },
+            ]}
+          >
+            <View style={styles.titleContainer}>
+              <View
+                style={[
+                  styles.titleLine,
+                  { flexDirection: rtl ? "row-reverse" : "row" },
+                ]}
+              >
                 <Text
                   style={[
-                    styles.createdAt,
+                    styles.cardTitle,
                     {
-                      color: colors.tabIconDefault,
+                      color: colors.text,
                       textAlign: rtl ? "right" : "left",
                       writingDirection: rtl ? "rtl" : "ltr",
+                      flex: 1,
                     },
                   ]}
-                  numberOfLines={1}
+                  numberOfLines={2}
+                  ellipsizeMode="tail"
                 >
-                  {formattedDate}
+                  {video.title}
                 </Text>
               </View>
 
-              <TouchableOpacity
-                onPress={onPressToggleFavorite}
-                style={styles.iconButton}
-                activeOpacity={0.7}
-                hitSlop={8}
-              >
-                <Ionicons
-                  name={isFavorite ? "heart" : "heart-outline"}
-                  size={30}
-                  color={isFavorite ? Colors[colorScheme].error : colors.text}
-                />
-              </TouchableOpacity>
-            </View>
-
-            <View
-              style={[
-                styles.actionsRow,
-                { flexDirection: rtl ? "row-reverse" : "row" },
-              ]}
-            >
-              <TouchableOpacity
-                onPress={onPressToggleWatched}
+              <Text
                 style={[
-                  styles.statusButton,
+                  styles.createdAt,
                   {
-                    backgroundColor: isWatched
-                      ? Colors.universal.primary
-                      : colors.background,
+                    color: colors.tabIconDefault,
+                    textAlign: rtl ? "right" : "left",
+                    writingDirection: rtl ? "rtl" : "ltr",
                   },
                 ]}
-                activeOpacity={0.75}
+                numberOfLines={1}
               >
-                <Ionicons
-                  name={isWatched ? "eye" : "eye-outline"}
-                  size={18}
-                  color={isWatched ? "#FFFFFF" : colors.text}
-                />
-                <Text
-                  numberOfLines={1}
-                  style={[
-                    styles.statusButtonText,
-                    { color: isWatched ? "#FFFFFF" : colors.text },
-                  ]}
-                >
-                  {t("watched")}
-                </Text>
-              </TouchableOpacity>
+                {formattedDate}
+              </Text>
             </View>
+
+            <TouchableOpacity
+              onPress={onPressToggleFavorite}
+              style={styles.iconButton}
+              activeOpacity={0.7}
+              hitSlop={8}
+            >
+              <Ionicons
+                name={isFavorite ? "heart" : "heart-outline"}
+                size={30}
+                color={isFavorite ? Colors[colorScheme].error : colors.text}
+              />
+            </TouchableOpacity>
+          </View>
+
+          <View
+            style={[
+              styles.actionsRow,
+              { flexDirection: rtl ? "row-reverse" : "row" },
+            ]}
+          >
+            <TouchableOpacity
+              onPress={onPressToggleWatched}
+              style={[
+                styles.statusButton,
+                {
+                  backgroundColor: isWatched
+                    ? Colors.universal.primary
+                    : colors.background,
+                },
+              ]}
+              activeOpacity={0.75}
+            >
+              <Ionicons
+                name={isWatched ? "eye" : "eye-outline"}
+                size={18}
+                color={isWatched ? "#FFFFFF" : colors.text}
+              />
+              <Text
+                numberOfLines={1}
+                style={[
+                  styles.statusButtonText,
+                  { color: isWatched ? "#FFFFFF" : colors.text },
+                ]}
+              >
+                {t("watched")}
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
       </View>
-    </>
+    </View>
   );
 }
 
