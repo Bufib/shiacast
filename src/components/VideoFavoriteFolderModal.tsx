@@ -199,7 +199,7 @@ export default function VideoFavoriteFolderModal({ videoId }: Props) {
                 onPress={() => setShowCreate(false)}
               >
                 <Text style={[styles.actionBtnText, { color: subTextColor }]}>
-                  {t("back")}
+                  {t("abort")}
                 </Text>
               </TouchableOpacity>
 
@@ -272,6 +272,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    paddingTop: 15,
     paddingHorizontal: 20,
     paddingBottom: 12,
     borderBottomWidth: 1,
@@ -309,6 +310,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     borderRadius: 12,
     borderWidth: 1,
+    gap: 10,
   },
 
   folderDot: {

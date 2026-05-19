@@ -56,6 +56,7 @@ const de = {
   noData: "Keine Daten vorhanden",
   feedback: "Feedback",
   loading: "Daten werden geladen",
+  abort: "Abbrechen",
 
   // Settings
   darkMode: "Dunkelmodus",

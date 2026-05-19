@@ -56,6 +56,7 @@ const en = {
   noData: "No data available",
   feedback: "Feedback",
   loading: "Loading data",
+  abort: "Cancel",
 
   // Settings
   darkMode: "Dark mode",

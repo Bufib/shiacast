@@ -56,6 +56,7 @@ const ar = {
   noData: "لا توجد بيانات",
   feedback: "ملاحظات",
   loading: "جارٍ تحميل البيانات",
+  abort: "يلغي",
 
   // Settings
   darkMode: "الوضع الداكن",
