@@ -31,11 +31,7 @@
       },
       "predictiveBackGestureEnabled": false,
       "package": "com.hadi_ea.shiacast",
-      "permissions": [
-        "android.permission.MODIFY_AUDIO_SETTINGS",
-        "android.permission.FOREGROUND_SERVICE",
-        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
-      ]
+      "permissions": []
     },
     "web": {
       "output": "static",
@@ -61,12 +57,6 @@
       "@react-native-community/datetimepicker",
       "expo-image",
       "expo-asset",
-      [
-        "expo-audio",
-        {
-          "enableBackgroundPlayback": true
-        }
-      ],
       "expo-localization",
       "expo-sharing",
       "expo-sqlite",

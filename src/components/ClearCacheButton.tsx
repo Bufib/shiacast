@@ -1,14 +1,20 @@
 import React, { useCallback, useState, useRef, useEffect } from "react";
-import { Alert, StyleSheet, Text, TouchableOpacity } from "react-native";
+import {
+  Alert,
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+} from "react-native";
 import * as FileSystem from "expo-file-system/legacy";
 import { useTranslation } from "react-i18next";
 import { useQueryClient } from "@tanstack/react-query";
 import { LoadingIndicator } from "./LoadingIndicator";
 import Toast from "react-native-toast-message";
-import { useGlobalPlayer } from "../../player/useGlobalPlayer";
-import { useLastPlayedPodcastStore } from "../../stores/useLastPlayedPodcastStore";
 
 async function clearAppCache(): Promise<void> {
+  if (Platform.OS === "web") return;
+
   const cacheDir = FileSystem.cacheDirectory;
   if (!cacheDir) return;
   const items = await FileSystem.readDirectoryAsync(cacheDir);
@@ -24,23 +30,13 @@ const ClearAppCacheButton: React.FC = () => {
   const [isClearing, setIsClearing] = useState(false);
   const isMountedRef = useRef(false);
   const queryClient = useQueryClient();
-  const { stopAndUnload } = useGlobalPlayer();
-  const clearLastPlayed = useLastPlayedPodcastStore((s) => s.clearStorage);
+
   useEffect(() => {
     isMountedRef.current = true;
     return () => {
       isMountedRef.current = false;
     };
   }, []);
-
-  useEffect(() => {
-    const queryKeys = queryClient
-      .getQueryCache()
-      .getAll()
-      .map((query) => query.queryKey);
-
-    console.log("All query keys:", queryKeys);
-  }, [queryClient]);
 
   const handlePress = useCallback(() => {
     Alert.alert(
@@ -55,16 +51,8 @@ const ClearAppCacheButton: React.FC = () => {
             try {
               setIsClearing(true);
 
-              // Stop and unload the global player
-              await stopAndUnload();
-
-              // Clear file system cache
               await clearAppCache();
 
-              // Clear last played
-              await clearLastPlayed();
-
-              // Clear React Query cache
               queryClient.clear();
 
               if (isMountedRef.current) {
@@ -86,7 +74,7 @@ const ClearAppCacheButton: React.FC = () => {
         },
       ],
     );
-  }, [t, queryClient, stopAndUnload, clearLastPlayed]);
+  }, [t, queryClient]);
 
   return (
     <TouchableOpacity

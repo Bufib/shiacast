@@ -9,20 +9,24 @@ import en from "../locales/en";
 
 const I18N_CACHE_KEY = "i18nextLng";
 
+const canUseBrowserStorage = () => typeof window !== "undefined";
+
 const languageDetector = {
   type: "languageDetector" as const,
   async: true as const,
 
   detect: (callback: (lng: string) => void): void => {
     (async () => {
-      try {
-        const cached = await AsyncStorage.getItem(I18N_CACHE_KEY);
-        if (cached) {
-          callback(cached);
-          return;
+      if (canUseBrowserStorage()) {
+        try {
+          const cached = await AsyncStorage.getItem(I18N_CACHE_KEY);
+          if (cached) {
+            callback(cached);
+            return;
+          }
+        } catch (e) {
+          console.warn("AsyncStorage getItem failed:", e);
         }
-      } catch (e) {
-        console.warn("AsyncStorage getItem failed:", e);
       }
 
       try {
@@ -40,6 +44,8 @@ const languageDetector = {
   },
 
   cacheUserLanguage: (lng: string): void => {
+    if (!canUseBrowserStorage()) return;
+
     AsyncStorage.setItem(I18N_CACHE_KEY, lng).catch((e) =>
       console.warn("AsyncStorage setItem failed:", e),
     );

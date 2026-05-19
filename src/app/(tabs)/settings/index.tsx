@@ -23,7 +23,6 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useDataVersionStore } from "../../../../stores/dataVersionStore";
 import ClearAppCacheButton from "@/components/ClearCacheButton";
 import FeedbackButton from "@/components/FeedbackButton";
 import { useScreenFadeIn } from "@/hooks/useScreenFadeIn";

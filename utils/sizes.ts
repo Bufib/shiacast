@@ -7,7 +7,6 @@ export const returnSize = (width: number, height: number): SizesType => {
   const isSmall = !isTablet && !isLarge && !isMedium; // SE, kleine Geräte
 
   return {
-    imageSizePodcastPlayer: isTablet ? 70 : isLarge ? 55 : isMedium ? 50 : 39,
     fontSize: isTablet ? 15 : isLarge ? 13 : isMedium ? 12 : 11,
     badgeSize: isTablet ? 14 : isLarge ? 12 : isMedium ? 10 : 9,
     iconSize: isTablet ? 75 : isLarge ? 65 : isMedium ? 55 : 50,

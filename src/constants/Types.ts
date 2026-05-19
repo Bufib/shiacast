@@ -20,7 +20,6 @@ export type LanguageType = {
 export type InternalLinkType = "questionLink" | "prayerLink" | "quranLink";
 
 export type SizesType = {
-  imageSizePodcastPlayer: number;
   fontSize: number;
   badgeSize: number;
   iconSize: number;
@@ -528,26 +527,29 @@ export type PodcastType = {
   id: number;
   title: string;
   description: string;
-  filename: string;
+  url?: string | null;
+  youtube_url?: string | null;
+  youtube_video_url?: string | null;
+  video_url?: string | null;
+  start?: string | number | null;
+  end?: string | number | null;
+  start_time?: string | number | null;
+  end_time?: string | number | null;
+  video_start?: string | number | null;
+  video_end?: string | number | null;
+  youtube_start?: string | number | null;
+  youtube_end?: string | number | null;
+  youtube_start_seconds?: string | number | null;
+  youtube_end_seconds?: string | number | null;
   language_code?: string;
   created_at: string;
   podcast_topic?: string;
   podcast_author?: string;
-  image_filename: string;
-  image_url: any
-};
-
-export type SavedProgress = {
-  position: number;
-  duration: number;
-  savedAt: number;
+  image_filename?: string | null;
+  image_url: string | null;
 };
 
 export type PodcastProps = {
-  podcast: PodcastType;
-};
-
-export type PodcastPlayerPropsType = {
   podcast: PodcastType;
 };
 
@@ -884,12 +886,38 @@ export type SectionItem =
       longLatin: string;
     };
 
-    export type PodcastGridCardType = {
-      podcast: PodcastType;
-      width: number;
-      rtl: boolean;
-      lang: string;
-      listenText: string;
-      gradientColors: readonly [string, string, ...string[]] | string[];
-    };
-    
+export type PodcastGridCardType = {
+  podcast: PodcastType;
+  width: number;
+  rtl: boolean;
+  lang: string;
+  gradientColors: readonly [string, string, ...string[]] | string[];
+  isPlaying?: boolean;
+  onRequestPlay?: () => void;
+  onStopPlaying?: () => void;
+};
+
+
+
+export type YoutubePlayerState =
+  | "unstarted"
+  | "ended"
+  | "playing"
+  | "paused"
+  | "buffering"
+  | "video cued";
+
+export type YoutubeVideoPlayerParams = {
+  start?: number;
+  end?: number;
+};
+
+export type YoutubeVideoPlayerProps = {
+  videoId: string;
+  width: number;
+  height: number;
+  play: boolean;
+  initialPlayerParams?: YoutubeVideoPlayerParams;
+  onChangeState?: (state: YoutubePlayerState | string) => void;
+  onError?: () => void;
+};

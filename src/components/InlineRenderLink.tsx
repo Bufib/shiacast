@@ -1,19 +1,12 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { StyleSheet, useColorScheme } from "react-native";
+import { StyleSheet } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { Colors } from "@/constants/Colors";
 import { useLanguage } from "../../contexts/LanguageContext";
 
 import handleOpenExternalUrl from "../../utils/handleOpenExternalUrl";
 import handleOpenInternalUrl from "../../utils/handleOpenInternalUrl";
-import { getQuestionInternalURL } from "../../db/queries/questions";
-import { getPrayerInternalURL } from "../../db/queries/prayers";
-import { getQuranInternalURL } from "../../db/queries/quran";
-import {
-  InternalLinkType,
-  LanguageCode,
-  QuranInternalResultType,
-} from "@/constants/Types";
+import { InternalLinkType } from "@/constants/Types";
 
 type InlineRenderLinkProps = {
   url: string;
@@ -66,36 +59,10 @@ const getExternalLabel = (url: string): string => {
   }
 };
 
-const buildQuranLabel = (
-  identifier: string,
-  q: Partial<QuranInternalResultType> | null | undefined,
-  lang: LanguageCode
-): string => {
-  const [suraStr] = identifier.split(":");
-  const sura = q?.sura ?? Number(suraStr);
-
-  let suraName: string | undefined;
-
-  if (lang === "ar") {
-    suraName = q?.sura_label_ar || q?.sura_label_en || q?.sura_label_de;
-  } else {
-    suraName = q?.sura_label_en || q?.sura_label_de || q?.sura_label_ar;
-  }
-
-  if (suraName && Number.isFinite(sura)) {
-    return `${suraName} (${sura})`;
-  }
-
-  if (suraName) return suraName;
-  if (Number.isFinite(sura)) return `Sura ${sura}`;
-
-  return identifier;
-};
-
 // Prevent ugly internal breaking like "An-\nNisaa"
 const makeLabelMoreStable = (value: string) => {
   return value
-    .replace(/-/g, "\u2011")   // non-breaking hyphen
+    .replace(/-/g, "\u2011")
     .replace(/\s/g, "\u00A0"); // non-breaking space
 };
 
@@ -105,7 +72,6 @@ const InlineRenderLink = ({
   isExternal,
   isDone = false,
 }: InlineRenderLinkProps) => {
-  const colorScheme = useColorScheme() || "light";
   const { rtl, lang } = useLanguage();
 
   const [label, setLabel] = useState<string>(
@@ -141,54 +107,19 @@ const InlineRenderLink = ({
     }
 
     const { type, identifier } = parsed;
-    let cancelled = false;
 
-    const load = async () => {
-      try {
-        if (type === "questionLink") {
-          const q = await getQuestionInternalURL(identifier, lang);
-          if (!cancelled) {
-            setLabel(q?.title || `Frage ${identifier}`);
-          }
-          return;
-        }
+    if (type === "questionLink") {
+      setLabel(`Frage ${identifier}`);
+      return;
+    }
 
-        if (type === "prayerLink") {
-          const p = await getPrayerInternalURL(identifier, lang);
-          if (!cancelled) {
-            setLabel(
-              (lang === "ar" && p?.arabic_title) ||
-                p?.name ||
-                `Gebet ${identifier}`
-            );
-          }
-          return;
-        }
+    if (type === "prayerLink") {
+      setLabel(`Gebet ${identifier}`);
+      return;
+    }
 
-        if (type === "quranLink") {
-          const q = await getQuranInternalURL(String(identifier), lang);
-          if (!cancelled) {
-            setLabel(
-              q
-                ? buildQuranLabel(String(identifier), q, lang)
-                : buildQuranLabel(String(identifier), {}, lang)
-            );
-          }
-        }
-      } catch (error) {
-        console.error("InlineRenderLink: failed to hydrate label", error);
-        if (!cancelled) {
-          setLabel(`Link ${index + 1}`);
-        }
-      }
-    };
-
-    load();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [url, lang, isExternal, index]);
+    setLabel(`Sura ${String(identifier).split(":")[0]}`);
+  }, [url, isExternal, index]);
 
   return (
     <ThemedText

@@ -25,8 +25,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLanguage } from "../../../../contexts/LanguageContext";
 import PodcastGridList from "@/components/PodcastGridList";
 import PodcastGridCardSkeleton from "@/components/PodcastGridCardSkeleton";
-import ContinueListeningCard from "@/components/ContinueListeningCard";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const PAGE_SIZE = 20;
 const GRID_GAP = 12;
@@ -134,7 +132,6 @@ export default function HomeScreen() {
 
   const renderHeader = () => (
     <View style={styles.headerWrapper}>
-      <ContinueListeningCard />
       <View
         style={[
           styles.sectionHeaderRow,

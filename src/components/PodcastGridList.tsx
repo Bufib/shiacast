@@ -138,23 +138,19 @@ import { LoadingIndicator } from "@/components/LoadingIndicator";
 import type { PodcastType } from "@/constants/Types";
 import { useGradient } from "@/hooks/useGradient";
 import { useLanguage } from "../../contexts/LanguageContext";
-import { router } from "expo-router";
-import React, { useCallback, useMemo } from "react";
-import { useTranslation } from "react-i18next";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   FlatList,
   type FlatListProps,
   type ListRenderItemInfo,
   StyleSheet,
-  TouchableOpacity,
   useWindowDimensions,
   View,
 } from "react-native";
 
-const GRID_GAP = 12;
+const GRID_GAP = 16;
 const HORIZONTAL_PADDING = 16;
-const NUM_COLUMNS = 2;
-const CARD_HEIGHT_RATIO = 1.35; // height relative to card width
+const NUM_COLUMNS = 1;
 
 type PodcastGridListProps = {
   podcasts: PodcastType[];
@@ -176,20 +172,21 @@ export default function PodcastGridList({
   onEndReached,
 }: PodcastGridListProps) {
   const { width } = useWindowDimensions();
-  const { t } = useTranslation();
   const { lang, rtl } = useLanguage();
   const { gradientColors } = useGradient();
+  const [activePodcastId, setActivePodcastId] = useState<number | null>(null);
 
-  // Math: 2 cols, GRID_GAP between them, HORIZONTAL_PADDING on each side.
   const cardWidth = useMemo(() => {
     const available =
       width - HORIZONTAL_PADDING * 2 - GRID_GAP * (NUM_COLUMNS - 1);
     return available / NUM_COLUMNS;
   }, [width]);
 
-  const cardHeight = useMemo(
-    () => Math.round(cardWidth * CARD_HEIGHT_RATIO),
-    [cardWidth],
+  const stopPlaying = useCallback(
+    (id: number) => {
+      setActivePodcastId((currentId) => (currentId === id ? null : currentId));
+    },
+    [setActivePodcastId],
   );
 
   const renderItem = useCallback(
@@ -204,29 +201,20 @@ export default function PodcastGridList({
             paddingBottom: GRID_GAP,
           }}
         >
-          <TouchableOpacity
-            activeOpacity={0.85}
-            onPress={() =>
-              router.push({
-                pathname: "/indexPodcast",
-                params: { id: String(item.id) },
-              })
-            }
-          >
-            <PodcastGridCard
-              podcast={item}
-              width={cardWidth}
-              height={cardHeight}
-              rtl={rtl}
-              lang={lang}
-              listenText={t("listen")}
-              gradientColors={gradientColors}
-            />
-          </TouchableOpacity>
+          <PodcastGridCard
+            podcast={item}
+            width={cardWidth}
+            rtl={rtl}
+            lang={lang}
+            gradientColors={gradientColors}
+            isPlaying={activePodcastId === item.id}
+            onRequestPlay={() => setActivePodcastId(item.id)}
+            onStopPlaying={() => stopPlaying(item.id)}
+          />
         </View>
       );
     },
-    [cardWidth, cardHeight, rtl, lang, t, gradientColors],
+    [activePodcastId, cardWidth, gradientColors, lang, rtl, stopPlaying],
   );
 
   return (
