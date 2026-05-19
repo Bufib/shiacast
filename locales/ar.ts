@@ -19,6 +19,7 @@ const ar = {
   allAuthors: "كل المؤلفين",
   allLanguages: "كل اللغات",
   topics: "المواضيع",
+  uncategorizedTopic: "بدون موضوع",
   authors: "المؤلفون",
   filter: "تصفية",
   resetFilters: "إعادة تعيين التصفية",

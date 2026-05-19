@@ -14,7 +14,6 @@ import { useTranslation } from "react-i18next";
 import {
   Alert,
   Animated,
-  Platform,
   ScrollView,
   StyleSheet,
   Text,

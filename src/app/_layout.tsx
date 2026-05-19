@@ -33,7 +33,9 @@ import { usePushNotifications } from "../hooks/usePushNotifications";
 import { useFontSizeStore } from "../../stores/fontSizeStore";
 import { useVideoFavoriteFoldersStore } from "../../stores/videoFavoriteFoldersStore";
 
-void SplashScreen.preventAutoHideAsync().catch(() => {});
+if (Platform.OS !== "web") {
+  void SplashScreen.preventAutoHideAsync().catch(() => {});
+}
 
 const queryClient = new QueryClient();
 

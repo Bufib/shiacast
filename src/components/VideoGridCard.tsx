@@ -517,6 +517,7 @@ const styles = StyleSheet.create({
   },
 
   cardTitle: {
+    minHeight: 42,
     fontSize: 16,
     fontWeight: "900",
     lineHeight: 21,

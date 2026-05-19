@@ -3,9 +3,9 @@ import {
   View,
   StyleSheet,
   Pressable,
-  StatusBar,
   Dimensions,
   ActivityIndicator,
+  Platform,
 } from "react-native";
 import { VideoView, useVideoPlayer } from "expo-video";
 import { useEvent } from "expo";
@@ -25,9 +25,16 @@ interface IntroVideoProps {
 }
 
 export function useIntroVideo() {
-  const [hasPlayed, setHasPlayed] = useState<boolean | null>(null); // null = loading
+  const [hasPlayed, setHasPlayed] = useState<boolean | null>(
+    Platform.OS === "web" ? true : null,
+  ); // null = loading
 
   useEffect(() => {
+    if (Platform.OS === "web") {
+      setHasPlayed(true);
+      return;
+    }
+
     AsyncStorage.getItem(INTRO_VIDEO_KEY).then((value) => {
       setHasPlayed(value === "true");
     });

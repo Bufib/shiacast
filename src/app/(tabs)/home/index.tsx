@@ -451,6 +451,9 @@ export default function HomeScreen() {
       <Animated.View style={{ flex: 1, opacity: listOpacity }}>
         <VideoGridList
           videos={videos}
+          layout={
+            hasActiveSearch || activeFilterCount > 0 ? "grid" : "topicRows"
+          }
           ListHeaderComponent={renderHeader}
           ListEmptyComponent={renderEmpty}
           refreshing={isManualRefreshing}

@@ -20,6 +20,7 @@ const STORE_URLS = {
 };
 
 const REQUIRED_VERSION_CACHE_KEY = "required_app_version";
+const VERSION_CHECK_TIMEOUT_MS = 5000;
 
 function getInstalledVersion(): string {
   const fromExpo = Constants.expoConfig?.version;
@@ -27,7 +28,28 @@ function getInstalledVersion(): string {
   return (fromExpo ?? fromNative ?? "0.0.0").trim();
 }
 
+function withTimeout<T>(promise: PromiseLike<T>, ms: number): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      reject(new Error("Version check timed out"));
+    }, ms);
+
+    Promise.resolve(promise)
+      .then(resolve)
+      .catch(reject)
+      .finally(() => clearTimeout(timeout));
+  });
+}
+
 export default function ForceUpdateGate() {
+  if (Platform.OS === "web") {
+    return null;
+  }
+
+  return <NativeForceUpdateGate />;
+}
+
+function NativeForceUpdateGate() {
   const { t } = useTranslation();
   const [status, setStatus] = useState<"checking" | "ok" | "needsUpdate">(
     "checking",
@@ -45,10 +67,10 @@ export default function ForceUpdateGate() {
       const installedVersion = getInstalledVersion();
 
       try {
-        const { data, error } = await supabase
-          .from("versions")
-          .select("app_version")
-          .single();
+        const { data, error } = await withTimeout(
+          supabase.from("versions").select("app_version").single(),
+          VERSION_CHECK_TIMEOUT_MS,
+        );
 
         if (cancelled) return;
 

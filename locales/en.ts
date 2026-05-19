@@ -19,6 +19,7 @@ const en = {
   allAuthors: "All authors",
   allLanguages: "All languages",
   topics: "Topics",
+  uncategorizedTopic: "Uncategorized",
   authors: "Authors",
   filter: "Filter",
   resetFilters: "Reset filters",
