@@ -151,7 +151,7 @@ const Settings = () => {
               />
             </View>
 
-            <LanguageSwitcher disabled={true} />
+            <LanguageSwitcher disabled={false} />
             {/* //! Auf false */}
 
             <View style={{ gap: 10 }}>

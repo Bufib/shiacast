@@ -50,6 +50,7 @@ export default function PodcastGridCard({
   lang,
   gradientColors,
   isPlaying = false,
+  podcastFavoritesVersion,
   onRequestPlay,
   onStopPlaying,
 }: Props) {
@@ -119,7 +120,7 @@ export default function PodcastGridCard({
     return () => {
       mounted = false;
     };
-  }, [podcast.id, lang]);
+  }, [podcast.id, lang, podcastFavoritesVersion]);
 
   useEffect(() => {
     setHasVideoError(false);
@@ -300,7 +301,7 @@ export default function PodcastGridCard({
             >
               <Ionicons
                 name={isFavorite ? "heart" : "heart-outline"}
-                size={24}
+                size={30}
                 color={isFavorite ? Colors[colorScheme].error : colors.text}
               />
             </TouchableOpacity>

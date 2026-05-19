@@ -99,7 +99,7 @@ export function LanguageSwitcher({ disabled }: { disabled: boolean }) {
               lang === "en" && styles.buttonActive,
               {
                 opacity: pressed ? 0.8 : 1,
-                // paddingHorizontal: isLarge ? 12 : 7,
+                paddingHorizontal: isLarge ? 12 : 7,
                 //! Entfernen die //
               },
               rtl && { marginLeft: 0, marginRight: 8 },
@@ -162,8 +162,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 12,
     marginBottom: 8,
-    paddingHorizontal: 5, //! Entfernen
-    borderRadius: 10, //! Entfernen
+    // paddingHorizontal: 5, //! Entfernen
+    // borderRadius: 10, //! Entfernen
   },
   title: {
     fontSize: 16,

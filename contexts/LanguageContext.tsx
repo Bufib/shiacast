@@ -173,7 +173,7 @@ const USER_PICKED_KEY = "userPickedLanguage";
 
 // TODO: Für späteres Release auf `false` setzen, damit die
 // Sprachauswahl wieder angezeigt wird.
-const FORCE_DEFAULT_LANGUAGE = true;
+const FORCE_DEFAULT_LANGUAGE = false;
 
 function isValidLanguage(
   value: string | null | undefined,

@@ -1,177 +1,3 @@
-// import PodcastGridList from "@/components/PodcastGridList";
-// import { LoadingIndicator } from "@/components/LoadingIndicator";
-// import { ThemedText } from "@/components/ThemedText";
-// import { ThemedView } from "@/components/ThemedView";
-// import { Colors } from "@/constants/Colors";
-// import { useLanguage } from "../../contexts/LanguageContext";
-// import { useDataVersionStore } from "../../stores/dataVersionStore";
-// import { getFavoritePodcasts } from "../../utils/favorites";
-// import React, { useEffect, useMemo, useState } from "react";
-// import { useTranslation } from "react-i18next";
-// import { Animated, StyleSheet, useColorScheme } from "react-native";
-// import {
-//   SafeAreaView,
-//   useSafeAreaInsets,
-// } from "react-native-safe-area-context";
-// import { usePodcastsByIdsForFavorites } from "../../hooks/usePodcastsByIdsForFavorites";
-// import { useScreenFadeIn } from "@/hooks/useScreenFadeIn";
-
-// export default function RenderFavoritePodcasts() {
-//   const { lang } = useLanguage();
-//   const { t } = useTranslation();
-//   const colorScheme = useColorScheme() ?? "light";
-
-//   const podcastFavoritesVersion = useDataVersionStore(
-//     (state) => state.podcastFavoritesVersion,
-//   );
-
-//   const [favoriteIds, setFavoriteIds] = useState<number[]>([]);
-//   const [refreshing, setRefreshing] = useState(false);
-//   const { fadeAnim, onLayout } = useScreenFadeIn(800);
-//   const insets = useSafeAreaInsets();
-
-//   useEffect(() => {
-//     let cancelled = false;
-
-//     async function loadFavoriteIds() {
-//       try {
-//         const ids = await getFavoritePodcasts(lang);
-
-//         if (!cancelled) {
-//           setFavoriteIds(ids);
-//         }
-//       } catch (error) {
-//         if (!cancelled) {
-//           console.warn("Failed to load favorite podcasts:", error);
-//           setFavoriteIds([]);
-//         }
-//       }
-//     }
-
-//     loadFavoriteIds();
-
-//     return () => {
-//       cancelled = true;
-//     };
-//   }, [lang, podcastFavoritesVersion]);
-
-//   const {
-//     data: favoriteEpisodes = [],
-//     isLoading,
-//     isError,
-//     refetch,
-//     isFetching,
-//   } = usePodcastsByIdsForFavorites({
-//     ids: favoriteIds,
-//     language: lang,
-//   });
-//   const { rtl } = useLanguage();
-
-//   const handleRefresh = async () => {
-//     try {
-//       setRefreshing(true);
-
-//       const ids = await getFavoritePodcasts(lang);
-//       setFavoriteIds(ids);
-
-//       if (ids.length > 0) {
-//         await refetch();
-//       }
-//     } catch (error) {
-//       console.warn("Failed to refresh favorite podcasts:", error);
-//     } finally {
-//       setRefreshing(false);
-//     }
-//   };
-
-//   if (isLoading && favoriteIds.length > 0) {
-//     return (
-//       <ThemedView style={styles.centeredContainer}>
-//         <LoadingIndicator size="large" />
-//       </ThemedView>
-//     );
-//   }
-
-//   if (isError) {
-//     return (
-//       <ThemedView style={styles.centeredContainer}>
-//         <ThemedText style={styles.errorText}>{t("error")}</ThemedText>
-//       </ThemedView>
-//     );
-//   }
-
-//   if (favoriteIds.length === 0 || favoriteEpisodes.length === 0) {
-//     return (
-//       <ThemedView style={styles.centeredContainer}>
-//         <ThemedText style={styles.emptyText}>{t("noFavorites")}</ThemedText>
-//       </ThemedView>
-//     );
-//   }
-
-//   return (
-//     <Animated.View
-//       onLayout={onLayout}
-//       style={[
-//         styles.container,
-//         {
-//           opacity: fadeAnim,
-//           backgroundColor: Colors[colorScheme].background,
-//           paddingTop: insets.top + 10,
-//           paddingBottom: insets.bottom,
-//         },
-//       ]}
-//     >
-//       <ThemedText
-//         type="title"
-//         style={[
-//           styles.sectionLabel,
-//           {
-//             textAlign: rtl ? "right" : "left",
-//             paddingHorizontal: 24,
-//             marginBottom: 22
-
-//           },
-//         ]}
-//       >
-//         {t("favorites")}
-//       </ThemedText>
-//       <PodcastGridList
-//         podcasts={favoriteEpisodes}
-//         refreshing={refreshing || isFetching}
-//         onRefresh={handleRefresh}
-//       />
-//     </Animated.View>
-//   );
-// }
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//   },
-//   sectionLabel: {
-//     paddingHorizontal: 6,
-//   },
-//   centeredContainer: {
-//     flex: 1,
-//     justifyContent: "center",
-//     alignItems: "center",
-//     paddingHorizontal: 20,
-//   },
-
-//   emptyText: {
-//     textAlign: "center",
-//     fontWeight: "500",
-//     fontSize: 16,
-//     lineHeight: 22,
-//   },
-
-//   errorText: {
-//     fontSize: 16,
-//     color: "red",
-//     textAlign: "center",
-//   },
-// });
-
 import PodcastGridList from "@/components/PodcastGridList";
 import { LoadingIndicator } from "@/components/LoadingIndicator";
 import { ThemedText } from "@/components/ThemedText";
@@ -196,7 +22,6 @@ export default function RenderFavoritePodcasts() {
   );
 
   const [favoriteIds, setFavoriteIds] = useState<number[]>([]);
-  const [refreshing, setRefreshing] = useState(false);
   const { fadeAnim, onLayout } = useScreenFadeIn(800);
   const insets = useSafeAreaInsets();
 
@@ -230,29 +55,10 @@ export default function RenderFavoritePodcasts() {
     data: favoriteEpisodes = [],
     isLoading,
     isError,
-    // refetch,
-    isFetching,
   } = usePodcastsByIdsForFavorites({
     ids: favoriteIds,
     language: lang,
   });
-
-  // const handleRefresh = async () => {
-  //   try {
-  //     setRefreshing(true);
-
-  //     const ids = await getFavoritePodcasts(lang);
-  //     setFavoriteIds(ids);
-
-  //     if (ids.length > 0) {
-  //       await refetch();
-  //     }
-  //   } catch (error) {
-  //     console.warn("Failed to refresh favorite podcasts:", error);
-  //   } finally {
-  //     setRefreshing(false);
-  //   }
-  // };
 
   const renderEmpty = () => (
     <View style={styles.emptyContainer}>
@@ -313,8 +119,6 @@ export default function RenderFavoritePodcasts() {
     >
       <PodcastGridList
         podcasts={favoriteEpisodes}
-        // refreshing={refreshing || isFetching}
-        // onRefresh={handleRefresh}
         ListHeaderComponent={renderHeader}
         ListEmptyComponent={renderEmpty}
       />

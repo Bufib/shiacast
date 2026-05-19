@@ -893,6 +893,7 @@ export type PodcastGridCardType = {
   lang: string;
   gradientColors: readonly [string, string, ...string[]] | string[];
   isPlaying?: boolean;
+  podcastFavoritesVersion: number,
   onRequestPlay?: () => void;
   onStopPlaying?: () => void;
 };
