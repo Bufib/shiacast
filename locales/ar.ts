@@ -46,7 +46,8 @@ const ar = {
   remove: "إزالة",
   delete: "حذف",
   cancel: "إلغاء",
-  create: "إنشاء",
+  createFolder: "إنشاء مجلد",
+
   pickColor: "اختر لونًا",
   noFavorites: "ليس لديك أي عناصر مفضلة بعد!",
   noFoldersYet: "ليس لديك أي مجلدات بعد",
@@ -67,8 +68,7 @@ const ar = {
   clearAppCacheConfirmTitle: "مسح ذاكرة التخزين المؤقت",
   clearAppCacheConfirmMessage:
     "هل تريد حقًا حذف جميع الملفات المخزنة مؤقتًا في التطبيق؟",
-  clearAppCacheSuccessMessage:
-    "تم مسح ذاكرة التخزين المؤقت للتطبيق بنجاح.",
+  clearAppCacheSuccessMessage: "تم مسح ذاكرة التخزين المؤقت للتطبيق بنجاح.",
   dataPrivacy: "حماية البيانات",
   aboutTheApp: "حول التطبيق",
   imprint: "البيانات القانونية",

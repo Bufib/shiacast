@@ -1,7 +1,22 @@
 const YOUTUBE_ID_PATTERN = /^[A-Za-z0-9_-]{11}$/;
+const YOUTUBE_ID_PREFIX_PATTERN = /^([A-Za-z0-9_-]{11})(?=[^A-Za-z0-9_-]|$)/;
+const DEVTOOLS_PASTE_SUFFIX_PATTERN = /\$0$/;
 const CLOCK_TIME_PATTERN = /^(?:(\d+):)?(\d{1,2}):(\d{1,2})(?:\.\d+)?$/;
 const COMPACT_TIME_PATTERN =
   /^(?:(\d+(?:\.\d+)?)h)?(?:(\d+(?:\.\d+)?)m)?(?:(\d+(?:\.\d+)?)s)?$/i;
+
+function cleanYoutubeValue(value: string) {
+  return value.trim().replace(DEVTOOLS_PASTE_SUFFIX_PATTERN, "");
+}
+
+function normalizeYoutubeIdCandidate(value?: string | null) {
+  const cleaned = value ? cleanYoutubeValue(value) : "";
+  if (!cleaned) return null;
+
+  if (YOUTUBE_ID_PATTERN.test(cleaned)) return cleaned;
+
+  return cleaned.match(YOUTUBE_ID_PREFIX_PATTERN)?.[1] ?? null;
+}
 
 function normalizeHost(hostname: string) {
   return hostname.toLowerCase().replace(/^www\./, "").replace(/^m\./, "");
@@ -12,10 +27,11 @@ function firstPathSegment(pathname: string) {
 }
 
 export function getYoutubeVideoId(urlOrId?: string | null): string | null {
-  const value = urlOrId?.trim();
+  const value = urlOrId ? cleanYoutubeValue(urlOrId) : "";
   if (!value) return null;
 
-  if (YOUTUBE_ID_PATTERN.test(value)) return value;
+  const rawId = normalizeYoutubeIdCandidate(value);
+  if (rawId) return rawId;
 
   try {
     const parsed = new URL(value);
@@ -23,7 +39,7 @@ export function getYoutubeVideoId(urlOrId?: string | null): string | null {
 
     if (host === "youtu.be") {
       const id = firstPathSegment(parsed.pathname);
-      return id && YOUTUBE_ID_PATTERN.test(id) ? id : null;
+      return normalizeYoutubeIdCandidate(id);
     }
 
     if (
@@ -32,14 +48,12 @@ export function getYoutubeVideoId(urlOrId?: string | null): string | null {
       host.endsWith(".youtube.com")
     ) {
       const watchId = parsed.searchParams.get("v");
-      if (watchId && YOUTUBE_ID_PATTERN.test(watchId)) return watchId;
+      const normalizedWatchId = normalizeYoutubeIdCandidate(watchId);
+      if (normalizedWatchId) return normalizedWatchId;
 
       const [, route, id] = parsed.pathname.split("/");
-      if (
-        ["embed", "shorts", "live"].includes(route) &&
-        YOUTUBE_ID_PATTERN.test(id)
-      ) {
-        return id;
+      if (["embed", "shorts", "live"].includes(route)) {
+        return normalizeYoutubeIdCandidate(id);
       }
     }
   } catch {

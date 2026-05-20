@@ -211,7 +211,7 @@ export default function VideoFavoriteFolderModal({ videoId }: Props) {
                 onPress={handleCreateFolder}
               >
                 <Text style={[styles.actionBtnText, { color: "#fff" }]}>
-                  {t("create")}
+                  {t("createFolder")}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -235,7 +235,7 @@ export default function VideoFavoriteFolderModal({ videoId }: Props) {
                 { color: Colors.universal.primary },
               ]}
             >
-              {t("create")}
+              {t("createFolder")}
             </Text>
           </TouchableOpacity>
         )}

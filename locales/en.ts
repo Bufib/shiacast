@@ -46,7 +46,7 @@ const en = {
   remove: "Remove",
   delete: "Delete",
   cancel: "Cancel",
-  create: "Create",
+  createFolder: "Create Folder",
   pickColor: "Choose a color",
   noFavorites: "You don't have any favorites yet!",
   noFoldersYet: "You don't have any folders yet",

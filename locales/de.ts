@@ -46,7 +46,7 @@ const de = {
   remove: "Entfernen",
   delete: "Löschen",
   cancel: "Abbrechen",
-  create: "Erstellen",
+  createFolder: "Orderner Erstellen",
   pickColor: "Wähle eine Farbe aus",
   noFavorites: "Du hast noch keine Favoriten!",
   noFoldersYet: "Du hast noch keine Ordner",
