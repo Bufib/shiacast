@@ -5,7 +5,7 @@ import type { VideoType } from "@/constants/Types";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { parseTopics } from "../../utils/videoTopics";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import {
   FlatList,
@@ -23,7 +23,6 @@ const WEB_MAX_CONTENT_WIDTH = 820;
 const HORIZONTAL_PADDING = IS_WEB ? 24 : 16;
 const ROW_CARD_GAP = IS_WEB ? 12 : 14;
 const GRID_CARD_GAP = 12;
-const GRID_SECTION_KEY = "__grid__";
 const UNCATEGORIZED_TOPIC_KEY = "__uncategorized__";
 
 type TopicVideoSection = {
@@ -61,7 +60,6 @@ export default function VideoGridList({
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
-  const [activeVideoKey, setActiveVideoKey] = useState<string | null>(null);
 
   const layoutWidth = IS_WEB ? Math.min(width, WEB_MAX_CONTENT_WIDTH) : width;
 
@@ -129,20 +127,8 @@ export default function VideoGridList({
     });
   }, [lang, uncategorizedTitle, videos]);
 
-  const getPlaybackKey = useCallback((sectionKey: string, videoId: number) => {
-    return `${sectionKey}:${videoId}`;
-  }, []);
-
-  const stopPlaying = useCallback((playbackKey: string) => {
-    setActiveVideoKey((currentKey) =>
-      currentKey === playbackKey ? null : currentKey,
-    );
-  }, []);
-
   const renderGridItem = useCallback(
     ({ item }: ListRenderItemInfo<VideoType>) => {
-      const playbackKey = getPlaybackKey(GRID_SECTION_KEY, item.id);
-
       return (
         <View style={[styles.gridItemWrapper, { width: gridCardWidth }]}>
           <VideoGridCard
@@ -150,28 +136,16 @@ export default function VideoGridList({
             width={gridCardWidth}
             rtl={rtl}
             lang={lang}
-            isPlaying={activeVideoKey === playbackKey}
-            onRequestPlay={() => setActiveVideoKey(playbackKey)}
-            onStopPlaying={() => stopPlaying(playbackKey)}
           />
         </View>
       );
     },
-    [
-      activeVideoKey,
-      getPlaybackKey,
-      gridCardWidth,
-      lang,
-      rtl,
-      stopPlaying,
-    ],
+    [gridCardWidth, lang, rtl],
   );
 
   const renderSection = useCallback(
     ({ item: section }: ListRenderItemInfo<TopicVideoSection>) => {
       const renderVideo = ({ item }: ListRenderItemInfo<VideoType>) => {
-        const playbackKey = getPlaybackKey(section.key, item.id);
-
         return (
           <View style={styles.itemWrapper}>
             <VideoGridCard
@@ -179,9 +153,6 @@ export default function VideoGridList({
               width={topicCardWidth}
               rtl={rtl}
               lang={lang}
-              isPlaying={activeVideoKey === playbackKey}
-              onRequestPlay={() => setActiveVideoKey(playbackKey)}
-              onStopPlaying={() => stopPlaying(playbackKey)}
             />
           </View>
         );
@@ -228,7 +199,6 @@ export default function VideoGridList({
 
           <FlatList
             data={section.videos}
-            extraData={activeVideoKey}
             horizontal
             keyExtractor={(item) => `${section.key}:${item.id}`}
             renderItem={renderVideo}
@@ -249,16 +219,7 @@ export default function VideoGridList({
         </View>
       );
     },
-    [
-      activeVideoKey,
-      colors.tabIconDefault,
-      colors.text,
-      getPlaybackKey,
-      lang,
-      rtl,
-      stopPlaying,
-      topicCardWidth,
-    ],
+    [colors.tabIconDefault, colors.text, lang, rtl, topicCardWidth],
   );
 
   if (layout === "grid") {
@@ -267,7 +228,6 @@ export default function VideoGridList({
         key={`video-grid-${gridColumns}`}
         style={IS_WEB && styles.webListFrame}
         data={videos}
-        extraData={activeVideoKey}
         keyExtractor={(item) => item.id.toString()}
         renderItem={renderGridItem}
         numColumns={gridColumns}
@@ -308,7 +268,6 @@ export default function VideoGridList({
       key="topic-rows"
       style={IS_WEB && styles.webListFrame}
       data={topicSections}
-      extraData={activeVideoKey}
       keyExtractor={(item) => item.key}
       renderItem={renderSection}
       refreshing={refreshing}

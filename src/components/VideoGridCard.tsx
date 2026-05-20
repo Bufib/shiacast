@@ -48,6 +48,7 @@ export default function VideoGridCard({
   rtl,
   lang,
   gradientColors,
+  playbackMode = "navigate",
   isPlaying = false,
   onRequestPlay,
   onStopPlaying,
@@ -65,6 +66,7 @@ export default function VideoGridCard({
   );
 
   const playerHeight = Math.round(width * PLAYER_ASPECT_RATIO);
+  const usesInlinePlayer = playbackMode === "inline";
 
   // Deterministischer Gradient pro Video-ID. Wenn der Aufrufer einen eigenen
   // gradientColors-Prop übergibt, hat dieser Vorrang.
@@ -112,12 +114,12 @@ export default function VideoGridCard({
   useEffect(() => {
     setHasVideoError(false);
     setPlayerMounted(false);
-  }, [videoId]);
+  }, [usesInlinePlayer, videoId]);
 
   // Wenn diese Karte das "aktive" Video ist, montieren.
   useEffect(() => {
-    if (isPlaying) setPlayerMounted(true);
-  }, [isPlaying]);
+    if (usesInlinePlayer && isPlaying) setPlayerMounted(true);
+  }, [isPlaying, usesInlinePlayer]);
 
   const onPressToggleFavorite = useCallback(() => {
     router.push({
@@ -139,10 +141,18 @@ export default function VideoGridCard({
     });
   }, [isWatched, lang, video.id, t, toggleWatched]);
 
-  const onPressPlay = useCallback(() => {
-    setPlayerMounted(true);
-    onRequestPlay?.();
-  }, [onRequestPlay]);
+  const onPressOpenVideo = useCallback(() => {
+    if (usesInlinePlayer) {
+      setPlayerMounted(true);
+      onRequestPlay?.();
+      return;
+    }
+
+    router.push({
+      pathname: "/video/[id]",
+      params: { id: String(video.id) },
+    });
+  }, [onRequestPlay, usesInlinePlayer, video.id]);
 
   const onStateChange = useCallback(
     (state: string) => {
@@ -221,7 +231,7 @@ export default function VideoGridCard({
         ]}
       >
         {videoId && !hasVideoError ? (
-          playerMounted ? (
+          usesInlinePlayer && playerMounted ? (
             <View style={[styles.playerClip, { height: playerHeight }]}>
               <YoutubeVideoPlayer
                 key={playerKey}
@@ -239,7 +249,7 @@ export default function VideoGridCard({
               accessibilityRole="button"
               accessibilityLabel={t("playVideo")}
               activeOpacity={0.9}
-              onPress={onPressPlay}
+              onPress={onPressOpenVideo}
               style={[
                 styles.playerClip,
                 { height: playerHeight },
@@ -326,7 +336,13 @@ export default function VideoGridCard({
               isWatched && { opacity: 0.7 },
             ]}
           >
-            <View style={styles.titleContainer}>
+            <TouchableOpacity
+              accessibilityRole={usesInlinePlayer ? undefined : "button"}
+              activeOpacity={0.82}
+              disabled={usesInlinePlayer}
+              onPress={onPressOpenVideo}
+              style={styles.titleContainer}
+            >
               <View
                 style={[
                   styles.titleLine,
@@ -389,7 +405,7 @@ export default function VideoGridCard({
               >
                 {formattedDate}
               </Text>
-            </View>
+            </TouchableOpacity>
 
             <TouchableOpacity
               onPress={onPressToggleFavorite}

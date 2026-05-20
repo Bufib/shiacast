@@ -58,6 +58,7 @@ export type VideoGridCardType = {
    * Gradient anhand der Video-ID.
    */
   gradientColors?: readonly [string, string, ...string[]] | string[];
+  playbackMode?: "navigate" | "inline";
   isPlaying?: boolean;
   onRequestPlay?: () => void;
   onStopPlaying?: () => void;

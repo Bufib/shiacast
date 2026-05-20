@@ -64,13 +64,13 @@ export default function HomeScreen() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isManualRefreshing, setIsManualRefreshing] = useState(false);
 
-  const selectedPodcastLanguage =
+  const selectedVideoLanguage =
     storeDefaultLanguage === null ? lang : selectedLanguageValue;
   const debouncedSearchQuery = useDebouncedValue(searchQuery.trim(), 350);
   const activeFilterCount =
     (selectedTopic ? 1 : 0) +
     (selectedAuthor ? 1 : 0) +
-    (selectedPodcastLanguage !== lang ? 1 : 0);
+    (selectedVideoLanguage !== lang ? 1 : 0);
   const hasActiveSearch = debouncedSearchQuery.length > 0;
   const {
     videos,
@@ -84,7 +84,7 @@ export default function HomeScreen() {
     isRefetching: videosIsRefetching,
     isFetching: videosIsFetching,
   } = useVideoList({
-    language: selectedPodcastLanguage,
+    language: selectedVideoLanguage,
     selectedTopic,
     selectedAuthor,
     searchQuery: debouncedSearchQuery,
@@ -354,7 +354,7 @@ export default function HomeScreen() {
               </View>
             )}
 
-            {selectedPodcastLanguage !== lang && (
+            {selectedVideoLanguage !== lang && (
               <View
                 style={[
                   styles.filterChip,
@@ -375,7 +375,7 @@ export default function HomeScreen() {
                     },
                   ]}
                 >
-                  {getLanguageLabel(selectedPodcastLanguage)}
+                  {getLanguageLabel(selectedVideoLanguage)}
                 </Text>
               </View>
             )}
@@ -407,7 +407,7 @@ export default function HomeScreen() {
       activeFilterCount,
       selectedTopic,
       selectedAuthor,
-      selectedPodcastLanguage,
+      selectedVideoLanguage,
       lang,
       clearFilters,
     ],
