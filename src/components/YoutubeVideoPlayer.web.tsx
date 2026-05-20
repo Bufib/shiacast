@@ -1,11 +1,23 @@
-import { YoutubePlayerState, YoutubeVideoPlayerProps } from "@/constants/Types";
-import React, { useEffect, useMemo, useRef } from "react";
+import {
+  YoutubePlayerState,
+  YoutubeVideoPlayerProps,
+  type YoutubeVideoPlayerRef,
+} from "@/constants/Types";
+import React, {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+} from "react";
 import { View, type ViewStyle } from "react-native";
 
 
 type YoutubeApiPlayer = {
+  getCurrentTime?: () => number;
   playVideo?: () => void;
   pauseVideo?: () => void;
+  seekTo?: (seconds: number, allowSeekAhead: boolean) => void;
   destroy?: () => void;
 };
 
@@ -16,6 +28,7 @@ declare global {
         element: HTMLIFrameElement,
         options: {
           events?: {
+            onReady?: () => void;
             onStateChange?: (event: { data: number }) => void;
             onError?: () => void;
           };
@@ -77,17 +90,42 @@ function mapPlayerState(state: number): YoutubePlayerState | string {
   }
 }
 
-export default function YoutubeVideoPlayer({
-  videoId,
-  width,
-  height,
-  play,
-  initialPlayerParams,
-  onChangeState,
-  onError,
-}: YoutubeVideoPlayerProps) {
+const YoutubeVideoPlayer = forwardRef<
+  YoutubeVideoPlayerRef,
+  YoutubeVideoPlayerProps
+>(function YoutubeVideoPlayer(
+  {
+    videoId,
+    width,
+    height,
+    play,
+    initialPlayerParams,
+    onChangeState,
+    onError,
+    onReady,
+  },
+  ref,
+) {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const playerRef = useRef<YoutubeApiPlayer | null>(null);
+  const playRef = useRef(play);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      getCurrentTime: async () => {
+        return playerRef.current?.getCurrentTime?.() ?? 0;
+      },
+      seekTo: (seconds, allowSeekAhead) => {
+        playerRef.current?.seekTo?.(seconds, allowSeekAhead);
+      },
+    }),
+    [],
+  );
+
+  useEffect(() => {
+    playRef.current = play;
+  }, [play]);
 
   const src = useMemo(() => {
     const params = new URLSearchParams({
@@ -120,6 +158,12 @@ export default function YoutubeVideoPlayer({
 
       playerRef.current = new window.YT.Player(iframeRef.current, {
         events: {
+          onReady: () => {
+            onReady?.();
+            if (playRef.current) {
+              playerRef.current?.playVideo?.();
+            }
+          },
           onStateChange: (event) => {
             onChangeState?.(mapPlayerState(event.data));
           },
@@ -133,7 +177,7 @@ export default function YoutubeVideoPlayer({
       playerRef.current?.destroy?.();
       playerRef.current = null;
     };
-  }, [onChangeState, onError, src]);
+  }, [onChangeState, onError, onReady, src]);
 
   useEffect(() => {
     if (play) {
@@ -155,7 +199,9 @@ export default function YoutubeVideoPlayer({
       />
     </View>
   );
-}
+});
+
+export default YoutubeVideoPlayer;
 
 const containerStyle: ViewStyle = {
   backgroundColor: "#000",

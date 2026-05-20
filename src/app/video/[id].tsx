@@ -4,6 +4,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import YoutubeVideoPlayer from "@/components/YoutubeVideoPlayer";
 import { Colors } from "@/constants/Colors";
+import type { YoutubeVideoPlayerRef } from "@/constants/Types";
 import { webTransition } from "@/constants/webStyle";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { useHover } from "@/hooks/useHover";
@@ -17,10 +18,18 @@ import {
 } from "@/hooks/useVideoWatchedStore";
 import { useVideoById } from "@/hooks/useVideoById";
 import { Ionicons } from "@expo/vector-icons";
+import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useCallback, useMemo, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useTranslation } from "react-i18next";
 import {
+  ActivityIndicator,
   Platform,
   StyleSheet,
   Text,
@@ -54,7 +63,10 @@ export default function VideoScreen() {
   const insets = useSafeAreaInsets();
   const { lang, rtl } = useLanguage();
   const [isPlaying, setIsPlaying] = useState(true);
+  const [isPlayerReady, setIsPlayerReady] = useState(false);
   const [playerSize, setPlayerSize] = useState({ width: 0, height: 0 });
+  const playerRef = useRef<YoutubeVideoPlayerRef | null>(null);
+  const hasHandledEndRef = useRef(false);
 
   // Web-only Hover-State fuer den Favoriten-Button.
   const { hovered: favHovered, hoverProps: favHoverProps } = useHover();
@@ -93,6 +105,15 @@ export default function VideoScreen() {
   );
 
   const playerKey = `${youtubeVideoId ?? "no-video"}:${videoStartSeconds ?? "start"}:${videoEndSeconds ?? "end"}`;
+
+  const thumbnailImageSource = useMemo(() => {
+    if (!youtubeVideoId) return null;
+
+    return {
+      uri: `https://i.ytimg.com/vi/${youtubeVideoId}/hqdefault.jpg`,
+      cacheKey: `youtube-thumbnail:${youtubeVideoId}:detail`,
+    };
+  }, [youtubeVideoId]);
 
   const playerDimensions = useMemo(() => {
     if (playerSize.width <= 0 || playerSize.height <= 0) {
@@ -136,9 +157,46 @@ export default function VideoScreen() {
     });
   }, [videoId]);
 
+  const onPlayerReady = useCallback(() => {
+    setIsPlayerReady(true);
+  }, []);
+
+  const handlePlaybackEnded = useCallback(() => {
+    if (!video) return;
+
+    setIsPlaying(false);
+
+    if (hasHandledEndRef.current) return;
+    hasHandledEndRef.current = true;
+
+    if (!isWatched) {
+      markAsWatched(video.id, lang);
+    }
+
+    if (!isFinished) {
+      markAsFinished(video.id, lang);
+
+      Toast.show({
+        type: "success",
+        text1: t("marked_as_finished"),
+        visibilityTime: 2000,
+        position: "top",
+      });
+    }
+  }, [
+    isFinished,
+    isWatched,
+    lang,
+    markAsFinished,
+    markAsWatched,
+    t,
+    video,
+  ]);
+
   const onStateChange = useCallback(
     (state: string) => {
       if (state === "playing") {
+        setIsPlayerReady(true);
         setIsPlaying(true);
         return;
       }
@@ -148,35 +206,47 @@ export default function VideoScreen() {
         return;
       }
 
-      if (state === "ended" && video) {
-        setIsPlaying(false);
-
-        if (!isWatched) {
-          markAsWatched(video.id, lang);
-        }
-
-        if (!isFinished) {
-          markAsFinished(video.id, lang);
-
-          Toast.show({
-            type: "success",
-            text1: t("marked_as_finished"),
-            visibilityTime: 2000,
-            position: "top",
-          });
-        }
+      if (state === "ended") {
+        handlePlaybackEnded();
       }
     },
-    [
-      isFinished,
-      isWatched,
-      lang,
-      markAsFinished,
-      markAsWatched,
-      t,
-      video,
-    ],
+    [handlePlaybackEnded],
   );
+
+  useEffect(() => {
+    hasHandledEndRef.current = false;
+    setIsPlaying(true);
+    setIsPlayerReady(false);
+  }, [playerKey]);
+
+  useEffect(() => {
+    if (!isPlaying || videoEndSeconds === undefined || !youtubeVideoId) return;
+
+    let cancelled = false;
+
+    const checkEndTime = async () => {
+      try {
+        const currentTime = await playerRef.current?.getCurrentTime();
+        if (cancelled || currentTime === undefined) return;
+
+        if (currentTime >= videoEndSeconds - 0.25) {
+          handlePlaybackEnded();
+        }
+      } catch (error) {
+        if (__DEV__) {
+          console.warn("Failed to read YouTube current time:", error);
+        }
+      }
+    };
+
+    const interval = setInterval(checkEndTime, 500);
+    void checkEndTime();
+
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [handlePlaybackEnded, isPlaying, videoEndSeconds, youtubeVideoId]);
 
   if (isLoading) {
     return (
@@ -295,19 +365,17 @@ export default function VideoScreen() {
           playerDimensions.width > 0 &&
           playerDimensions.height > 0 ? (
             <View
-              style={
-                IS_WEB
-                  ? [
-                      styles.webPlayerCard,
-                      {
-                        width: playerDimensions.width,
-                        height: playerDimensions.height,
-                      },
-                    ]
-                  : undefined
-              }
+              style={[
+                styles.playerShell,
+                {
+                  width: playerDimensions.width,
+                  height: playerDimensions.height,
+                },
+                IS_WEB && styles.webPlayerCard,
+              ]}
             >
               <YoutubeVideoPlayer
+                ref={playerRef}
                 key={playerKey}
                 height={playerDimensions.height}
                 width={playerDimensions.width}
@@ -315,12 +383,47 @@ export default function VideoScreen() {
                 videoId={youtubeVideoId}
                 initialPlayerParams={initialPlayerParams}
                 onChangeState={onStateChange}
+                onReady={onPlayerReady}
               />
+
+              {!isPlayerReady && (
+                <View pointerEvents="none" style={styles.playerLoadingOverlay}>
+                  {thumbnailImageSource && (
+                    <Image
+                      source={thumbnailImageSource}
+                      style={StyleSheet.absoluteFill}
+                      contentFit="cover"
+                      cachePolicy="memory-disk"
+                      priority="high"
+                      recyclingKey={thumbnailImageSource.cacheKey}
+                    />
+                  )}
+
+                  <View style={styles.playerLoadingScrim} />
+
+                  <ActivityIndicator color="#FFFFFF" size="small" />
+                </View>
+              )}
             </View>
           ) : (
             <View style={styles.playerFallback}>
               {youtubeVideoId ? (
-                <LoadingIndicator size="small" />
+                <>
+                  {thumbnailImageSource && (
+                    <Image
+                      source={thumbnailImageSource}
+                      style={StyleSheet.absoluteFill}
+                      contentFit="cover"
+                      cachePolicy="memory-disk"
+                      priority="high"
+                      recyclingKey={thumbnailImageSource.cacheKey}
+                    />
+                  )}
+
+                  <View style={styles.playerLoadingScrim} />
+
+                  <ActivityIndicator color="#FFFFFF" size="small" />
+                </>
               ) : (
                 <Text style={styles.playerFallbackText}>
                   {t("videoUnavailable")}
@@ -415,14 +518,26 @@ const styles = StyleSheet.create({
   webPlayerFrame: {
     maxWidth: 1120,
   },
+  playerShell: {
+    backgroundColor: "#000",
+    overflow: "hidden",
+    position: "relative",
+  },
   webPlayerCard: {
     borderRadius: 16,
-    overflow: "hidden",
-    backgroundColor: "#000",
     shadowColor: "#0b1220",
     shadowOffset: { width: 0, height: 18 },
     shadowOpacity: 0.3,
     shadowRadius: 44,
+  },
+  playerLoadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  playerLoadingScrim: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.32)",
   },
   playerFallback: {
     alignItems: "center",

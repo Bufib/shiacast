@@ -86,4 +86,10 @@ export type YoutubeVideoPlayerProps = {
   initialPlayerParams?: YoutubeVideoPlayerParams;
   onChangeState?: (state: YoutubePlayerState | string) => void;
   onError?: () => void;
+  onReady?: () => void;
+};
+
+export type YoutubeVideoPlayerRef = {
+  getCurrentTime: () => Promise<number>;
+  seekTo: (seconds: number, allowSeekAhead: boolean) => void;
 };
