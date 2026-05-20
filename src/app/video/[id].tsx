@@ -4,7 +4,9 @@ import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import YoutubeVideoPlayer from "@/components/YoutubeVideoPlayer";
 import { Colors } from "@/constants/Colors";
+import { webTransition } from "@/constants/webStyle";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { useHover } from "@/hooks/useHover";
 import {
   useIsVideoFinished,
   useVideoFinishedStore,
@@ -53,6 +55,9 @@ export default function VideoScreen() {
   const { lang, rtl } = useLanguage();
   const [isPlaying, setIsPlaying] = useState(true);
   const [playerSize, setPlayerSize] = useState({ width: 0, height: 0 });
+
+  // Web-only Hover-State fuer den Favoriten-Button.
+  const { hovered: favHovered, hoverProps: favHoverProps } = useHover();
 
   const { data: video, isLoading, isError } = useVideoById(videoId);
   const isFavorite = useVideoFavoriteFoldersStore((s) =>
@@ -252,11 +257,17 @@ export default function VideoScreen() {
         </View>
 
         <TouchableOpacity
+          {...favHoverProps}
           accessibilityRole="button"
           activeOpacity={0.75}
           hitSlop={8}
           onPress={onPressToggleFavorite}
-          style={[styles.favoriteButton, IS_WEB && styles.webFavoriteButton]}
+          style={[
+            styles.favoriteButton,
+            IS_WEB && styles.webFavoriteButton,
+            IS_WEB && webTransition("transform", 160, "ease"),
+            IS_WEB && favHovered && styles.webFavoriteButtonHover,
+          ]}
         >
           <Ionicons
             name={isFavorite ? "heart" : "heart-outline"}
@@ -269,7 +280,11 @@ export default function VideoScreen() {
       <View
         style={[
           styles.playerStage,
-          { paddingBottom: insets.bottom, backgroundColor: "#000" },
+          IS_WEB && styles.webPlayerStage,
+          {
+            paddingBottom: IS_WEB ? 28 : insets.bottom,
+            backgroundColor: IS_WEB ? colors.background : "#000",
+          },
         ]}
       >
         <View
@@ -279,15 +294,29 @@ export default function VideoScreen() {
           {youtubeVideoId &&
           playerDimensions.width > 0 &&
           playerDimensions.height > 0 ? (
-            <YoutubeVideoPlayer
-              key={playerKey}
-              height={playerDimensions.height}
-              width={playerDimensions.width}
-              play={isPlaying}
-              videoId={youtubeVideoId}
-              initialPlayerParams={initialPlayerParams}
-              onChangeState={onStateChange}
-            />
+            <View
+              style={
+                IS_WEB
+                  ? [
+                      styles.webPlayerCard,
+                      {
+                        width: playerDimensions.width,
+                        height: playerDimensions.height,
+                      },
+                    ]
+                  : undefined
+              }
+            >
+              <YoutubeVideoPlayer
+                key={playerKey}
+                height={playerDimensions.height}
+                width={playerDimensions.width}
+                play={isPlaying}
+                videoId={youtubeVideoId}
+                initialPlayerParams={initialPlayerParams}
+                onChangeState={onStateChange}
+              />
+            </View>
           ) : (
             <View style={styles.playerFallback}>
               {youtubeVideoId ? (
@@ -360,10 +389,20 @@ const styles = StyleSheet.create({
   webFavoriteButton: {
     height: 36,
     width: 36,
+    borderRadius: 18,
+    transform: [{ scale: 1 }],
+  },
+  webFavoriteButtonHover: {
+    transform: [{ scale: 1.12 }],
   },
   playerStage: {
     alignItems: "center",
     flex: 1,
+  },
+  webPlayerStage: {
+    paddingHorizontal: 28,
+    paddingTop: 28,
+    justifyContent: "center",
   },
   playerFrame: {
     alignItems: "center",
@@ -375,6 +414,15 @@ const styles = StyleSheet.create({
   },
   webPlayerFrame: {
     maxWidth: 1120,
+  },
+  webPlayerCard: {
+    borderRadius: 16,
+    overflow: "hidden",
+    backgroundColor: "#000",
+    shadowColor: "#0b1220",
+    shadowOffset: { width: 0, height: 18 },
+    shadowOpacity: 0.3,
+    shadowRadius: 44,
   },
   playerFallback: {
     alignItems: "center",

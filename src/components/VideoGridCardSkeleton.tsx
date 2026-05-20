@@ -3,9 +3,12 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import {
   Animated,
   Easing,
+  Platform,
   StyleSheet,
   View
 } from "react-native";
+
+const IS_WEB = Platform.OS === "web";
 
 export default function VideoGridCardSkeleton() {
   const colorScheme = useColorScheme();
@@ -70,7 +73,13 @@ function SkeletonCard({
 }: SkeletonCardProps) {
   return (
     <View style={styles.cardShadow}>
-      <View style={[styles.card, { backgroundColor: cardBackgroundColor }]}>
+      <View
+        style={[
+          styles.card,
+          IS_WEB && styles.webCard,
+          { backgroundColor: cardBackgroundColor },
+        ]}
+      >
         <Animated.View
           style={[
             styles.player,
@@ -107,6 +116,10 @@ const styles = StyleSheet.create({
   container: {
     width: "100%",
     rowGap: 16,
+    ...(IS_WEB && {
+      maxWidth: 360,
+      alignSelf: "center" as const,
+    }),
   },
   cardShadow: {
     width: "100%",
@@ -120,6 +133,9 @@ const styles = StyleSheet.create({
     width: "100%",
     borderRadius: 18,
     overflow: "hidden",
+  },
+  webCard: {
+    borderRadius: 14,
   },
   player: {
     width: "100%",

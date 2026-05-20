@@ -14,6 +14,7 @@ import { useTranslation } from "react-i18next";
 import {
   Alert,
   Appearance,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -27,8 +28,14 @@ import ClearAppCacheButton from "@/components/ClearCacheButton";
 import FeedbackButton from "@/components/FeedbackButton";
 import { useScreenFadeIn } from "@/hooks/useScreenFadeIn";
 
+const IS_WEB = Platform.OS === "web";
+
 const Settings = () => {
   const colorScheme = useColorScheme();
+  const webBorderColor =
+    colorScheme === "dark"
+      ? "rgba(255,255,255,0.09)"
+      : "rgba(17,24,28,0.08)";
   const [isDarkMode, setIsDarkMode] = useState(colorScheme === "dark");
   const [payPalLink, setPayPalLink] = useState<string | null>("");
 
@@ -79,9 +86,14 @@ const Settings = () => {
         ]}
         edges={["top"]}
       >
-        <View style={[styles.header, rtl && styles.rtl]}>
+        <View
+          style={[styles.header, rtl && styles.rtl, IS_WEB && styles.webHeader]}
+        >
           <ThemedText
-            style={[rtl && { textAlign: "right", paddingRight: 15 }]}
+            style={[
+              rtl && { textAlign: "right", paddingRight: 15 },
+              IS_WEB && styles.webScreenTitle,
+            ]}
             type="title"
           >
             {t("settings")}
@@ -92,8 +104,25 @@ const Settings = () => {
           style={styles.scrollView}
           showsVerticalScrollIndicator={false}
         >
-          <View style={styles.section}>
-            <View style={[styles.settingRow, rtl && styles.rtl]}>
+          <View style={IS_WEB ? styles.webColumn : undefined}>
+          <View
+            style={[
+              styles.section,
+              IS_WEB && styles.webSection,
+              IS_WEB && {
+                backgroundColor: Colors[colorScheme].contrast,
+                borderColor: webBorderColor,
+              },
+            ]}
+          >
+            <View
+              style={[
+                styles.settingRow,
+                rtl && styles.rtl,
+                IS_WEB && styles.webSettingRow,
+                IS_WEB && { borderBottomColor: webBorderColor },
+              ]}
+            >
               <View>
                 <ThemedText
                   style={[styles.settingTitle, rtl && { textAlign: "right" }]}
@@ -120,7 +149,14 @@ const Settings = () => {
               />
             </View>
 
-            <View style={[styles.settingRow, rtl && styles.rtl]}>
+            <View
+              style={[
+                styles.settingRow,
+                rtl && styles.rtl,
+                IS_WEB && styles.webSettingRow,
+                IS_WEB && { borderBottomColor: webBorderColor },
+              ]}
+            >
               <View>
                 <ThemedText
                   style={[styles.settingTitle, rtl && { textAlign: "right" }]}
@@ -167,7 +203,7 @@ const Settings = () => {
           >
             <Image
               source={require("@/assets/images/paypal.png")}
-              style={styles.paypalImage}
+              style={[styles.paypalImage, IS_WEB && styles.webPaypalImage]}
             />
           </Pressable>
 
@@ -185,6 +221,7 @@ const Settings = () => {
               styles.footer,
               rtl && { flexDirection: "row-reverse" },
               { borderTopColor: Colors[colorScheme].border },
+              IS_WEB && styles.webFooter,
             ]}
           >
             <Pressable
@@ -217,6 +254,7 @@ const Settings = () => {
               </ThemedText>
             </Pressable>
           </View>
+          </View>
         </ScrollView>
       </SafeAreaView>
     </Animated.View>
@@ -238,6 +276,54 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
+  },
+  webHeader: {
+    borderBottomWidth: 0,
+    alignSelf: "center",
+    width: "100%",
+    maxWidth: 640,
+    paddingLeft: 32,
+    paddingRight: 32,
+    paddingTop: 22,
+    paddingBottom: 2,
+  },
+  webScreenTitle: {
+    fontSize: 24,
+    lineHeight: 28,
+    fontWeight: "800",
+    letterSpacing: -0.4,
+  },
+  webColumn: {
+    width: "100%",
+    maxWidth: 640,
+    alignSelf: "center",
+    paddingHorizontal: 16,
+  },
+  webSection: {
+    borderBottomWidth: 0,
+    borderWidth: 1,
+    borderRadius: 16,
+    paddingTop: 6,
+    paddingBottom: 14,
+    paddingHorizontal: 18,
+    marginTop: 14,
+    shadowColor: "#0b1220",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.07,
+    shadowRadius: 18,
+  },
+  webSettingRow: {
+    marginBottom: 0,
+    paddingVertical: 14,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  webPaypalImage: {
+    height: 56,
+  },
+  webFooter: {
+    borderTopWidth: 0,
+    marginTop: 4,
+    marginBottom: 28,
   },
   section: {
     padding: 15,

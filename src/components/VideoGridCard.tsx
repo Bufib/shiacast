@@ -1,5 +1,7 @@
 import { Colors } from "@/constants/Colors";
+import { webTransition } from "@/constants/webStyle";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { useHover } from "@/hooks/useHover";
 import { VideoGridCardType } from "@/constants/Types";
 import YoutubeVideoPlayer from "@/components/YoutubeVideoPlayer";
 import { useGradient } from "@/hooks/useGradient";
@@ -57,6 +59,15 @@ export default function VideoGridCard({
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const formattedDate = formatDate(video.created_at);
+
+  // Web-only Hover-States – auf Nativ bleiben diese inaktiv.
+  const { hovered: cardHovered, hoverProps: cardHoverProps } = useHover();
+  const { hovered: watchedHovered, hoverProps: watchedHoverProps } = useHover();
+
+  const webBorderColor =
+    colorScheme === "dark"
+      ? "rgba(255,255,255,0.09)"
+      : "rgba(17,24,28,0.08)";
 
   const authorName = video.author_name;
 
@@ -217,9 +228,13 @@ export default function VideoGridCard({
 
   return (
     <View
+      {...cardHoverProps}
       style={[
         styles.cardShadow,
         IS_WEB && styles.webCardShadow,
+        IS_WEB && webTransition("transform, box-shadow", 240),
+        IS_WEB && styles.webCardMotion,
+        IS_WEB && cardHovered && styles.webCardShadowHover,
         { width },
       ]}
     >
@@ -227,7 +242,13 @@ export default function VideoGridCard({
         style={[
           styles.card,
           IS_WEB && styles.webCard,
+          IS_WEB && webTransition("border-color", 200, "ease"),
           { backgroundColor: colors.contrast },
+          IS_WEB && {
+            borderColor: cardHovered
+              ? "rgba(46,168,83,0.55)"
+              : webBorderColor,
+          },
         ]}
       >
         {videoId && !hasVideoError ? (
@@ -259,7 +280,11 @@ export default function VideoGridCard({
               {thumbnailImageSource ? (
                 <Image
                   source={thumbnailImageSource}
-                  style={StyleSheet.absoluteFill}
+                  style={[
+                    StyleSheet.absoluteFill,
+                    IS_WEB && webTransition("transform", 420, "ease"),
+                    IS_WEB && cardHovered && styles.webThumbnailZoom,
+                  ]}
                   contentFit="cover"
                   cachePolicy="memory-disk"
                   priority="normal"
@@ -278,11 +303,32 @@ export default function VideoGridCard({
               <View style={styles.thumbnailOverlay} />
 
               <View style={styles.playButtonWrapper}>
-                <Ionicons
-                  name="play-circle"
-                  size={playIconSize}
-                  color="#FFFFFF"
-                />
+                {IS_WEB ? (
+                  <View
+                    style={[
+                      styles.webPlayButton,
+                      webTransition(
+                        "transform, background-color, border-color",
+                        200,
+                        "ease",
+                      ),
+                      cardHovered && styles.webPlayButtonHover,
+                    ]}
+                  >
+                    <Ionicons
+                      name="play"
+                      size={22}
+                      color="#FFFFFF"
+                      style={styles.webPlayIcon}
+                    />
+                  </View>
+                ) : (
+                  <Ionicons
+                    name="play-circle"
+                    size={playIconSize}
+                    color="#FFFFFF"
+                  />
+                )}
               </View>
             </TouchableOpacity>
           )
@@ -428,15 +474,25 @@ export default function VideoGridCard({
             ]}
           >
             <TouchableOpacity
+              {...watchedHoverProps}
               onPress={onPressToggleWatched}
               style={[
                 styles.statusButton,
                 IS_WEB && styles.webStatusButton,
+                IS_WEB && webTransition("background-color, border-color", 160, "ease"),
                 {
                   backgroundColor: isWatched
                     ? Colors.universal.primary
                     : colors.background,
                 },
+                IS_WEB && { borderColor: webBorderColor },
+                IS_WEB &&
+                  watchedHovered && {
+                    backgroundColor: isWatched
+                      ? Colors.universal.third
+                      : colors.backgroundElement,
+                    borderColor: Colors.universal.primary,
+                  },
               ]}
               activeOpacity={0.75}
             >
@@ -474,9 +530,22 @@ const styles = StyleSheet.create({
     overflow: "visible",
   },
   webCardShadow: {
-    shadowOpacity: 0.08,
-    shadowRadius: 10,
+    shadowColor: "#0b1220",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.1,
+    shadowRadius: 18,
     elevation: 1,
+  },
+  webCardMotion: {
+    transform: [{ translateY: 0 }],
+    cursor: "pointer",
+  },
+  webCardShadowHover: {
+    shadowColor: "#0b1220",
+    shadowOffset: { width: 0, height: 16 },
+    shadowOpacity: 0.18,
+    shadowRadius: 32,
+    transform: [{ translateY: -6 }],
   },
 
   card: {
@@ -486,8 +555,8 @@ const styles = StyleSheet.create({
     borderWidth: 0.6,
   },
   webCard: {
-    borderRadius: 8,
-    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: 14,
+    borderWidth: 1,
   },
 
   playerClip: {
@@ -505,6 +574,30 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     alignItems: "center",
     justifyContent: "center",
+  },
+
+  webThumbnailZoom: {
+    transform: [{ scale: 1.07 }],
+  },
+
+  webPlayButton: {
+    width: 54,
+    height: 54,
+    borderRadius: 27,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(12,15,20,0.55)",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.28)",
+    transform: [{ scale: 1 }],
+  },
+  webPlayButtonHover: {
+    backgroundColor: Colors.universal.primary,
+    borderColor: Colors.universal.primary,
+    transform: [{ scale: 1.09 }],
+  },
+  webPlayIcon: {
+    marginLeft: 3,
   },
 
   videoFallback: {
@@ -533,8 +626,8 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   webContent: {
-    padding: 10,
-    gap: 8,
+    padding: 12,
+    gap: 9,
   },
 
   titleRow: {
@@ -570,10 +663,11 @@ const styles = StyleSheet.create({
     lineHeight: 21,
   },
   webCardTitle: {
-    minHeight: 34,
+    minHeight: 36,
     fontSize: 13,
-    lineHeight: 17,
+    lineHeight: 18,
     fontWeight: "800",
+    letterSpacing: -0.1,
   },
 
   createdAt: {
@@ -583,6 +677,7 @@ const styles = StyleSheet.create({
   },
   webCreatedAt: {
     fontSize: 10,
+    letterSpacing: 0.6,
   },
 
   authorRow: {

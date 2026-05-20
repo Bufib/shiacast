@@ -1,7 +1,9 @@
 import RetryButton from "@/components/RetryButton";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { useHover } from "@/hooks/useHover";
 import { ThemedText } from "@/components/ThemedText";
 import { Colors } from "@/constants/Colors";
+import { webTransition } from "@/constants/webStyle";
 import { useScreenFadeIn } from "@/hooks/useScreenFadeIn";
 import { useDebouncedValue } from "../../../hooks/useDebouncedValue";
 import { useVideoList } from "../../../hooks/useVideoList";
@@ -63,6 +65,13 @@ export default function HomeScreen() {
   const [searchVisible, setSearchVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isManualRefreshing, setIsManualRefreshing] = useState(false);
+  const [searchFocused, setSearchFocused] = useState(false);
+
+  // Web-only Hover-States fuer die Header-Buttons.
+  const { hovered: searchBtnHovered, hoverProps: searchBtnHoverProps } =
+    useHover();
+  const { hovered: filterBtnHovered, hoverProps: filterBtnHoverProps } =
+    useHover();
 
   const selectedVideoLanguage =
     storeDefaultLanguage === null ? lang : selectedLanguageValue;
@@ -162,9 +171,16 @@ export default function HomeScreen() {
                 style={[
                   styles.searchContainer,
                   IS_WEB && styles.webSearchContainer,
+                  IS_WEB && webTransition("border-color", 160, "ease"),
                   {
                     backgroundColor: Colors[colorScheme].contrast,
                     flexDirection: rtl ? "row-reverse" : "row",
+                  },
+                  IS_WEB && {
+                    borderWidth: 1.5,
+                    borderColor: searchFocused
+                      ? Colors.universal.primary
+                      : "transparent",
                   },
                 ]}
               >
@@ -183,6 +199,8 @@ export default function HomeScreen() {
                   returnKeyType="search"
                   autoCorrect={false}
                   autoCapitalize="none"
+                  onFocus={() => setSearchFocused(true)}
+                  onBlur={() => setSearchFocused(false)}
                   style={[
                     styles.searchInput,
                     IS_WEB && styles.webSearchInput,
@@ -237,6 +255,7 @@ export default function HomeScreen() {
             ]}
           >
             <TouchableOpacity
+              {...searchBtnHoverProps}
               activeOpacity={0.75}
               onPress={() => {
                 if (searchVisible) {
@@ -248,11 +267,13 @@ export default function HomeScreen() {
               style={[
                 styles.iconButton,
                 IS_WEB && styles.webIconButton,
+                IS_WEB && webTransition("transform, background-color", 160, "ease"),
                 {
                   backgroundColor: searchVisible
                     ? Colors.universal.primary
                     : colors.backgroundElement,
                 },
+                IS_WEB && searchBtnHovered && styles.webIconButtonHover,
               ]}
             >
               <Ionicons
@@ -263,14 +284,17 @@ export default function HomeScreen() {
             </TouchableOpacity>
 
             <TouchableOpacity
+              {...filterBtnHoverProps}
               activeOpacity={0.75}
               onPress={() => router.push("/video-filters")}
               style={[
                 styles.iconButton,
                 IS_WEB && styles.webIconButton,
+                IS_WEB && webTransition("transform, background-color", 160, "ease"),
                 {
                   backgroundColor: colors.backgroundElement,
                 },
+                IS_WEB && filterBtnHovered && styles.webIconButtonHover,
               ]}
             >
               <Ionicons
@@ -401,6 +425,11 @@ export default function HomeScreen() {
       rtl,
       searchVisible,
       searchQuery,
+      searchFocused,
+      searchBtnHovered,
+      searchBtnHoverProps,
+      filterBtnHovered,
+      filterBtnHoverProps,
       colorScheme,
       colors,
       t,
@@ -548,6 +577,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     lineHeight: 26,
     fontWeight: "800",
+    letterSpacing: -0.4,
   },
   headerActions: {
     alignItems: "center",
@@ -567,6 +597,10 @@ const styles = StyleSheet.create({
     width: 34,
     height: 34,
     borderRadius: 17,
+    transform: [{ scale: 1 }],
+  },
+  webIconButtonHover: {
+    transform: [{ scale: 1.08 }],
   },
   searchContainer: {
     minHeight: 44,

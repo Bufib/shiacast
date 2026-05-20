@@ -19,7 +19,9 @@ import {
 } from "react-native";
 
 const IS_WEB = Platform.OS === "web";
-const WEB_MAX_CONTENT_WIDTH = 820;
+const WEB_MAX_CONTENT_WIDTH = 960;
+// Eine einspaltige Grid-Karte auf Web nicht ueber diese Breite wachsen lassen.
+const WEB_SINGLE_CARD_MAX = 560;
 const HORIZONTAL_PADDING = IS_WEB ? 24 : 16;
 const ROW_CARD_GAP = IS_WEB ? 12 : 14;
 const GRID_CARD_GAP = 12;
@@ -79,10 +81,17 @@ export default function VideoGridList({
     const availableWidth = Math.max(0, layoutWidth - HORIZONTAL_PADDING * 2);
     const minWidth = gridColumns === 1 ? 0 : IS_WEB ? 160 : 120;
     const totalGap = Math.max(0, gridColumns - 1) * GRID_CARD_GAP;
-    return Math.max(
+    const computed = Math.max(
       minWidth,
       Math.floor((availableWidth - totalGap) / Math.max(1, gridColumns)),
     );
+
+    // Auf Web einspaltige Karten begrenzen, damit sie nicht uebergross wirken.
+    if (IS_WEB && gridColumns === 1) {
+      return Math.min(computed, WEB_SINGLE_CARD_MAX);
+    }
+
+    return computed;
   }, [gridColumns, layoutWidth]);
 
   const uncategorizedTitle = t("uncategorizedTopic");
@@ -129,18 +138,29 @@ export default function VideoGridList({
 
   const renderGridItem = useCallback(
     ({ item }: ListRenderItemInfo<VideoType>) => {
+      const isWebCentered = IS_WEB && gridColumns === 1;
+
       return (
-        <View style={[styles.gridItemWrapper, { width: gridCardWidth }]}>
-          <VideoGridCard
-            video={item}
-            width={gridCardWidth}
-            rtl={rtl}
-            lang={lang}
-          />
+        <View
+          style={[
+            styles.gridItemWrapper,
+            isWebCentered
+              ? styles.webCenteredGridItem
+              : { width: gridCardWidth },
+          ]}
+        >
+          <View style={{ width: gridCardWidth }}>
+            <VideoGridCard
+              video={item}
+              width={gridCardWidth}
+              rtl={rtl}
+              lang={lang}
+            />
+          </View>
         </View>
       );
     },
-    [gridCardWidth, lang, rtl],
+    [gridCardWidth, gridColumns, lang, rtl],
   );
 
   const renderSection = useCallback(
@@ -167,29 +187,44 @@ export default function VideoGridList({
               rtl && styles.topicHeaderReverse,
             ]}
           >
-            <Text
+            <View
               style={[
-                styles.topicTitle,
-                IS_WEB && styles.webTopicTitle,
-                {
-                  color: colors.text,
-                  textAlign: rtl ? "right" : "left",
-                  writingDirection: rtl ? "rtl" : "ltr",
-                },
+                styles.topicTitleWrap,
+                { flexDirection: rtl ? "row-reverse" : "row" },
               ]}
-              numberOfLines={1}
             >
-              {section.title}
-            </Text>
+              {IS_WEB && (
+                <View
+                  style={[
+                    styles.webTopicAccent,
+                    { backgroundColor: Colors.universal.primary },
+                  ]}
+                />
+              )}
+
+              <Text
+                style={[
+                  styles.topicTitle,
+                  IS_WEB && styles.webTopicTitle,
+                  {
+                    color: colors.text,
+                    textAlign: rtl ? "right" : "left",
+                    writingDirection: rtl ? "rtl" : "ltr",
+                  },
+                ]}
+                numberOfLines={1}
+              >
+                {section.title}
+              </Text>
+            </View>
 
             <Text
               style={[
                 styles.topicCount,
-                IS_WEB && styles.webTopicCount,
-                {
-                  color: colors.tabIconDefault,
-                  textAlign: rtl ? "left" : "right",
-                },
+                { color: IS_WEB ? colors.text : colors.tabIconDefault },
+                !IS_WEB && { textAlign: rtl ? "left" : "right" },
+                IS_WEB && styles.webTopicCountPill,
+                IS_WEB && { backgroundColor: colors.backgroundElement },
               ]}
               numberOfLines={1}
             >
@@ -219,7 +254,14 @@ export default function VideoGridList({
         </View>
       );
     },
-    [colors.tabIconDefault, colors.text, lang, rtl, topicCardWidth],
+    [
+      colors.backgroundElement,
+      colors.tabIconDefault,
+      colors.text,
+      lang,
+      rtl,
+      topicCardWidth,
+    ],
   );
 
   if (layout === "grid") {
@@ -324,6 +366,16 @@ const styles = StyleSheet.create({
   topicHeaderReverse: {
     flexDirection: "row-reverse",
   },
+  topicTitleWrap: {
+    flex: 1,
+    alignItems: "center",
+    gap: 8,
+  },
+  webTopicAccent: {
+    width: 4,
+    height: 17,
+    borderRadius: 2,
+  },
   topicTitle: {
     flex: 1,
     fontSize: 20,
@@ -334,6 +386,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     lineHeight: 20,
     fontWeight: "800",
+    letterSpacing: -0.2,
   },
   topicCount: {
     minWidth: 28,
@@ -341,9 +394,16 @@ const styles = StyleSheet.create({
     lineHeight: 16,
     fontWeight: "800",
   },
-  webTopicCount: {
+  webTopicCountPill: {
+    minWidth: 26,
+    paddingHorizontal: 9,
+    paddingVertical: 3,
+    borderRadius: 999,
+    overflow: "hidden",
     fontSize: 11,
     lineHeight: 14,
+    fontWeight: "800",
+    textAlign: "center",
   },
   webListFrame: {
     width: "100%",
@@ -367,6 +427,11 @@ const styles = StyleSheet.create({
     flexDirection: "row-reverse",
   },
   gridItemWrapper: {
+    paddingBottom: 16,
+  },
+  webCenteredGridItem: {
+    width: "100%",
+    alignItems: "center",
     paddingBottom: 16,
   },
   itemWrapper: {
