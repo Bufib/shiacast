@@ -33,6 +33,7 @@ import { useVideoFavoriteFoldersStore } from "../../../stores/videoFavoriteFolde
 import { getYoutubeVideoId, parseYoutubeTime } from "../../../utils/youtube";
 
 const IS_WEB = Platform.OS === "web";
+const PLAYER_ASPECT_RATIO = 16 / 9;
 
 function firstYoutubeTime(...values: (string | number | null | undefined)[]) {
   for (const value of values) {
@@ -87,6 +88,26 @@ export default function VideoScreen() {
   );
 
   const playerKey = `${youtubeVideoId ?? "no-video"}:${videoStartSeconds ?? "start"}:${videoEndSeconds ?? "end"}`;
+
+  const playerDimensions = useMemo(() => {
+    if (playerSize.width <= 0 || playerSize.height <= 0) {
+      return { width: 0, height: 0 };
+    }
+
+    const availableAspectRatio = playerSize.width / playerSize.height;
+
+    if (availableAspectRatio > PLAYER_ASPECT_RATIO) {
+      return {
+        width: Math.round(playerSize.height * PLAYER_ASPECT_RATIO),
+        height: playerSize.height,
+      };
+    }
+
+    return {
+      width: playerSize.width,
+      height: Math.round(playerSize.width / PLAYER_ASPECT_RATIO),
+    };
+  }, [playerSize.height, playerSize.width]);
 
   const onPlayerLayout = useCallback((event: LayoutChangeEvent) => {
     const nextWidth = Math.round(event.nativeEvent.layout.width);
@@ -255,11 +276,13 @@ export default function VideoScreen() {
           onLayout={onPlayerLayout}
           style={[styles.playerFrame, IS_WEB && styles.webPlayerFrame]}
         >
-          {youtubeVideoId && playerSize.width > 0 && playerSize.height > 0 ? (
+          {youtubeVideoId &&
+          playerDimensions.width > 0 &&
+          playerDimensions.height > 0 ? (
             <YoutubeVideoPlayer
               key={playerKey}
-              height={playerSize.height}
-              width={playerSize.width}
+              height={playerDimensions.height}
+              width={playerDimensions.width}
               play={isPlaying}
               videoId={youtubeVideoId}
               initialPlayerParams={initialPlayerParams}
@@ -343,9 +366,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   playerFrame: {
+    alignItems: "center",
     flex: 1,
+    justifyContent: "center",
     overflow: "hidden",
     width: "100%",
+    alignSelf: "center",
   },
   webPlayerFrame: {
     maxWidth: 1120,
