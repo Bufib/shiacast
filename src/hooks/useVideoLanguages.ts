@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../../utils/supabase";
 
 // RPC-basiert mit Fallback auf SELECT, falls die DB-Function noch nicht
-// deployed ist. Siehe supabase/migrations/20260519_video_filter_rpcs.sql.
+// deployed ist.
 async function fetchLanguagesViaRpc(): Promise<string[]> {
   const { data, error } = await supabase.rpc("video_distinct_languages");
 
@@ -23,7 +23,7 @@ async function fetchLanguagesViaRpc(): Promise<string[]> {
 
 async function fetchLanguagesFallback(): Promise<string[]> {
   const { data, error } = await supabase
-    .from("podcasts")
+    .from("videos")
     .select("language_code");
 
   if (error) throw error;

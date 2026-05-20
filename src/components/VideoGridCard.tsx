@@ -19,12 +19,19 @@ import { router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import Toast from "react-native-toast-message";
 import { useVideoFavoriteFoldersStore } from "../../stores/videoFavoriteFoldersStore";
 
 type Props = VideoGridCardType;
 
+const IS_WEB = Platform.OS === "web";
 const PLAYER_ASPECT_RATIO = 9 / 16;
 
 function firstYoutubeTime(...values: (string | number | null | undefined)[]) {
@@ -50,13 +57,12 @@ export default function VideoGridCard({
   const colors = Colors[colorScheme];
   const formattedDate = formatDate(video.created_at);
 
-  const videoUrl =
-    video.youtube_url ??
-    video.youtube_video_url ??
-    video.video_url ??
-    video.url;
+  const authorName = video.author_name;
 
-  const videoId = useMemo(() => getYoutubeVideoId(videoUrl), [videoUrl]);
+  const videoId = useMemo(
+    () => getYoutubeVideoId(video.youtube_url),
+    [video.youtube_url],
+  );
 
   const playerHeight = Math.round(width * PLAYER_ASPECT_RATIO);
 
@@ -68,37 +74,15 @@ export default function VideoGridCard({
   const effectiveGradient = gradientColors ?? deterministicGradient;
 
   const { videoStartSeconds, videoEndSeconds } = useMemo(() => {
-    const start = firstYoutubeTime(
-      video.start,
-      video.start_time,
-      video.video_start,
-      video.youtube_start,
-      video.youtube_start_seconds,
-    );
-    const rawEnd = firstYoutubeTime(
-      video.end,
-      video.end_time,
-      video.video_end,
-      video.youtube_end,
-      video.youtube_end_seconds,
-    );
+    const start = firstYoutubeTime(video.start_time);
+    const rawEnd = firstYoutubeTime(video.end_time);
     const end =
       rawEnd !== undefined && (start === undefined || rawEnd > start)
         ? rawEnd
         : undefined;
+
     return { videoStartSeconds: start, videoEndSeconds: end };
-  }, [
-    video.start,
-    video.start_time,
-    video.video_start,
-    video.youtube_start,
-    video.youtube_start_seconds,
-    video.end,
-    video.end_time,
-    video.video_end,
-    video.youtube_end,
-    video.youtube_end_seconds,
-  ]);
+  }, [video.start_time, video.end_time]);
 
   const initialPlayerParams = useMemo(
     () => ({
@@ -144,6 +128,7 @@ export default function VideoGridCard({
 
   const onPressToggleWatched = useCallback(() => {
     const willBeWatched = !isWatched;
+
     toggleWatched(video.id, lang);
 
     Toast.show({
@@ -180,6 +165,7 @@ export default function VideoGridCard({
 
         if (!isFinished) {
           markAsFinished(video.id, lang);
+
           Toast.show({
             type: "success",
             text1: t("marked_as_finished"),
@@ -206,17 +192,6 @@ export default function VideoGridCard({
     ? `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`
     : null;
 
-  const coverImageSource = useMemo(() => {
-    if (!video.image_url) return null;
-
-    return {
-      uri: video.image_url,
-      cacheKey:
-        video.image_cache_key ??
-        `video-cover:${video.image_filename ?? video.id}`,
-    };
-  }, [video.id, video.image_cache_key, video.image_filename, video.image_url]);
-
   const thumbnailImageSource = useMemo(() => {
     if (!thumbnailUrl || !videoId) return null;
 
@@ -226,9 +201,25 @@ export default function VideoGridCard({
     };
   }, [thumbnailUrl, videoId]);
 
+  const playIconSize = IS_WEB ? 52 : 70;
+  const favoriteIconSize = IS_WEB ? 24 : 30;
+  const statusIconSize = IS_WEB ? 15 : 18;
+
   return (
-    <View style={[styles.cardShadow, { width }, isWatched && {}]}>
-      <View style={[styles.card, { backgroundColor: colors.contrast }]}>
+    <View
+      style={[
+        styles.cardShadow,
+        IS_WEB && styles.webCardShadow,
+        { width },
+      ]}
+    >
+      <View
+        style={[
+          styles.card,
+          IS_WEB && styles.webCard,
+          { backgroundColor: colors.contrast },
+        ]}
+      >
         {videoId && !hasVideoError ? (
           playerMounted ? (
             <View style={[styles.playerClip, { height: playerHeight }]}>
@@ -255,14 +246,15 @@ export default function VideoGridCard({
                 isWatched && { opacity: 0.7 },
               ]}
             >
-              {coverImageSource ? (
+              {thumbnailImageSource ? (
                 <Image
-                  source={coverImageSource}
+                  source={thumbnailImageSource}
                   style={StyleSheet.absoluteFill}
                   contentFit="cover"
                   cachePolicy="memory-disk"
-                  priority="high"
-                  recyclingKey={coverImageSource.cacheKey}
+                  priority="normal"
+                  transition={150}
+                  recyclingKey={thumbnailImageSource.cacheKey}
                 />
               ) : (
                 <LinearGradient
@@ -273,37 +265,29 @@ export default function VideoGridCard({
                 />
               )}
 
-              {thumbnailImageSource && (
-                <Image
-                  source={thumbnailImageSource}
-                  placeholder={coverImageSource ?? undefined}
-                  placeholderContentFit="cover"
-                  style={StyleSheet.absoluteFill}
-                  contentFit="cover"
-                  cachePolicy="memory-disk"
-                  priority={coverImageSource ? "low" : "normal"}
-                  transition={coverImageSource ? 250 : 150}
-                  recyclingKey={thumbnailImageSource.cacheKey}
-                />
-              )}
               <View style={styles.thumbnailOverlay} />
+
               <View style={styles.playButtonWrapper}>
-                <Ionicons name="play-circle" size={70} color="#FFFFFF" />
+                <Ionicons
+                  name="play-circle"
+                  size={playIconSize}
+                  color="#FFFFFF"
+                />
               </View>
             </TouchableOpacity>
           )
         ) : (
           <View style={[styles.videoFallback, { height: playerHeight }]}>
-            {coverImageSource ? (
+            {thumbnailImageSource ? (
               <>
                 <Image
-                  source={coverImageSource}
+                  source={thumbnailImageSource}
                   style={StyleSheet.absoluteFill}
                   contentFit="cover"
                   cachePolicy="memory-disk"
-                  priority="high"
-                  recyclingKey={coverImageSource.cacheKey}
+                  recyclingKey={thumbnailImageSource.cacheKey}
                 />
+
                 <LinearGradient
                   colors={[
                     "rgba(0,0,0,0.15)",
@@ -327,15 +311,17 @@ export default function VideoGridCard({
 
             <View style={styles.fallbackContent}>
               <Ionicons name="logo-youtube" size={34} color="#FFFFFF" />
+
               <Text style={styles.fallbackText}>{t("videoUnavailable")}</Text>
             </View>
           </View>
         )}
 
-        <View style={[styles.content]}>
+        <View style={[styles.content, IS_WEB && styles.webContent]}>
           <View
             style={[
               styles.titleRow,
+              IS_WEB && styles.webTitleRow,
               { flexDirection: rtl ? "row-reverse" : "row" },
               isWatched && { opacity: 0.7 },
             ]}
@@ -350,6 +336,7 @@ export default function VideoGridCard({
                 <Text
                   style={[
                     styles.cardTitle,
+                    IS_WEB && styles.webCardTitle,
                     {
                       color: colors.text,
                       textAlign: rtl ? "right" : "left",
@@ -364,9 +351,34 @@ export default function VideoGridCard({
                 </Text>
               </View>
 
+              {authorName && (
+                <View
+                  style={[
+                    styles.authorRow,
+                    { flexDirection: rtl ? "row-reverse" : "row" },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.authorName,
+                      IS_WEB && styles.webAuthorName,
+                      {
+                        color: colors.text,
+                        textAlign: rtl ? "right" : "left",
+                        writingDirection: rtl ? "rtl" : "ltr",
+                      },
+                    ]}
+                    numberOfLines={1}
+                  >
+                    {authorName}
+                  </Text>
+                </View>
+              )}
+
               <Text
                 style={[
                   styles.createdAt,
+                  IS_WEB && styles.webCreatedAt,
                   {
                     color: colors.tabIconDefault,
                     textAlign: rtl ? "right" : "left",
@@ -381,13 +393,13 @@ export default function VideoGridCard({
 
             <TouchableOpacity
               onPress={onPressToggleFavorite}
-              style={styles.iconButton}
+              style={[styles.iconButton, IS_WEB && styles.webIconButton]}
               activeOpacity={0.7}
               hitSlop={8}
             >
               <Ionicons
                 name={isFavorite ? "heart" : "heart-outline"}
-                size={30}
+                size={favoriteIconSize}
                 color={isFavorite ? Colors[colorScheme].error : colors.text}
               />
             </TouchableOpacity>
@@ -403,6 +415,7 @@ export default function VideoGridCard({
               onPress={onPressToggleWatched}
               style={[
                 styles.statusButton,
+                IS_WEB && styles.webStatusButton,
                 {
                   backgroundColor: isWatched
                     ? Colors.universal.primary
@@ -413,13 +426,15 @@ export default function VideoGridCard({
             >
               <Ionicons
                 name={isWatched ? "eye" : "eye-outline"}
-                size={18}
+                size={statusIconSize}
                 color={isWatched ? "#FFFFFF" : colors.text}
               />
+
               <Text
                 numberOfLines={1}
                 style={[
                   styles.statusButtonText,
+                  IS_WEB && styles.webStatusButtonText,
                   { color: isWatched ? "#FFFFFF" : colors.text },
                 ]}
               >
@@ -442,12 +457,21 @@ const styles = StyleSheet.create({
     elevation: 3,
     overflow: "visible",
   },
+  webCardShadow: {
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    elevation: 1,
+  },
 
   card: {
     width: "100%",
     borderRadius: 18,
     overflow: "hidden",
     borderWidth: 0.6,
+  },
+  webCard: {
+    borderRadius: 8,
+    borderWidth: StyleSheet.hairlineWidth,
   },
 
   playerClip: {
@@ -492,10 +516,17 @@ const styles = StyleSheet.create({
     padding: 14,
     gap: 12,
   },
+  webContent: {
+    padding: 10,
+    gap: 8,
+  },
 
   titleRow: {
     alignItems: "flex-start",
     gap: 10,
+  },
+  webTitleRow: {
+    gap: 8,
   },
 
   titleContainer: {
@@ -522,11 +553,33 @@ const styles = StyleSheet.create({
     fontWeight: "900",
     lineHeight: 21,
   },
+  webCardTitle: {
+    minHeight: 34,
+    fontSize: 13,
+    lineHeight: 17,
+    fontWeight: "800",
+  },
 
   createdAt: {
     fontSize: 11,
     fontWeight: "700",
     textTransform: "uppercase",
+  },
+  webCreatedAt: {
+    fontSize: 10,
+  },
+
+  authorRow: {
+    alignItems: "center",
+    marginTop: 2,
+  },
+  authorName: {
+    flex: 1,
+    fontSize: 12,
+    fontWeight: "700",
+  },
+  webAuthorName: {
+    fontSize: 11,
   },
 
   iconButton: {
@@ -535,6 +588,11 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     alignItems: "center",
     justifyContent: "center",
+  },
+  webIconButton: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
   },
 
   actionsRow: {
@@ -552,10 +610,19 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 6,
   },
+  webStatusButton: {
+    minHeight: 32,
+    borderRadius: 7,
+    paddingHorizontal: 8,
+    gap: 5,
+  },
 
   statusButtonText: {
     flexShrink: 1,
     fontSize: 12,
     fontWeight: "800",
+  },
+  webStatusButtonText: {
+    fontSize: 11,
   },
 });

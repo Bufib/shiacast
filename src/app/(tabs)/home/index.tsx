@@ -12,6 +12,7 @@ import { useTranslation } from "react-i18next";
 import {
   Animated,
   Keyboard,
+  KeyboardAvoidingView,
   LayoutAnimation,
   Platform,
   StyleSheet,
@@ -36,6 +37,12 @@ if (
 }
 
 const PAGE_SIZE = 20;
+const IS_WEB = Platform.OS === "web";
+const SEARCH_ICON_SIZE = IS_WEB ? 16 : 18;
+const HEADER_ICON_SIZE = IS_WEB ? 22 : 27;
+const HEADER_CLOSE_ICON_SIZE = IS_WEB ? 21 : 25;
+// Floating NativeTabs pill on web sits at top: 24px with height 40px (ends at 64px).
+const WEB_TAB_BAR_TOP_OFFSET = 80;
 
 export default function HomeScreen() {
   const colorScheme = useColorScheme();
@@ -131,10 +138,11 @@ export default function HomeScreen() {
 
   const renderHeader = useCallback(
     () => (
-      <View style={styles.headerWrapper}>
+      <View style={[styles.headerWrapper, IS_WEB && styles.webHeaderWrapper]}>
         <View
           style={[
             styles.sectionHeaderRow,
+            IS_WEB && styles.webSectionHeaderRow,
             {
               flexDirection: rtl ? "row-reverse" : "row",
             },
@@ -143,6 +151,7 @@ export default function HomeScreen() {
           <View
             style={[
               styles.titleGroup,
+              IS_WEB && styles.webTitleGroup,
               {
                 flexDirection: rtl ? "row-reverse" : "row",
               },
@@ -152,6 +161,7 @@ export default function HomeScreen() {
               <View
                 style={[
                   styles.searchContainer,
+                  IS_WEB && styles.webSearchContainer,
                   {
                     backgroundColor: Colors[colorScheme].contrast,
                     flexDirection: rtl ? "row-reverse" : "row",
@@ -160,7 +170,7 @@ export default function HomeScreen() {
               >
                 <Ionicons
                   name="search-outline"
-                  size={18}
+                  size={SEARCH_ICON_SIZE}
                   color={colors.tabIconDefault}
                 />
 
@@ -173,9 +183,9 @@ export default function HomeScreen() {
                   returnKeyType="search"
                   autoCorrect={false}
                   autoCapitalize="none"
-                  clearButtonMode="never"
                   style={[
                     styles.searchInput,
+                    IS_WEB && styles.webSearchInput,
                     {
                       color: colors.text,
                       textAlign: rtl ? "right" : "left",
@@ -188,11 +198,14 @@ export default function HomeScreen() {
                   <TouchableOpacity
                     activeOpacity={0.75}
                     onPress={clearSearch}
-                    style={styles.clearSearchButton}
+                    style={[
+                      styles.clearSearchButton,
+                      IS_WEB && styles.webClearSearchButton,
+                    ]}
                   >
                     <Ionicons
                       name="close-circle"
-                      size={18}
+                      size={SEARCH_ICON_SIZE}
                       color={colors.tabIconDefault}
                     />
                   </TouchableOpacity>
@@ -203,6 +216,7 @@ export default function HomeScreen() {
                 type="title"
                 style={[
                   styles.sectionLabel,
+                  IS_WEB && styles.webSectionLabel,
                   {
                     textAlign: rtl ? "right" : "left",
                   },
@@ -216,6 +230,7 @@ export default function HomeScreen() {
           <View
             style={[
               styles.headerActions,
+              IS_WEB && styles.webHeaderActions,
               {
                 flexDirection: rtl ? "row-reverse" : "row",
               },
@@ -232,6 +247,7 @@ export default function HomeScreen() {
               }}
               style={[
                 styles.iconButton,
+                IS_WEB && styles.webIconButton,
                 {
                   backgroundColor: searchVisible
                     ? Colors.universal.primary
@@ -241,7 +257,7 @@ export default function HomeScreen() {
             >
               <Ionicons
                 name={searchVisible ? "close-outline" : "search-outline"}
-                size={searchVisible ? 25 : 27}
+                size={searchVisible ? HEADER_CLOSE_ICON_SIZE : HEADER_ICON_SIZE}
                 color={searchVisible ? "#FFFFFF" : colors.text}
               />
             </TouchableOpacity>
@@ -251,6 +267,7 @@ export default function HomeScreen() {
               onPress={() => router.push("/video-filters")}
               style={[
                 styles.iconButton,
+                IS_WEB && styles.webIconButton,
                 {
                   backgroundColor: colors.backgroundElement,
                 },
@@ -258,7 +275,7 @@ export default function HomeScreen() {
             >
               <Ionicons
                 name="options-outline"
-                size={27}
+                size={HEADER_ICON_SIZE}
                 color={
                   activeFilterCount > 0 ? Colors.universal.primary : colors.text
                 }
@@ -279,6 +296,7 @@ export default function HomeScreen() {
           <View
             style={[
               styles.activeFiltersRow,
+              IS_WEB && styles.webActiveFiltersRow,
               {
                 flexDirection: rtl ? "row-reverse" : "row",
               },
@@ -288,6 +306,7 @@ export default function HomeScreen() {
               <View
                 style={[
                   styles.filterChip,
+                  IS_WEB && styles.webFilterChip,
                   {
                     backgroundColor: colors.backgroundElement,
                   },
@@ -297,6 +316,7 @@ export default function HomeScreen() {
                   numberOfLines={1}
                   style={[
                     styles.filterChipText,
+                    IS_WEB && styles.webFilterChipText,
                     {
                       color: colors.text,
                       textAlign: rtl ? "right" : "left",
@@ -312,6 +332,7 @@ export default function HomeScreen() {
               <View
                 style={[
                   styles.filterChip,
+                  IS_WEB && styles.webFilterChip,
                   {
                     backgroundColor: colors.backgroundElement,
                   },
@@ -321,6 +342,7 @@ export default function HomeScreen() {
                   numberOfLines={1}
                   style={[
                     styles.filterChipText,
+                    IS_WEB && styles.webFilterChipText,
                     {
                       color: colors.text,
                       textAlign: rtl ? "right" : "left",
@@ -336,6 +358,7 @@ export default function HomeScreen() {
               <View
                 style={[
                   styles.filterChip,
+                  IS_WEB && styles.webFilterChip,
                   {
                     backgroundColor: colors.backgroundElement,
                   },
@@ -345,6 +368,7 @@ export default function HomeScreen() {
                   numberOfLines={1}
                   style={[
                     styles.filterChipText,
+                    IS_WEB && styles.webFilterChipText,
                     {
                       color: colors.text,
                       textAlign: rtl ? "right" : "left",
@@ -360,6 +384,7 @@ export default function HomeScreen() {
               <Text
                 style={[
                   styles.clearFiltersText,
+                  IS_WEB && styles.webClearFiltersText,
                   {
                     color: Colors.universal.link,
                   },
@@ -440,7 +465,7 @@ export default function HomeScreen() {
         {
           opacity: fadeAnim,
           backgroundColor: colors.background,
-          paddingTop: insets.top,
+          paddingTop: IS_WEB ? WEB_TAB_BAR_TOP_OFFSET : insets.top,
         },
         // Platform.OS === "ios" &&
         //   parseInt(Platform.Version, 10) >= 26 && {
@@ -448,31 +473,39 @@ export default function HomeScreen() {
         //   },
       ]}
     >
-      <Animated.View style={{ flex: 1, opacity: listOpacity }}>
-        <VideoGridList
-          videos={videos}
-          layout={
-            hasActiveSearch || activeFilterCount > 0 ? "grid" : "topicRows"
-          }
-          ListHeaderComponent={renderHeader}
-          ListEmptyComponent={renderEmpty}
-          refreshing={isManualRefreshing}
-          onRefresh={() => {
-            setIsManualRefreshing(true);
-            videosRefetch();
-          }}
-          isLoadingMore={videosIsFetchingNextPage}
-          onEndReached={() => {
-            if (
-              videosHasNextPage &&
-              !videosIsFetchingNextPage &&
-              !videosLoading
-            ) {
-              videosFetchNextPage();
+      <KeyboardAvoidingView
+        enabled={!IS_WEB && searchVisible}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? insets.top : 0}
+        style={styles.keyboardAvoidingView}
+      >
+        <Animated.View style={{ flex: 1, opacity: listOpacity }}>
+          <VideoGridList
+            videos={videos}
+            layout={
+              hasActiveSearch || activeFilterCount > 0 ? "grid" : "topicRows"
             }
-          }}
-        />
-      </Animated.View>
+            gridColumns={hasActiveSearch || activeFilterCount > 0 ? 1 : 2}
+            ListHeaderComponent={renderHeader()}
+            ListEmptyComponent={renderEmpty}
+            refreshing={isManualRefreshing}
+            onRefresh={() => {
+              setIsManualRefreshing(true);
+              videosRefetch();
+            }}
+            isLoadingMore={videosIsFetchingNextPage}
+            onEndReached={() => {
+              if (
+                videosHasNextPage &&
+                !videosIsFetchingNextPage &&
+                !videosLoading
+              ) {
+                videosFetchNextPage();
+              }
+            }}
+          />
+        </Animated.View>
+      </KeyboardAvoidingView>
     </Animated.View>
   );
 }
@@ -481,14 +514,24 @@ const styles = StyleSheet.create({
   animatedContainer: {
     flex: 1,
   },
+  keyboardAvoidingView: {
+    flex: 1,
+  },
   headerWrapper: {
     paddingBottom: 16,
     paddingTop: 10,
+  },
+  webHeaderWrapper: {
+    paddingBottom: 12,
+    paddingTop: 8,
   },
   sectionHeaderRow: {
     minHeight: 40,
     justifyContent: "space-between",
     alignItems: "center",
+  },
+  webSectionHeaderRow: {
+    minHeight: 36,
   },
   titleGroup: {
     flex: 1,
@@ -497,10 +540,21 @@ const styles = StyleSheet.create({
     paddingRight: 12,
     height: 40,
   },
+  webTitleGroup: {
+    height: 36,
+  },
   sectionLabel: {},
+  webSectionLabel: {
+    fontSize: 24,
+    lineHeight: 26,
+    fontWeight: "800",
+  },
   headerActions: {
     alignItems: "center",
     gap: 8,
+  },
+  webHeaderActions: {
+    gap: 6,
   },
   iconButton: {
     width: 38,
@@ -508,6 +562,11 @@ const styles = StyleSheet.create({
     borderRadius: 19,
     justifyContent: "center",
     alignItems: "center",
+  },
+  webIconButton: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
   },
   searchContainer: {
     minHeight: 44,
@@ -517,11 +576,24 @@ const styles = StyleSheet.create({
     gap: 8,
     flex: 1,
   },
+  webSearchContainer: {
+    minHeight: 36,
+    borderRadius: 18,
+    paddingHorizontal: 12,
+    gap: 7,
+  },
   searchInput: {
     flex: 1,
     fontSize: 15,
     fontWeight: "500",
     paddingVertical: 10,
+    ...(Platform.OS === "web" && {
+      outlineStyle: "none",
+    }),
+  },
+  webSearchInput: {
+    fontSize: 13,
+    paddingVertical: 7,
   },
   clearSearchButton: {
     width: 26,
@@ -529,6 +601,11 @@ const styles = StyleSheet.create({
     borderRadius: 13,
     justifyContent: "center",
     alignItems: "center",
+  },
+  webClearSearchButton: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
   },
   filterBadge: {
     position: "absolute",
@@ -553,19 +630,33 @@ const styles = StyleSheet.create({
     gap: 8,
     marginTop: 10,
   },
+  webActiveFiltersRow: {
+    gap: 6,
+    marginTop: 8,
+  },
   filterChip: {
     maxWidth: 170,
     borderRadius: 999,
     paddingHorizontal: 10,
     paddingVertical: 5,
   },
+  webFilterChip: {
+    paddingHorizontal: 9,
+    paddingVertical: 4,
+  },
   filterChipText: {
     fontSize: 12,
     fontWeight: "600",
   },
+  webFilterChipText: {
+    fontSize: 11,
+  },
   clearFiltersText: {
     fontSize: 12,
     fontWeight: "700",
+  },
+  webClearFiltersText: {
+    fontSize: 11,
   },
   emptyContainer: {
     alignItems: "center",

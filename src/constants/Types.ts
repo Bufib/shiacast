@@ -35,32 +35,17 @@ export type UseGradientOptionsType = {
   defaultIndex?: number;
 };
 
-// Videos (gespeichert in Supabase-Tabelle `podcasts` – Legacy-Name)
+// Videos
 export type VideoType = {
   id: number;
   title: string;
-  description: string;
-  url?: string | null;
-  youtube_url?: string | null;
-  youtube_video_url?: string | null;
-  video_url?: string | null;
-  start?: string | number | null;
-  end?: string | number | null;
-  start_time?: string | number | null;
-  end_time?: string | number | null;
-  video_start?: string | number | null;
-  video_end?: string | number | null;
-  youtube_start?: string | number | null;
-  youtube_end?: string | number | null;
-  youtube_start_seconds?: string | number | null;
-  youtube_end_seconds?: string | number | null;
-  language_code?: string;
+  youtube_url: string | null;
+  start_time: number | null;
+  end_time: number | null;
+  language_code: string | null;
+  video_topic: string | null;
+  author_name: string | null;
   created_at: string;
-  podcast_topic?: string;
-  podcast_author?: string;
-  image_filename?: string | null;
-  image_url: string | null;
-  image_cache_key?: string | null;
 };
 
 export type VideoGridCardType = {

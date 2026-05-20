@@ -7,7 +7,6 @@ import {
 
 import { VideoType } from "@/constants/Types";
 import { supabase } from "../../utils/supabase";
-import { attachVideoImageUrls } from "../../utils/videoStorage";
 import { matchesTopic } from "../../utils/videoTopics";
 
 export type VideoPage = {
@@ -51,7 +50,7 @@ export function useVideoList({
 
     queryFn: async ({ pageParam = 0 }) => {
       let request = supabase
-        .from("podcasts")
+        .from("videos")
         .select("*")
         .order("created_at", { ascending: false })
         .order("id", { ascending: false })
@@ -62,7 +61,7 @@ export function useVideoList({
       }
 
       if (selectedAuthor) {
-        request = request.eq("podcast_author", selectedAuthor);
+        request = request.eq("author_name", selectedAuthor);
       }
 
       if (trimmedSearchQuery.length > 0) {
@@ -74,18 +73,16 @@ export function useVideoList({
 
       if (error) throw error;
 
-      const rawRows = (data ?? []) as VideoType[];
+      const rawRows = (data ?? []) as unknown as VideoType[];
 
       const filteredRows = selectedTopic
         ? rawRows.filter((video) =>
-            matchesTopic(video.podcast_topic, selectedTopic),
+            matchesTopic(video.video_topic, selectedTopic),
           )
         : rawRows;
 
-      const itemsWithImages = attachVideoImageUrls(filteredRows);
-
       return {
-        items: itemsWithImages as VideoType[],
+        items: filteredRows,
         nextOffset:
           rawRows.length === pageSize ? pageParam + pageSize : undefined,
       };

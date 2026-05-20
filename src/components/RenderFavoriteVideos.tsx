@@ -239,7 +239,9 @@ export default function RenderFavoriteVideos() {
     >
       <VideoGridList
         videos={videos}
-        ListHeaderComponent={renderHeader}
+        layout="grid"
+        gridColumns={1}
+        ListHeaderComponent={renderHeader()}
         ListEmptyComponent={() => (
           <View style={styles.emptyContainer}>
             <ThemedText style={styles.emptyText}>{t("noData")}</ThemedText>

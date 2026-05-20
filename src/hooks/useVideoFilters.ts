@@ -49,22 +49,26 @@ async function fetchFilterPairsFallback(
   lang: string | null,
 ): Promise<FilterPair[]> {
   let request = supabase
-    .from("podcasts")
-    .select("podcast_topic, podcast_author");
+    .from("videos")
+    .select("video_topic, author_name");
 
   if (lang !== null) request = request.eq("language_code", lang);
 
   const { data, error } = await request;
   if (error) throw error;
 
-  return ((data ?? []) as { podcast_topic: unknown; podcast_author: unknown }[])
-    .flatMap((row): FilterPair[] => {
-      const topics = parseTopics(row.podcast_topic);
-      const author = (row.podcast_author as string | null) ?? null;
+  type Row = {
+    video_topic: unknown;
+    author_name: string | null;
+  };
 
-      if (topics.length === 0) return [{ topic: null, author }];
-      return topics.map((topic) => ({ topic, author }));
-    });
+  return ((data ?? []) as unknown as Row[]).flatMap((row): FilterPair[] => {
+    const topics = parseTopics(row.video_topic);
+    const author = row.author_name ?? null;
+
+    if (topics.length === 0) return [{ topic: null, author }];
+    return topics.map((topic) => ({ topic, author }));
+  });
 }
 
 type FilterData = {

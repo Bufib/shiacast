@@ -8,12 +8,6 @@ import { useDataVersionStore } from "../../stores/dataVersionStore";
 
 const VIDEO_INVALIDATION_DEBOUNCE_MS = 300;
 
-type VideoRealtimeRow = {
-  id?: number;
-  language_code?: string | null;
-  image_filename?: string | null;
-};
-
 type PaypalRealtimeRow = {
   paypal_link?: string | null;
 };
@@ -30,48 +24,32 @@ export const SupabaseRealtimeProvider = ({
   // Eindeutiger Suffix pro Provider-Instanz – schützt vor Channel-Namen-Kollisionen.
   const instanceId = useId().replace(/[^a-zA-Z0-9]/g, "");
 
-  const invalidateVideoQueries = useCallback(
-    async (changedImageFilenames: string[] = []) => {
-      const uniqueImageFilenames = [
-        ...new Set(changedImageFilenames.filter(Boolean)),
-      ];
+  const invalidateVideoQueries = useCallback(async () => {
+    await Promise.all([
+      queryClient.invalidateQueries({
+        queryKey: ["videos"],
+        refetchType: "active",
+      }),
+      queryClient.invalidateQueries({
+        queryKey: ["video_filter_pairs"],
+        refetchType: "active",
+      }),
+      queryClient.invalidateQueries({
+        queryKey: ["video_languages"],
+        refetchType: "active",
+      }),
+    ]);
+  }, [queryClient]);
 
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: ["videos"],
-          refetchType: "active",
-        }),
-        queryClient.invalidateQueries({
-          queryKey: ["video_filter_pairs"],
-          refetchType: "active",
-        }),
-        queryClient.invalidateQueries({
-          queryKey: ["video_languages"],
-          refetchType: "active",
-        }),
-        ...uniqueImageFilenames.map((filename) =>
-          queryClient.invalidateQueries({
-            queryKey: ["video_cover", filename],
-            refetchType: "all",
-          }),
-        ),
-      ]);
-    },
-    [queryClient],
-  );
-
-  const pendingFilenamesRef = useRef<Set<string>>(new Set());
   const pendingDeleteRedirectRef = useRef(false);
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const flushVideoChanges = useCallback(() => {
-    const filenames = Array.from(pendingFilenamesRef.current);
     const shouldRedirect = pendingDeleteRedirectRef.current;
-    pendingFilenamesRef.current.clear();
     pendingDeleteRedirectRef.current = false;
     debounceTimerRef.current = null;
 
-    invalidateVideoQueries(filenames)
+    invalidateVideoQueries()
       .then(() => {
         incrementVideoVersion();
         if (shouldRedirect) {
@@ -95,21 +73,12 @@ export const SupabaseRealtimeProvider = ({
     let hasSubscribedBefore = false;
 
     const videoChannel = supabase
-      .channel(`videos_realtime_changes_${instanceId}`)
+      .channel(`videos_authors_realtime_changes_${instanceId}`)
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "podcasts" },
+        { event: "*", schema: "public", table: "videos" },
         (payload) => {
           try {
-            const newRow = payload.new as VideoRealtimeRow | undefined;
-            const oldRow = payload.old as VideoRealtimeRow | undefined;
-
-            if (newRow?.image_filename) {
-              pendingFilenamesRef.current.add(newRow.image_filename);
-            }
-            if (oldRow?.image_filename) {
-              pendingFilenamesRef.current.add(oldRow.image_filename);
-            }
             if (payload.eventType === "DELETE") {
               pendingDeleteRedirectRef.current = true;
             }
@@ -120,6 +89,17 @@ export const SupabaseRealtimeProvider = ({
           }
         },
       )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "authors" },
+        () => {
+          try {
+            scheduleVideoFlush();
+          } catch (err) {
+            console.warn("Failed to handle author realtime change:", err);
+          }
+        },
+      )
       .subscribe((status, err) => {
         if (status === "SUBSCRIBED") {
           if (hasSubscribedBefore) {
@@ -127,16 +107,9 @@ export const SupabaseRealtimeProvider = ({
               clearTimeout(debounceTimerRef.current);
               debounceTimerRef.current = null;
             }
-            pendingFilenamesRef.current.clear();
             pendingDeleteRedirectRef.current = false;
 
-            Promise.all([
-              invalidateVideoQueries(),
-              queryClient.invalidateQueries({
-                queryKey: ["video_cover"],
-                refetchType: "all",
-              }),
-            ])
+            invalidateVideoQueries()
               .then(() => incrementVideoVersion())
               .catch((e) =>
                 console.warn("Failed to refetch videos after reconnect:", e),

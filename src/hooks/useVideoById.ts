@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import type { VideoType } from "@/constants/Types";
 import { supabase } from "../../utils/supabase";
-import { attachVideoImageUrls } from "../../utils/videoStorage";
 
 export function useVideoById(id: number | null | undefined) {
   return useQuery<VideoType, Error>({
@@ -9,15 +8,14 @@ export function useVideoById(id: number | null | undefined) {
     enabled: id != null,
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("podcasts")
+        .from("videos")
         .select("*")
         .eq("id", id)
         .single();
 
       if (error) throw error;
 
-      const [withImages] = attachVideoImageUrls([data as VideoType]);
-      return withImages;
+      return data as unknown as VideoType;
     },
     retry: 3,
     staleTime: 12 * 60 * 60 * 1000,

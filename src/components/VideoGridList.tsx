@@ -11,14 +11,17 @@ import {
   FlatList,
   type FlatListProps,
   type ListRenderItemInfo,
+  Platform,
   StyleSheet,
   Text,
   useWindowDimensions,
   View,
 } from "react-native";
 
-const HORIZONTAL_PADDING = 16;
-const ROW_CARD_GAP = 14;
+const IS_WEB = Platform.OS === "web";
+const WEB_MAX_CONTENT_WIDTH = 820;
+const HORIZONTAL_PADDING = IS_WEB ? 24 : 16;
+const ROW_CARD_GAP = IS_WEB ? 12 : 14;
 const GRID_CARD_GAP = 12;
 const GRID_SECTION_KEY = "__grid__";
 const UNCATEGORIZED_TOPIC_KEY = "__uncategorized__";
@@ -33,6 +36,7 @@ type TopicVideoSection = {
 type VideoGridListProps = {
   videos: VideoType[];
   layout?: "topicRows" | "grid";
+  gridColumns?: number;
   ListHeaderComponent?: FlatListProps<VideoType>["ListHeaderComponent"];
   ListEmptyComponent?: FlatListProps<VideoType>["ListEmptyComponent"];
   refreshing?: boolean;
@@ -44,6 +48,7 @@ type VideoGridListProps = {
 export default function VideoGridList({
   videos,
   layout = "topicRows",
+  gridColumns = 2,
   ListHeaderComponent,
   ListEmptyComponent,
   refreshing = false,
@@ -58,18 +63,29 @@ export default function VideoGridList({
   const colors = Colors[colorScheme];
   const [activeVideoKey, setActiveVideoKey] = useState<string | null>(null);
 
+  const layoutWidth = IS_WEB ? Math.min(width, WEB_MAX_CONTENT_WIDTH) : width;
+
   const topicCardWidth = useMemo(() => {
-    const availableWidth = Math.max(0, width - HORIZONTAL_PADDING * 2);
+    const availableWidth = Math.max(0, layoutWidth - HORIZONTAL_PADDING * 2);
     const targetWidth =
-      width >= 640 ? 360 : Math.round(availableWidth * 0.82);
+      layoutWidth >= 640
+        ? IS_WEB
+          ? 300
+          : 360
+        : Math.round(availableWidth * 0.82);
 
     return Math.min(availableWidth, Math.max(260, targetWidth));
-  }, [width]);
+  }, [layoutWidth]);
 
   const gridCardWidth = useMemo(() => {
-    const availableWidth = Math.max(0, width - HORIZONTAL_PADDING * 2);
-    return Math.max(120, Math.floor((availableWidth - GRID_CARD_GAP) / 2));
-  }, [width]);
+    const availableWidth = Math.max(0, layoutWidth - HORIZONTAL_PADDING * 2);
+    const minWidth = gridColumns === 1 ? 0 : IS_WEB ? 160 : 120;
+    const totalGap = Math.max(0, gridColumns - 1) * GRID_CARD_GAP;
+    return Math.max(
+      minWidth,
+      Math.floor((availableWidth - totalGap) / Math.max(1, gridColumns)),
+    );
+  }, [gridColumns, layoutWidth]);
 
   const uncategorizedTitle = t("uncategorizedTopic");
 
@@ -77,7 +93,7 @@ export default function VideoGridList({
     const sectionsByKey = new Map<string, TopicVideoSection>();
 
     for (const video of videos) {
-      const topicNames = parseTopics(video.podcast_topic);
+      const topicNames = parseTopics(video.video_topic);
       const topics =
         topicNames.length > 0
           ? Array.from(new Set(topicNames))
@@ -172,13 +188,18 @@ export default function VideoGridList({
       };
 
       return (
-        <View style={styles.topicSection}>
+        <View style={[styles.topicSection, IS_WEB && styles.webTopicSection]}>
           <View
-            style={[styles.topicHeader, rtl && styles.topicHeaderReverse]}
+            style={[
+              styles.topicHeader,
+              IS_WEB && styles.webTopicHeader,
+              rtl && styles.topicHeaderReverse,
+            ]}
           >
             <Text
               style={[
                 styles.topicTitle,
+                IS_WEB && styles.webTopicTitle,
                 {
                   color: colors.text,
                   textAlign: rtl ? "right" : "left",
@@ -193,6 +214,7 @@ export default function VideoGridList({
             <Text
               style={[
                 styles.topicCount,
+                IS_WEB && styles.webTopicCount,
                 {
                   color: colors.tabIconDefault,
                   textAlign: rtl ? "left" : "right",
@@ -214,7 +236,10 @@ export default function VideoGridList({
             keyboardShouldPersistTaps="handled"
             nestedScrollEnabled
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.rowContent}
+            contentContainerStyle={[
+              styles.rowContent,
+              IS_WEB && styles.webRowContent,
+            ]}
             style={styles.rowList}
             initialNumToRender={3}
             maxToRenderPerBatch={4}
@@ -239,16 +264,21 @@ export default function VideoGridList({
   if (layout === "grid") {
     return (
       <FlatList
-        key="video-grid"
+        key={`video-grid-${gridColumns}`}
+        style={IS_WEB && styles.webListFrame}
         data={videos}
         extraData={activeVideoKey}
         keyExtractor={(item) => item.id.toString()}
         renderItem={renderGridItem}
-        numColumns={2}
-        columnWrapperStyle={[
-          styles.gridColumnWrapper,
-          rtl && styles.gridColumnWrapperReverse,
-        ]}
+        numColumns={gridColumns}
+        columnWrapperStyle={
+          gridColumns > 1
+            ? [
+                styles.gridColumnWrapper,
+                rtl && styles.gridColumnWrapperReverse,
+              ]
+            : undefined
+        }
         refreshing={refreshing}
         onRefresh={onRefresh}
         onEndReached={onEndReached}
@@ -276,6 +306,7 @@ export default function VideoGridList({
   return (
     <FlatList
       key="topic-rows"
+      style={IS_WEB && styles.webListFrame}
       data={topicSections}
       extraData={activeVideoKey}
       keyExtractor={(item) => item.key}
@@ -316,6 +347,9 @@ const styles = StyleSheet.create({
   topicSection: {
     marginBottom: 24,
   },
+  webTopicSection: {
+    marginBottom: 18,
+  },
   topicHeader: {
     minHeight: 32,
     marginBottom: 10,
@@ -323,6 +357,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     gap: 12,
+  },
+  webTopicHeader: {
+    minHeight: 26,
+    marginBottom: 8,
   },
   topicHeaderReverse: {
     flexDirection: "row-reverse",
@@ -333,11 +371,25 @@ const styles = StyleSheet.create({
     lineHeight: 25,
     fontWeight: "900",
   },
+  webTopicTitle: {
+    fontSize: 15,
+    lineHeight: 20,
+    fontWeight: "800",
+  },
   topicCount: {
     minWidth: 28,
     fontSize: 12,
     lineHeight: 16,
     fontWeight: "800",
+  },
+  webTopicCount: {
+    fontSize: 11,
+    lineHeight: 14,
+  },
+  webListFrame: {
+    width: "100%",
+    maxWidth: WEB_MAX_CONTENT_WIDTH,
+    alignSelf: "center",
   },
   rowList: {
     overflow: "visible",
@@ -345,6 +397,9 @@ const styles = StyleSheet.create({
   rowContent: {
     paddingTop: 2,
     paddingBottom: 6,
+  },
+  webRowContent: {
+    paddingBottom: 4,
   },
   gridColumnWrapper: {
     justifyContent: "space-between",
