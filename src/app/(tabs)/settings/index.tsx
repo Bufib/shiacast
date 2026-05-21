@@ -29,6 +29,7 @@ import FeedbackButton from "@/components/FeedbackButton";
 import { useScreenFadeIn } from "@/hooks/useScreenFadeIn";
 
 const IS_WEB = Platform.OS === "web";
+const WEB_TAB_BAR_TOP_OFFSET = 80;
 
 const Settings = () => {
   const colorScheme = useColorScheme();
@@ -83,6 +84,7 @@ const Settings = () => {
         style={[
           styles.container,
           { backgroundColor: Colors[colorScheme].background },
+          IS_WEB && styles.webSafeArea,
         ]}
         edges={["top"]}
       >
@@ -149,44 +151,51 @@ const Settings = () => {
               />
             </View>
 
-            <View
-              style={[
-                styles.settingRow,
-                rtl && styles.rtl,
-                IS_WEB && styles.webSettingRow,
-                IS_WEB && { borderBottomColor: webBorderColor },
-              ]}
-            >
-              <View>
-                <ThemedText
-                  style={[styles.settingTitle, rtl && { textAlign: "right" }]}
-                >
-                  {t("notifications")}
-                </ThemedText>
-                <ThemedText
-                  style={[
-                    styles.settingSubtitle,
-                    rtl && { textAlign: "right" },
-                  ]}
-                >
-                  {t("receivePushNotifications")}
-                </ThemedText>
+            {!IS_WEB && (
+              <View
+                style={[
+                  styles.settingRow,
+                  rtl && styles.rtl,
+                  IS_WEB && styles.webSettingRow,
+                  IS_WEB && { borderBottomColor: webBorderColor },
+                ]}
+              >
+                <View>
+                  <ThemedText
+                    style={[
+                      styles.settingTitle,
+                      rtl && { textAlign: "right" },
+                    ]}
+                  >
+                    {t("notifications")}
+                  </ThemedText>
+                  <ThemedText
+                    style={[
+                      styles.settingSubtitle,
+                      rtl && { textAlign: "right" },
+                    ]}
+                  >
+                    {t("receivePushNotifications")}
+                  </ThemedText>
+                </View>
+                <Switch
+                  value={effectiveEnabled}
+                  onValueChange={() => {
+                    if (!hasInternet) return;
+                    toggleGetNotifications();
+                  }}
+                  trackColor={{
+                    false: Colors.light.trackColor,
+                    true: Colors.dark.trackColor,
+                  }}
+                  thumbColor={
+                    isDarkMode
+                      ? Colors.light.thumbColor
+                      : Colors.dark.thumbColor
+                  }
+                />
               </View>
-              <Switch
-                value={effectiveEnabled}
-                onValueChange={() => {
-                  if (!hasInternet) return;
-                  toggleGetNotifications();
-                }}
-                trackColor={{
-                  false: Colors.light.trackColor,
-                  true: Colors.dark.trackColor,
-                }}
-                thumbColor={
-                  isDarkMode ? Colors.light.thumbColor : Colors.dark.thumbColor
-                }
-              />
-            </View>
+            )}
 
             <LanguageSwitcher disabled={false} />
             {/* //! Auf false */}
@@ -264,6 +273,9 @@ const Settings = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  webSafeArea: {
+    paddingTop: WEB_TAB_BAR_TOP_OFFSET,
   },
   header: {
     flexDirection: "row",
