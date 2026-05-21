@@ -22,7 +22,7 @@ const IS_WEB = Platform.OS === "web";
 const WEB_MAX_CONTENT_WIDTH = 960;
 // Eine einspaltige Grid-Karte auf Web nicht ueber diese Breite wachsen lassen.
 const WEB_SINGLE_CARD_MAX = 560;
-const HORIZONTAL_PADDING = IS_WEB ? 24 : 16;
+const HORIZONTAL_PADDING = IS_WEB ? 10 : 16;
 const ROW_CARD_GAP = IS_WEB ? 12 : 14;
 const GRID_CARD_GAP = 12;
 const UNCATEGORIZED_TOPIC_KEY = "__uncategorized__";
